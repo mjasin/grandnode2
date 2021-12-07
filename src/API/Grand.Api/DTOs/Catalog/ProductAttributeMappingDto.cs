@@ -35,6 +35,7 @@ namespace Grand.Api.DTOs.Catalog
         public double PriceAdjustment { get; set; }
         public double WeightAdjustment { get; set; }
         public double Cost { get; set; }
+        public bool IsCostIncrementByPercentage { get; set; }
         public int Quantity { get; set; }
         public bool IsPreSelected { get; set; }
         public int DisplayOrder { get; set; }

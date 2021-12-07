@@ -1860,6 +1860,9 @@
   <Resource Name="Admin.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.IsPreSelected">
     <Value>Is pre-selected</Value>
   </Resource>
+  <Resource Name="Admin.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.IsCostIncrementByPercentage">
+    <Value>Is cost increment by percentage</Value>
+  </Resource>
   <Resource Name="Admin.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.Name">
     <Value>Name</Value>
   </Resource>

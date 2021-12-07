@@ -90,6 +90,9 @@ namespace Grand.Web.Admin.Models.Catalog
 
         [GrandResourceDisplayName("Admin.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.DisplayOrder")]
         public int DisplayOrder { get; set; }
+        
+        [GrandResourceDisplayName("Admin.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.IsCostIncrementByPercentage")]
+        public bool IsCostIncrementByPercentage { get; set; }
 
         public IList<PredefinedProductAttributeValueLocalizedModel> Locales { get; set; }
     }

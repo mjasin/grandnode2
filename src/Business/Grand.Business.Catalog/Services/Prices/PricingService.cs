@@ -776,7 +776,7 @@ namespace Grand.Business.Catalog.Services.Prices
                     case AttributeValueType.Simple:
                         {
                             //simple attribute
-                            cost += attributeValue.Cost;
+                            cost += attributeValue.IsCostIncrementByPercentage ? cost * attributeValue.Cost : attributeValue.Cost;
                         }
                         break;
                     case AttributeValueType.AssociatedToProduct:

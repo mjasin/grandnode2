@@ -33,6 +33,12 @@ namespace Grand.Domain.Catalog
         /// </summary>
         public double Cost { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets a value indicator is cost increment by percentage 
+        /// </summary>
+        public bool IsCostIncrementByPercentage { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether the value is pre-selected
         /// </summary>

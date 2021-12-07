@@ -54,6 +54,11 @@ namespace Grand.Domain.Catalog
         public double Cost { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicator is cost increment by percentage (used only with AttributeValueType.Simple)
+        /// </summary>
+        public bool IsCostIncrementByPercentage { get; set; }
+
+        /// <summary>
         /// Gets or sets the quantity of associated product (used only with AttributeValueType.AssociatedToProduct)
         /// </summary>
         public int Quantity { get; set; }

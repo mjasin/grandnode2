@@ -313,6 +313,7 @@ namespace Grand.Business.Catalog.Services.Products
                         pav.DisplayOrder = productAttributeValue.DisplayOrder;
                         pav.PictureId = productAttributeValue.PictureId;
                         pav.Locales = productAttributeValue.Locales;
+                        pav.IsCostIncrementByPercentage = productAttributeValue.IsCostIncrementByPercentage;
 
                         await _productRepository.UpdateToSet(productId, x => x.ProductAttributeMappings, z => z.Id, productAttributeMappingId, pavs);
                     }
