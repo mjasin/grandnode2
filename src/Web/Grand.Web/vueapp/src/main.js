@@ -164,7 +164,7 @@ import { ValidationObserver, ValidationProvider } from 'vee-validate';
 Vue.component('ValidationProvider', ValidationProvider);
 Vue.component('ValidationObserver', ValidationObserver);
 
-import { extend, configure  } from 'vee-validate';
+import { extend, configure } from 'vee-validate';
 
 export const config = {
     classes: {
@@ -182,7 +182,7 @@ extend('confirmed', {
         return value === target;
     },
     message: (fieldName) => {
-        const text = vee_getMessage(fieldName, 'confirmed');
+        const text = vee_getMessage(fieldName, 'equalto');
         if (text) {
             return text;
         }
@@ -264,6 +264,16 @@ extend('min', {
             return text;
         }
         return 'This ' + fieldName + ' should have at least  characters.'
+    }
+});
+
+extend("exact_length", {
+    params: ["length", "message"],
+    validate(val, { length, message }) {
+        if (val.length < 1)
+            return message ?? "Must have " + length + " items";
+
+        return true;
     }
 });
 

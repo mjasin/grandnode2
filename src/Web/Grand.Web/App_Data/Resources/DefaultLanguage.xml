@@ -12069,6 +12069,9 @@
   <Resource Name="Admin.Settings.Vendor.VendorReviewPossibleOnlyAfterPurchasing">
     <Value>Vendor review possible only after purchasing product from vendor</Value>
   </Resource>
+  <Resource Name="Admin.Settings.Vendor.VendorReviewPossibleOnlyOnce">
+    <Value>Vendor review possible only once by customer</Value>
+  </Resource>
   <Resource Name="Admin.Settings.Vendor.VendorReviews">
     <Value>Vendor reviews</Value>
   </Resource>
@@ -15547,7 +15550,7 @@
     <Value>This product has a minimum quantity of {0}</Value>
   </Resource>
   <Resource Name="Products.Mpn">
-    <Value>Collection part number</Value>
+    <Value>Manufacturer part number</Value>
   </Resource>
   <Resource Name="Products.NewProducts">
     <Value>New products</Value>
@@ -16607,6 +16610,9 @@
   </Resource>
   <Resource Name="VendorReviews.VendorReviewPossibleOnlyAfterPurchasing">
     <Value>Vendor can be reviewed only after purchasing a product from this vendor.</Value>
+  </Resource>
+  <Resource Name="VendorReviews.VendorReviewPossibleOnlyOnce">
+    <Value>Vendor can be reviewed only once by customer</Value>
   </Resource>
   <Resource Name="Vendors">
     <Value>Vendors</Value>
