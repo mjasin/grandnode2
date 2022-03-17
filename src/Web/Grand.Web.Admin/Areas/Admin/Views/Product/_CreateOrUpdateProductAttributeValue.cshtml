@@ -41,10 +41,12 @@
             $('#group-quantity').hide();
             $('#group-weight-adjustment').show();
             $('#group-cost').show();
+            $('#group-cost-increment').show();
         } else if (selectedProductTypeId == @(((int)AttributeValueType.AssociatedToProduct).ToString())) {
             $('#group-associated-product').show();
             $('#group-quantity').show();
             $('#group-weight-adjustment').hide();
+            $('#group-cost-increment').hide();
             $('#group-cost').hide();
         }
     }
@@ -155,6 +157,16 @@
             <div class="col-md-9 col-sm-9">
                 <admin-input asp-for="Cost" /> [@Model.PrimaryStoreCurrencyCode]
                 <span asp-validation-for="Cost"></span>
+            </div>
+        </div>
+        <div class="form-group" id="group-cost-increment">
+        <admin-label asp-for="IsCostIncrementByPercentage" class="col-sm-3 control-label" />
+            <div class="col-md-9 col-sm-9">
+                <label class="mt-checkbox mt-checkbox-outline control control-checkbox">
+                    <admin-input asp-for="IsCostIncrementByPercentage" />
+                    <div class="control__indicator"></div>
+                </label>
+                <span asp-validation-for="IsCostIncrementByPercentage"></span>
             </div>
         </div>
         <div class="form-group">

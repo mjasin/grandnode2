@@ -946,6 +946,9 @@ namespace Grand.Web.Admin.Models.Catalog
             [GrandResourceDisplayName("Admin.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Cost")]
             public double Cost { get; set; }
 
+            [GrandResourceDisplayName("Admin.Catalog.Products.ProductAttributes.Attributes.Values.Fields.IsCostIncrementByPercentage")]
+            public bool IsCostIncrementByPercentage { get; set; }
+
             [GrandResourceDisplayName("Admin.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Quantity")]
             public int Quantity { get; set; }
 

@@ -99,7 +99,8 @@ namespace Grand.Web.Features.Handlers.Products
                     request.Customer,
                     request.Currency,
                     ShoppingCartType.ShoppingCart,
-                    1, customAttributes, (double?)default,
+                    1, customAttributes, 
+                    (double?)default,
                     rentalStartDate, rentalEndDate,
                     true);
 

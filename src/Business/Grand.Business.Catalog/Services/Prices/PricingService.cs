@@ -630,7 +630,9 @@ namespace Grand.Business.Catalog.Services.Prices
                         {
                             foreach (var attributeValue in attributeValues)
                             {
-                                attributesTotalPrice += await GetProductAttributeValuePriceAdjustment(attributeValue);
+                                attributesTotalPrice += attributeValue.IsCostIncrementByPercentage ?
+                                    (product.Price + attributesTotalPrice) * (attributeValue.PriceAdjustment / 100) :
+                                    await GetProductAttributeValuePriceAdjustment(attributeValue);
                             }
                         }
                     }

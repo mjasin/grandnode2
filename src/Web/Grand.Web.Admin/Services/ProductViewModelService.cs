@@ -2206,6 +2206,7 @@ namespace Grand.Web.Admin.Services
                     PictureId = x.PictureId,
                     PictureThumbnailUrl = pictureThumbnailUrl,
                     ProductId = product.Id,
+                    IsCostIncrementByPercentage = x.IsCostIncrementByPercentage,
                 });
             }
             return items;
@@ -2232,7 +2233,8 @@ namespace Grand.Web.Admin.Services
                 Quantity = pav.Quantity,
                 IsPreSelected = pav.IsPreSelected,
                 DisplayOrder = pav.DisplayOrder,
-                PictureId = pav.PictureId
+                PictureId = pav.PictureId,
+                IsCostIncrementByPercentage = pav.IsCostIncrementByPercentage
             };
             if (model.DisplayColorSquaresRgb && string.IsNullOrEmpty(model.ColorSquaresRgb))
             {
@@ -2255,6 +2257,7 @@ namespace Grand.Web.Admin.Services
                 IsPreSelected = model.IsPreSelected,
                 DisplayOrder = model.DisplayOrder,
                 PictureId = model.PictureId,
+                IsCostIncrementByPercentage= model.IsCostIncrementByPercentage,
             };
             pav.Locales = model.Locales.ToTranslationProperty();
             await _productAttributeService.InsertProductAttributeValue(pav, model.ProductId, model.ProductAttributeMappingId);
@@ -2274,6 +2277,7 @@ namespace Grand.Web.Admin.Services
             pav.DisplayOrder = model.DisplayOrder;
             pav.PictureId = model.PictureId;
             pav.Locales = model.Locales.ToTranslationProperty();
+            pav.IsCostIncrementByPercentage = model.IsCostIncrementByPercentage;
 
             await _productAttributeService.UpdateProductAttributeValue(pav, model.ProductId, model.ProductAttributeMappingId);
         }
