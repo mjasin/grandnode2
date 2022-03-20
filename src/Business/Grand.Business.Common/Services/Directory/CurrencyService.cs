@@ -7,10 +7,6 @@ using Grand.Infrastructure.Caching.Constants;
 using Grand.Infrastructure.Extensions;
 using Grand.SharedKernel;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Business.Common.Services.Directory
 {
@@ -107,7 +103,7 @@ namespace Grand.Business.Common.Services.Directory
             return await _cacheBase.GetAsync(key, async () =>
             {
                 var query = from q in _currencyRepository.Table
-                            where q.CurrencyCode.ToLowerInvariant() == currencyCode.ToLower()
+                            where q.CurrencyCode.ToLowerInvariant() == currencyCode.ToLowerInvariant()
                             select q;
                 return await Task.FromResult(query.FirstOrDefault());
             });

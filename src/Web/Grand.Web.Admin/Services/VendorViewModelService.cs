@@ -8,7 +8,6 @@ using Grand.Business.Customers.Interfaces;
 using Grand.Business.Customers.Events;
 using Grand.Business.Storage.Interfaces;
 using Grand.Domain;
-using Grand.Domain.Customers;
 using Grand.Domain.Directory;
 using Grand.Domain.Discounts;
 using Grand.Domain.Seo;
@@ -20,10 +19,6 @@ using Grand.Web.Admin.Models.Customers;
 using Grand.Web.Admin.Models.Vendors;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Admin.Services
 {

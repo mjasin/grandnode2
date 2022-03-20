@@ -6,10 +6,6 @@ using Grand.Domain;
 using Grand.Domain.Customers;
 using Grand.Domain.Data;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Business.Marketing.Services.Customers
 {
@@ -71,7 +67,7 @@ namespace Grand.Business.Marketing.Services.Customers
                 throw new ArgumentNullException(nameof(customerTag));
 
             //update customer
-            await _customerRepository.Pull(string.Empty, x => x.CustomerTags, customerTag.Id, true);
+            await _customerRepository.Pull(string.Empty, x => x.CustomerTags, customerTag.Id);
 
             //delete
             await _customerTagRepository.DeleteAsync(customerTag);

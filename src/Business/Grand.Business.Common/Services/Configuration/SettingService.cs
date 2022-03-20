@@ -3,11 +3,7 @@ using Grand.Domain.Configuration;
 using Grand.Domain.Data;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Grand.Business.Common.Services.Configuration
 {
@@ -224,8 +220,8 @@ namespace Grand.Business.Common.Services.Configuration
                 {
                     var setting = settings.FirstOrDefault(x => x.StoreId == storeId);
 
-                    if (setting == null && !String.IsNullOrEmpty(storeId))
-                        setting = settings.FirstOrDefault(x => x.StoreId == "");
+                    if (setting == null && !string.IsNullOrEmpty(storeId))
+                        setting = settings.FirstOrDefault(x => string.IsNullOrEmpty(x.StoreId));
 
                     return JsonSerializer.Deserialize(setting.Metadata, type) as ISettings;
                 }

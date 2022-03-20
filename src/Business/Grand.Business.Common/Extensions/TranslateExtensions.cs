@@ -5,11 +5,8 @@ using Grand.Domain.Permissions;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Plugins;
 using Grand.SharedKernel.Extensions;
-using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace Grand.Business.Common.Extensions
 {
@@ -273,7 +270,7 @@ namespace Grand.Business.Common.Extensions
                 throw new ArgumentNullException(nameof(translationService));
             if (languageService == null)
                 throw new ArgumentNullException(nameof(languageService));
-            if (string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(name))
                 name = name.ToLowerInvariant();
             foreach (var lang in await languageService.GetAllLanguages(true))
             {

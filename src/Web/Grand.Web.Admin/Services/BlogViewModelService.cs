@@ -1,6 +1,4 @@
-﻿using Grand.Business.Catalog.Interfaces.Categories;
-using Grand.Business.Catalog.Interfaces.Collections;
-using Grand.Business.Catalog.Interfaces.Products;
+﻿using Grand.Business.Catalog.Interfaces.Products;
 using Grand.Business.Cms.Interfaces;
 using Grand.Business.Common.Extensions;
 using Grand.Business.Common.Interfaces.Directory;
@@ -12,7 +10,6 @@ using Grand.Business.Storage.Interfaces;
 using Grand.Infrastructure;
 using Grand.Domain.Blogs;
 using Grand.Domain.Catalog;
-using Grand.Domain.Customers;
 using Grand.Domain.Seo;
 using Grand.Web.Common.Extensions;
 using Grand.SharedKernel.Extensions;
@@ -21,10 +18,6 @@ using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Blogs;
 using Grand.Web.Admin.Models.Catalog;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Admin.Services
 {

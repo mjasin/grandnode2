@@ -2,10 +2,8 @@
 using Grand.Domain.Knowledgebase;
 using Grand.Web.Common.Components;
 using Grand.Business.Marketing.Interfaces.Knowledgebase;
-using Grand.Business.Common.Interfaces.Localization;
 using Grand.Web.Models.Knowledgebase;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using Grand.Business.Common.Extensions;
 
 namespace Grand.Web.Components

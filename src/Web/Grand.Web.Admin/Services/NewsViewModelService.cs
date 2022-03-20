@@ -5,7 +5,6 @@ using Grand.Business.Common.Interfaces.Localization;
 using Grand.Business.Common.Interfaces.Seo;
 using Grand.Business.Customers.Interfaces;
 using Grand.Business.Storage.Interfaces;
-using Grand.Domain.Customers;
 using Grand.Domain.News;
 using Grand.Domain.Seo;
 using Grand.Web.Common.Extensions;
@@ -14,10 +13,6 @@ using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.News;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Admin.Services
 {

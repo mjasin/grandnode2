@@ -15,10 +15,6 @@ using Grand.Infrastructure.Extensions;
 using Grand.SharedKernel.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Business.Authentication.Services
 {
@@ -320,8 +316,10 @@ namespace Grand.Business.Authentication.Services
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
 
-            var associationRecord = await _externalAuthenticationRecordRepository.FirstOrDefaultAsync(record =>
-                record.ExternalIdentifier.Equals(parameters.Identifier) && record.ProviderSystemName.Equals(parameters.ProviderSystemName));
+            var associationRecord = (from q in _externalAuthenticationRecordRepository.Table
+                        where q.ExternalIdentifier.ToLowerInvariant() == parameters.Identifier
+                        && q.ProviderSystemName.ToLowerInvariant() == parameters.ProviderSystemName.ToLowerInvariant()
+                        select q).FirstOrDefault();
 
             if (associationRecord == null)
                 return null;

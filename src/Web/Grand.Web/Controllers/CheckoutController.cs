@@ -19,6 +19,7 @@ using Grand.Domain.Payments;
 using Grand.Domain.Shipping;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Extensions;
+using Grand.Web.Common.Filters;
 using Grand.Web.Extensions;
 using Grand.Web.Features.Models.Checkout;
 using Grand.Web.Features.Models.Common;
@@ -27,13 +28,10 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Controllers
 {
+    [DenySystemAccount]
     public partial class CheckoutController : BasePublicController
     {
         #region Fields
@@ -580,7 +578,8 @@ namespace Grand.Web.Controllers
                 {
                     //shipping is not required
                     _workContext.CurrentCustomer.ShippingAddress = null;
-                    await _customerService.RemoveShippingAddress(_workContext.CurrentCustomer.Id);
+                    await _customerService.UpdateCustomerField(_workContext.CurrentCustomer, x => x.ShippingAddress, null);
+
                     await _userFieldService.SaveField<ShippingOption>(_workContext.CurrentCustomer, SystemCustomerFieldNames.SelectedShippingOption, null, _workContext.CurrentStore.Id);
                     //load next step
                     return await LoadStepAfterShippingMethod(cart);
@@ -615,7 +614,7 @@ namespace Grand.Web.Controllers
                         //customer decided to pick up in store
                         //no shipping address selected
                         _workContext.CurrentCustomer.ShippingAddress = null;
-                        await _customerService.RemoveShippingAddress(_workContext.CurrentCustomer.Id);
+                        await _customerService.UpdateCustomerField(_workContext.CurrentCustomer, x => x.ShippingAddress, null);
 
                         //clear shipping option XML/Description
                         await _userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ShippingOptionAttribute, "", _workContext.CurrentStore.Id);

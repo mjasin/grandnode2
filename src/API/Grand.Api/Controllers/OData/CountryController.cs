@@ -6,8 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace Grand.Api.Controllers.OData
 {
@@ -24,12 +23,16 @@ namespace Grand.Api.Controllers.OData
 
         [SwaggerOperation(summary: "Get entity from Country by key", OperationId = "GetCountryById")]
         [HttpGet("{key}")]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Get(string key)
         {
             if (!await _permissionService.Authorize(PermissionSystemName.Countries))
                 return Forbid();
 
-            var country = await _mediator.Send(new GetQuery<CountryDto>() { Id = key });
+            //Domain.Directory.Country
+            var country = await _mediator.Send(new GetGenericQuery<CountryDto, Domain.Directory.Country>(key));
             if (!country.Any())
                 return NotFound();
 
@@ -39,12 +42,14 @@ namespace Grand.Api.Controllers.OData
         [SwaggerOperation(summary: "Get entities from Country", OperationId = "GetCountries")]
         [HttpGet]
         [EnableQuery(HandleNullPropagation = HandleNullPropagationOption.False)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get()
         {
             if (!await _permissionService.Authorize(PermissionSystemName.Countries))
                 return Forbid();
 
-            return Ok(await _mediator.Send(new GetQuery<CountryDto>()));
+            return Ok(await _mediator.Send(new GetGenericQuery<CountryDto, Domain.Directory.Country>()));
         }
     }
 }

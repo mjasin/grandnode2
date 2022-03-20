@@ -1,7 +1,4 @@
-﻿using Grand.Domain.Customers;
-using Grand.Domain.Orders;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Grand.Domain.Orders;
 
 namespace Grand.Business.Checkout.Interfaces.Orders
 {

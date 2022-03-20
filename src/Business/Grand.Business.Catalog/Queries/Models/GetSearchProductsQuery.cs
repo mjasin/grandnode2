@@ -2,7 +2,6 @@
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
 using MediatR;
-using System.Collections.Generic;
 
 namespace Grand.Business.Catalog.Queries.Handlers
 {
@@ -33,6 +32,7 @@ namespace Grand.Business.Catalog.Queries.Handlers
         public bool SearchProductTags { get; set; } = false;
         public string LanguageId { get; set; } = "";
         public IList<string> FilteredSpecs { get; set; } = null;
+        public IList<string> SpecificationOptions { get; set; } = null;
         public ProductSortingEnum OrderBy { get; set; } = ProductSortingEnum.Position;
         public bool ShowHidden { get; set; } = false;
         public bool? OverridePublished { get; set; } = null;

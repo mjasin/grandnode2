@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using System.Collections.Generic;
 using System.Globalization;
 
 namespace Grand.Web.Common.Startup
@@ -62,7 +61,7 @@ namespace Grand.Web.Common.Startup
             });
 
             //add data protection
-            services.AddGrandDataProtection(config);
+            services.AddGrandDataProtection(configuration);
         }
 
         /// <summary>

@@ -1,15 +1,9 @@
-﻿using Grand.Business.Catalog.Extensions;
-using Grand.Business.Catalog.Interfaces.Products;
+﻿using Grand.Business.Catalog.Interfaces.Products;
 using Grand.Business.Common.Interfaces.Localization;
 using Grand.Business.Common.Interfaces.Logging;
 using Grand.Domain.Catalog;
 using Grand.Infrastructure;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Grand.Api.Commands.Models.Catalog
 {

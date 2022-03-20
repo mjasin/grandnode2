@@ -2,10 +2,7 @@
 using Grand.Domain.Data;
 using Grand.Domain.Stores;
 using Grand.Infrastructure.Migrations;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
 
 namespace Grand.Business.System.Services.Migrations._1._1
 {

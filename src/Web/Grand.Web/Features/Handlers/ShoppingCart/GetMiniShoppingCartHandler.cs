@@ -13,7 +13,6 @@ using Grand.Business.Common.Interfaces.Localization;
 using Grand.Business.Storage.Interfaces;
 using Grand.Domain.Catalog;
 using Grand.Domain.Common;
-using Grand.Domain.Customers;
 using Grand.Domain.Media;
 using Grand.Domain.Orders;
 using Grand.Domain.Tax;
@@ -23,11 +22,6 @@ using Grand.Web.Models.ShoppingCart;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Features.Handlers.ShoppingCart
 {

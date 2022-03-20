@@ -15,8 +15,6 @@ using Grand.Web.Features.Models.News;
 using Grand.Web.Models.News;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Controllers
 {
@@ -97,6 +95,7 @@ namespace Grand.Web.Controllers
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [ValidateCaptcha]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> NewsCommentAdd(string newsItemId,
             NewsItemModel model, bool captchaValid,
             [FromServices] IGroupService groupService

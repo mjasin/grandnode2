@@ -7,7 +7,6 @@ using Grand.Business.Common.Services.Security;
 using Grand.Domain.Blogs;
 using Grand.Infrastructure;
 using Grand.Web.Commands.Models.Blogs;
-using Grand.Web.Common.Controllers;
 using Grand.Web.Common.Filters;
 using Grand.Web.Common.Security.Captcha;
 using Grand.Web.Events;
@@ -15,8 +14,6 @@ using Grand.Web.Features.Models.Blogs;
 using Grand.Web.Models.Blogs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Controllers
 {
@@ -127,6 +124,7 @@ namespace Grand.Web.Controllers
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [ValidateCaptcha]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> BlogCommentAdd(string blogPostId, BlogPostModel model, bool captchaValid)
         {
             if (!_blogSettings.Enabled)
