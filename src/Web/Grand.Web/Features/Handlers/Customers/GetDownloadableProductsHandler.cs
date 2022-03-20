@@ -3,13 +3,9 @@ using Grand.Business.Checkout.Extensions;
 using Grand.Business.Checkout.Queries.Models.Orders;
 using Grand.Business.Common.Extensions;
 using Grand.Business.Common.Interfaces.Directory;
-using Grand.Business.Storage.Interfaces;
 using Grand.Web.Features.Models.Customers;
 using Grand.Web.Models.Customer;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Features.Handlers.Customers
 {

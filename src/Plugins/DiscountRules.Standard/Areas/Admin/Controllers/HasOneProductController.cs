@@ -1,7 +1,6 @@
 ﻿using DiscountRules.HasOneProduct.Models;
 using DiscountRules.Standard.Models;
 using Grand.Business.Catalog.Interfaces.Discounts;
-using Grand.Business.Catalog.Interfaces.Collections;
 using Grand.Business.Catalog.Interfaces.Products;
 using Grand.Business.Common.Interfaces.Configuration;
 using Grand.Business.Common.Interfaces.Localization;
@@ -18,10 +17,6 @@ using Grand.Web.Common.Extensions;
 using Grand.Web.Common.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DiscountRules.HasOneProduct.Controllers
 {

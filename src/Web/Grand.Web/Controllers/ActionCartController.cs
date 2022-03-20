@@ -10,6 +10,7 @@ using Grand.Domain.Catalog;
 using Grand.Domain.Common;
 using Grand.Domain.Orders;
 using Grand.Infrastructure;
+using Grand.Web.Common.Filters;
 using Grand.Web.Extensions;
 using Grand.Web.Features.Models.Products;
 using Grand.Web.Features.Models.ShoppingCart;
@@ -17,14 +18,11 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Controllers
 {
+    [DenySystemAccount]
     public partial class ActionCartController : BasePublicController
     {
         #region Fields
@@ -366,6 +364,7 @@ namespace Grand.Web.Controllers
 
             return quantity;
         }
+
         [HttpPost]
         public virtual async Task<IActionResult> AddProductDetails(string productId, int shoppingCartTypeId, IFormCollection form)
         {
@@ -716,8 +715,6 @@ namespace Grand.Web.Controllers
             });
         }
 
-
-
         public virtual async Task<IActionResult> GetItemCart(string shoppingcartId)
         {
             var cart = _workContext.CurrentCustomer.ShoppingCartItems.FirstOrDefault(sci => sci.Id == shoppingcartId);
@@ -776,7 +773,7 @@ namespace Grand.Web.Controllers
                 model = model,
             });
         }
-
+       
         [HttpPost]
         public virtual async Task<IActionResult> UpdateItemCart(string shoppingCartItemId, IFormCollection form)
         {

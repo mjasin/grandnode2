@@ -15,10 +15,6 @@ using Grand.Domain.Directory;
 using Grand.Domain.Discounts;
 using Grand.Domain.Orders;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Grand.Business.Catalog.Interfaces.Brands;
 
 namespace Grand.Business.Catalog.Services.Prices
@@ -643,10 +639,10 @@ namespace Grand.Business.Catalog.Services.Prices
                             var p1 = await _productService.GetProductById(item.ProductId);
                             if (p1 != null)
                             {
-                                var attributeValues = _productAttributeParser.ParseProductAttributeValues(p1, attributes);
-                                if (attributeValues != null)
+                                var bundledProductsAttributeValues = _productAttributeParser.ParseProductAttributeValues(p1, attributes);
+                                if (bundledProductsAttributeValues != null)
                                 {
-                                    foreach (var attributeValue in attributeValues)
+                                    foreach (var attributeValue in bundledProductsAttributeValues)
                                     {
                                         attributesTotalPrice += (item.Quantity * await GetProductAttributeValuePriceAdjustment(attributeValue));
                                     }

@@ -3,8 +3,6 @@ using Grand.Business.Common.Interfaces.Localization;
 using Grand.Business.Marketing.Interfaces.Knowledgebase;
 using Grand.Infrastructure.Validators;
 using Grand.Web.Admin.Models.Knowledgebase;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Grand.Web.Admin.Validators.Knowledgebase
 {

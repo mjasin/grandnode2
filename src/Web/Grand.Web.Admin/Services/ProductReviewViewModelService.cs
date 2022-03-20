@@ -6,7 +6,6 @@ using Grand.Business.Common.Interfaces.Localization;
 using Grand.Business.Common.Interfaces.Stores;
 using Grand.Business.Customers.Interfaces;
 using Grand.Domain.Catalog;
-using Grand.Domain.Customers;
 using Grand.Web.Common.Extensions;
 using Grand.SharedKernel.Extensions;
 using Grand.Web.Admin.Extensions;
@@ -14,10 +13,6 @@ using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Catalog;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Admin.Services
 {

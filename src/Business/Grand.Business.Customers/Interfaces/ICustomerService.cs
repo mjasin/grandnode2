@@ -3,10 +3,7 @@ using Grand.Domain.Common;
 using Grand.Domain.Customers;
 using Grand.Domain.Orders;
 using Grand.Domain.Stores;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Grand.Business.Customers.Interfaces
 {
@@ -50,13 +47,7 @@ namespace Grand.Business.Customers.Interfaces
             bool loadOnlyWithShoppingCart = false, ShoppingCartType? sct = null,
             int pageIndex = 0, int pageSize = int.MaxValue, Expression<Func<Customer, object>> orderBySelector = null);
 
-        /// <summary>
-        /// Gets all customers by customer format (including deleted ones)
-        /// </summary>
-        /// <param name="passwordFormat">Password format</param>
-        /// <returns>Customers</returns>
-        Task<IList<Customer>> GetAllCustomersByPasswordFormat(PasswordFormat passwordFormat);
-
+        
         /// <summary>
         /// Gets online customers
         /// </summary>
@@ -224,7 +215,6 @@ namespace Grand.Business.Customers.Interfaces
         Task UpdateAddress(Address address, string customerId);
         Task UpdateBillingAddress(Address address, string customerId);
         Task UpdateShippingAddress(Address address, string customerId);
-        Task RemoveShippingAddress(string customerId);
 
         #endregion
 

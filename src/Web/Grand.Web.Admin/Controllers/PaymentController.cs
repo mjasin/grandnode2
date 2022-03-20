@@ -15,10 +15,6 @@ using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Security.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Admin.Controllers
 {
@@ -30,7 +26,6 @@ namespace Grand.Web.Admin.Controllers
         private readonly IPaymentService _paymentService;
         private readonly ISettingService _settingService;
         private readonly ICountryService _countryService;
-        private readonly IGroupService _groupService;
         private readonly IShippingMethodService _shippingMethodService;
         private readonly ITranslationService _translationService;
         private readonly IServiceProvider _serviceProvider;
@@ -43,7 +38,6 @@ namespace Grand.Web.Admin.Controllers
         public PaymentController(IPaymentService paymentService,
             ISettingService settingService,
             ICountryService countryService,
-            IGroupService groupService,
             IShippingMethodService shippingMethodService,
             ITranslationService translationService,
             IServiceProvider serviceProvider,
@@ -52,7 +46,6 @@ namespace Grand.Web.Admin.Controllers
             _paymentService = paymentService;
             _settingService = settingService;
             _countryService = countryService;
-            _groupService = groupService;
             _shippingMethodService = shippingMethodService;
             _translationService = translationService;
             _serviceProvider = serviceProvider;
@@ -69,6 +62,8 @@ namespace Grand.Web.Admin.Controllers
         public async Task<IActionResult> Methods()
         {
             var storeScope = await GetActiveStore();
+            var _paymentSettings = _settingService.LoadSetting<PaymentSettings>(storeScope);
+
             var _paymentSettings = _settingService.LoadSetting<PaymentSettings>(storeScope);
 
             var paymentMethodsModel = new List<PaymentMethodModel>();
@@ -137,7 +132,7 @@ namespace Grand.Web.Admin.Controllers
             var model = await pm.ToModel();
             //TODO
             /*
-            model.LogoUrl = pm.PluginInfo.GetLogoUrl(_webHelper);
+            model.LogoUrl = "";
             */
             model.ConfigurationUrl = pm.ConfigurationUrl;
             return View(model);

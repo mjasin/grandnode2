@@ -7,8 +7,6 @@ using Grand.Infrastructure;
 using Grand.Web.Admin.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Grand.Business.Common.Interfaces.Directory;
 
@@ -101,7 +99,7 @@ namespace Grand.Web.Admin.Controllers
         public override JsonResult Json(object data)
         {
             var serializerSettings = new JsonSerializerSettings {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat 
+                DateFormatHandling = DateFormatHandling.IsoDateFormat
             };
             return base.Json(data, serializerSettings);
         }

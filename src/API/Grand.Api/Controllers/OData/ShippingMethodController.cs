@@ -6,8 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace Grand.Api.Controllers.OData
 {
@@ -24,12 +23,15 @@ namespace Grand.Api.Controllers.OData
 
         [SwaggerOperation(summary: "Get entity from ShippingMethod by key", OperationId = "GetShippingMethodById")]
         [HttpGet("{key}")]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Get(string key)
         {
             if (!await _permissionService.Authorize(PermissionSystemName.ShippingSettings))
                 return Forbid();
 
-            var shipping = await _mediator.Send(new GetQuery<ShippingMethodDto>() { Id = key });
+            var shipping = await _mediator.Send(new GetGenericQuery<ShippingMethodDto, Domain.Shipping.ShippingMethod>(key));
             if (!shipping.Any())
                 return NotFound();
 
@@ -39,12 +41,14 @@ namespace Grand.Api.Controllers.OData
         [SwaggerOperation(summary: "Get entities from ShippingMethod", OperationId = "GetShippingMethods")]
         [HttpGet]
         [EnableQuery(HandleNullPropagation = HandleNullPropagationOption.False)]
+        [ProducesResponseType((int)HttpStatusCode.Forbidden)]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get()
         {
             if (!await _permissionService.Authorize(PermissionSystemName.ShippingSettings))
                 return Forbid();
 
-            return Ok(await _mediator.Send(new GetQuery<ShippingMethodDto>()));
+            return Ok(await _mediator.Send(new GetGenericQuery<ShippingMethodDto, Domain.Shipping.ShippingMethod>()));
         }
     }
 }

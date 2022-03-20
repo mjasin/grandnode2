@@ -24,12 +24,10 @@ using Grand.Web.Models.Customer;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Controllers
 {
+    [DenySystemAccount]
     public partial class AccountController : BasePublicController
     {
         #region Fields

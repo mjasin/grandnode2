@@ -2,7 +2,6 @@
 using Grand.Infrastructure.Models;
 using Grand.Web.Common.Security.Captcha;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Grand.Web.Admin.Models.Settings
@@ -267,12 +266,16 @@ namespace Grand.Web.Admin.Models.Settings
             public bool CaptchaShowOnVendorReviewPage { get; set; }
 
             [GrandResourceDisplayName("Admin.Settings.GeneralCommon.reCaptchaPublicKey")]
-
             public string ReCaptchaPublicKey { get; set; }
 
             [GrandResourceDisplayName("Admin.Settings.GeneralCommon.reCaptchaPrivateKey")]
-
             public string ReCaptchaPrivateKey { get; set; }
+
+            [GrandResourceDisplayName("Admin.Settings.GeneralCommon.ReCaptchaTheme")]
+            public string ReCaptchaTheme { get; set; }
+
+            [GrandResourceDisplayName("Admin.Settings.GeneralCommon.ReCaptchaScore")]
+            public decimal ReCaptchaScore { get; set; }
 
             [GrandResourceDisplayName("Admin.Settings.GeneralCommon.reCaptchaVersion")]
             public GoogleReCaptchaVersion ReCaptchaVersion { get; set; }

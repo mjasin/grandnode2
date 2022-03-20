@@ -25,12 +25,7 @@ using Grand.Web.Models.Common;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Grand.Web.Common.Controllers;
 
 namespace Grand.Web.Controllers
@@ -97,23 +92,19 @@ namespace Grand.Web.Controllers
 
             return language != null ? language.Published : false;
         }
-        private string AddLanguageSeo(string url, PathString pathBase, Language language)
+
+        private string AddLanguageSeo(string url, Language language)
         {
             if (language == null)
                 throw new ArgumentNullException(nameof(language));
 
-            //remove application path from raw URL
             if (!string.IsNullOrEmpty(url))
             {
-                var _ = new PathString(url).StartsWithSegments(pathBase, out PathString result);
-                url = WebUtility.UrlDecode(result);
+                url = Flurl.Url.EncodeIllegalCharacters(url);
             }
 
             //add language code
-            url = $"/{language.UniqueSeoCode}{url}";
-            url = pathBase + url;
-
-            return url;
+            return $"/{language.UniqueSeoCode}/{url.TrimStart('/')}";
         }
 
         #endregion
@@ -143,6 +134,7 @@ namespace Grand.Web.Controllers
         }
 
         [PublicStore(true)]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> SetLanguage(
             [FromServices] AppConfig config,
             string langcode, string returnUrl = default)
@@ -163,10 +155,10 @@ namespace Grand.Web.Controllers
             //language part in URL
             if (config.SeoFriendlyUrlsForLanguagesEnabled)
             {
-                if (await IsLocalized(returnUrl, this.Request.PathBase))
-                    returnUrl = RemoveLanguageSeoCode(returnUrl, this.Request.PathBase);
+                if (await IsLocalized(returnUrl, Request.PathBase))
+                    returnUrl = RemoveLanguageSeoCode(returnUrl, Request.PathBase);
 
-                returnUrl = AddLanguageSeo(returnUrl, this.Request.PathBase, language);
+                returnUrl = AddLanguageSeo(returnUrl, language);
             }
 
             await _workContext.SetWorkingLanguage(language);
@@ -177,7 +169,7 @@ namespace Grand.Web.Controllers
             return Redirect(returnUrl);
         }
 
-        //helper method to redirect users.
+        //helper method to redirect (use in SlugRouteTransformer).
         public virtual IActionResult InternalRedirect(string url, bool permanentRedirect)
         {
             //ensure it's invoked from our GenericPathRoute class
@@ -202,13 +194,15 @@ namespace Grand.Web.Controllers
                 permanentRedirect = false;
             }
 
-            url = Uri.EscapeUriString(WebUtility.UrlDecode(url));
+            url = Flurl.Url.EncodeIllegalCharacters(url);
 
             if (permanentRedirect)
                 return RedirectPermanent(url);
+
             return Redirect(url);
         }
 
+        [DenySystemAccount]
         [PublicStore(true)]
         public virtual async Task<IActionResult> SetCurrency(
             [FromServices] ICurrencyService currencyService,
@@ -239,6 +233,7 @@ namespace Grand.Web.Controllers
             return Redirect(returnUrl);
         }
 
+        [DenySystemAccount]
         //available even when navigation is not allowed
         [PublicStore(true)]
         public virtual async Task<IActionResult> SetStore(
@@ -279,6 +274,7 @@ namespace Grand.Web.Controllers
             return Redirect(returnUrl);
         }
 
+        [DenySystemAccount]
         //available even when navigation is not allowed
         [PublicStore(true)]
         public virtual async Task<IActionResult> SetTaxType(int customerTaxType, string returnUrl = "")
@@ -300,6 +296,7 @@ namespace Grand.Web.Controllers
             return Redirect(returnUrl);
         }
 
+        [DenySystemAccount]
         public virtual async Task<IActionResult> SetStoreTheme(
             [FromServices] IThemeContext themeContext, string themeName, string returnUrl = "")
         {
@@ -346,6 +343,7 @@ namespace Grand.Web.Controllers
         [AutoValidateAntiforgeryToken]
         [ValidateCaptcha]
         [ClosedStore(true)]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> ContactUsSend(
             [FromServices] StoreInformationSettings storeInformationSettings,
             [FromServices] IPageService pageService,
@@ -419,6 +417,7 @@ namespace Grand.Web.Controllers
         [HttpPost]
         [ClosedStore(true)]
         [PublicStore(true)]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> CookieAccept(bool accept,
             [FromServices] StoreInformationSettings storeInformationSettings,
             [FromServices] IUserFieldService userFieldService,
@@ -469,6 +468,7 @@ namespace Grand.Web.Controllers
         [HttpPost]
         [ClosedStore(true)]
         [PublicStore(true)]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> PrivacyPreference(IFormCollection form,
             [FromServices] StoreInformationSettings storeInformationSettings,
             [FromServices] IUserFieldService userFieldService,
@@ -519,6 +519,7 @@ namespace Grand.Web.Controllers
         public virtual IActionResult StoreClosed() => View();
 
         [HttpPost]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> ContactAttributeChange(IFormCollection form)
         {
             var result = await _mediator.Send(new ContactAttributeChangeCommand() {
@@ -534,6 +535,7 @@ namespace Grand.Web.Controllers
         }
 
         [HttpPost]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> UploadFileContactAttribute(string attributeId,
             [FromServices] IDownloadService downloadService,
             [FromServices] IContactAttributeService contactAttributeService)
@@ -634,6 +636,7 @@ namespace Grand.Web.Controllers
 
 
         [HttpPost, ActionName("PopupInteractiveForm")]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> PopupInteractiveForm(IFormCollection formCollection)
         {
             var result = await _mediator.Send(new PopupInteractiveCommand() { Form = formCollection });
@@ -647,6 +650,7 @@ namespace Grand.Web.Controllers
         [HttpPost]
         [ClosedStore(true)]
         [PublicStore(true)]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> SaveCurrentPosition(
             LocationModel model,
             [FromServices] CustomerSettings customerSettings)

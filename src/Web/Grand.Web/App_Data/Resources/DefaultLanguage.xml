@@ -1275,6 +1275,9 @@
   <Resource Name="Address.Fields.Address2.Required">
     <Value>Address 2 is required.</Value>
   </Resource>
+  <Resource Name="Address.Fields.AddressName">
+	<Value>Address name</Value>
+  </Resource>
   <Resource Name="Address.Fields.Addresstype">
     <Value>Address type</Value>
   </Resource>
@@ -1502,6 +1505,9 @@
   </Resource>
   <Resource Name="Admin.Address.Fields.Address2.Required">
     <Value>Address 2 is required.</Value>
+  </Resource>
+  <Resource Name="Admin.Address.Fields.AddressName">
+	<Value>Address name</Value>
   </Resource>
   <Resource Name="Admin.Address.Fields.City">
     <Value>City</Value>
@@ -1961,6 +1967,18 @@
   </Resource>
   <Resource Name="Admin.Catalog.Attributes.SpecificationAttributes.Updated">
     <Value>The attribute has been updated successfully.</Value>
+  </Resource>
+  <Resource Name="Admin.Catalog.Attributes.SpecificationAttributes.UsedByProducts">
+    <Value>Used by products</Value>
+  </Resource>
+  <Resource Name="Admin.Catalog.Attributes.SpecificationAttributes.UsedByProducts.OptionName">
+    <Value>Name</Value>
+  </Resource>
+  <Resource Name="Admin.Catalog.Attributes.SpecificationAttributes.UsedByProducts.Product">
+    <Value>Product</Value>
+  </Resource>
+  <Resource Name="Admin.Catalog.Attributes.SpecificationAttributes.UsedByProducts.Published">
+    <Value>Published</Value>
   </Resource>
   <Resource Name="Admin.Catalog.Brand.Imported">
     <Value>Brands have been imported successfully.</Value>
@@ -2531,6 +2549,12 @@
   </Resource>
   <Resource Name="Admin.Catalog.Picture.Fields.AltAttribute">
     <Value>Picture alternate text</Value>
+  </Resource>
+  <Resource Name="Admin.Catalog.Picture.Fields.ExtraField">
+	<Value>Extra field</Value>
+  </Resource>
+  <Resource Name="Admin.Catalog.Picture.Fields.Style">
+	<Value>Style</Value>
   </Resource>
   <Resource Name="Admin.Catalog.Picture.Fields.TitleAttribute">
     <Value>Picture title</Value>
@@ -3387,6 +3411,9 @@
   <Resource Name="Admin.Catalog.Products.Pictures.Fields.DisplayOrder">
     <Value>Display order</Value>
   </Resource>
+  <Resource Name="Admin.Catalog.Products.Pictures.Fields.ExtraField">
+	<Value>Extra field</Value>
+  </Resource>
   <Resource Name="Admin.Catalog.Products.Pictures.Fields.OverrideAltAttribute">
     <Value>Alt</Value>
   </Resource>
@@ -3395,6 +3422,12 @@
   </Resource>
   <Resource Name="Admin.Catalog.Products.Pictures.Fields.Picture">
     <Value>Picture</Value>
+  </Resource>
+  <Resource Name="Admin.Catalog.Products.Pictures.Fields.Style">
+	<Value>Style</Value>
+  </Resource>
+  <Resource Name="Admin.Catalog.Products.Pictures.Fields.ExtraField">
+	<Value>Extra field</Value>
   </Resource>
   <Resource Name="Admin.Catalog.Products.Pictures.SaveBeforeEdit">
     <Value>You need to save the product before you can upload pictures for this product page.</Value>
@@ -8008,6 +8041,9 @@
   <Resource Name="Admin.GiftVouchers.Fields.SenderEmail">
     <Value>Sender's Email</Value>
   </Resource>
+  <Resource Name="Admin.GiftVouchers.Fields.StoreId">
+	<Value>Store</Value>
+  </Resource>	
   <Resource Name="Admin.GiftVouchers.Fields.SenderName">
     <Value>Sender's Name</Value>
   </Resource>
@@ -10918,6 +10954,9 @@
   <Resource Name="Admin.Settings.Customer.AddressFormFields.FaxRequired">
     <Value>'Fax number' required</Value>
   </Resource>
+  <Resource Name="Admin.Settings.Customer.AddressFormFields.NameEnabled">
+	<Value>'Address name' enabled</Value>
+  </Resource>
   <Resource Name="Admin.Settings.Customer.AddressFormFields.NoteEnabled">
     <Value>'Note' enabled</Value>
   </Resource>
@@ -11397,6 +11436,12 @@
   <Resource Name="Admin.Settings.GeneralCommon.reCaptchaPublicKey">
     <Value>reCAPTCHA public key</Value>
   </Resource>
+  <Resource Name="Admin.Settings.GeneralCommon.ReCaptchaTheme">
+	<Value>Theme for reCAPTCHA (e.g. blackglass, white) </Value>
+  </Resource>
+  <Resource Name="Admin.Settings.GeneralCommon.ReCaptchaScore">
+	<Value>reCAPTCHA v3 Score (1.0 is very likely a very good interaction, 0.0 is very likely a bot)</Value>
+  </Resource>
   <Resource Name="Admin.Settings.GeneralCommon.reCaptchaVersion">
     <Value>reCAPTCHA version</Value>
   </Resource>
@@ -11682,6 +11727,9 @@
   <Resource Name="Admin.Settings.Order.GiftVouchers_Activated.Pending">
     <Value>Order status could not be set to Pending</Value>
   </Resource>
+  <Resource Name="Admin.Settings.Order.GiftVouchers_Assign_StoreId">
+	<Value>Gift voucher assign to the current store</Value>
+  </Resource>	
   <Resource Name="Admin.Settings.Order.IsReOrderAllowed">
     <Value>Is re-order allowed</Value>
   </Resource>

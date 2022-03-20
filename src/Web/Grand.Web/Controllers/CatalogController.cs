@@ -27,9 +27,6 @@ using MediatR;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Controllers
 {
@@ -353,6 +350,7 @@ namespace Grand.Web.Controllers
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [ValidateCaptcha]
+        [DenySystemAccount]
         public virtual async Task<IActionResult> VendorReviews(
             VendorReviewsModel model, bool captchaValid,
             [FromServices] CaptchaSettings captchaSettings)
@@ -429,6 +427,7 @@ namespace Grand.Web.Controllers
             return Json(returnmodel);
         }
 
+        [DenySystemAccount]
         [HttpPost]
         public virtual async Task<IActionResult> SetVendorReviewHelpfulness(string VendorReviewId, string vendorId, bool washelpful, [FromServices] ICustomerService customerService)
         {

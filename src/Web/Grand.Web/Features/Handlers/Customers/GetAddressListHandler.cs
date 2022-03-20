@@ -1,13 +1,9 @@
 ﻿using Grand.Domain.Common;
 using Grand.Business.Common.Interfaces.Directory;
-using Grand.Business.Common.Interfaces.Stores;
 using Grand.Web.Features.Models.Common;
 using Grand.Web.Features.Models.Customers;
 using Grand.Web.Models.Customer;
 using MediatR;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Grand.Business.Common.Interfaces.Security;
 
 namespace Grand.Web.Features.Handlers.Customers

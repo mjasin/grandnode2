@@ -13,10 +13,6 @@ using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
 using Grand.Infrastructure.Extensions;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Business.Catalog.Services.Products
 {
@@ -452,6 +448,7 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="searchProductTags">A value indicating whether to search by a specified "keyword" in product tags</param>
         /// <param name="languageId">Language identifier (search for text searching)</param>
         /// <param name="filteredSpecs">Filtered product specification identifiers</param>
+        /// <param name="specificationOptions">Specification options identifiers</param>
         /// <param name="orderBy">Order by</param>
         /// <param name="showHidden">A value indicating whether to show hidden records</param>
         /// <param name="overridePublished">
@@ -484,6 +481,7 @@ namespace Grand.Business.Catalog.Services.Products
             bool searchProductTags = false,
             string languageId = "",
             IList<string> filteredSpecs = null,
+            IList<string> specificationOptions = null,
             ProductSortingEnum orderBy = ProductSortingEnum.Position,
             bool showHidden = false,
             bool? overridePublished = null)
@@ -514,6 +512,7 @@ namespace Grand.Business.Catalog.Services.Products
                 SearchProductTags = searchProductTags,
                 LanguageId = languageId,
                 FilteredSpecs = filteredSpecs,
+                SpecificationOptions = specificationOptions,
                 OrderBy = orderBy,
                 ShowHidden = showHidden,
                 OverridePublished = overridePublished

@@ -1,5 +1,4 @@
 ﻿using Grand.Business.Catalog.Interfaces.Categories;
-using Grand.Business.Catalog.Interfaces.Collections;
 using Grand.Business.Catalog.Interfaces.Products;
 using Grand.Business.Cms.Interfaces;
 using Grand.Business.Common.Extensions;
@@ -19,10 +18,6 @@ using Grand.Web.Models.Common;
 using Grand.Web.Models.Knowledgebase;
 using Grand.Web.Models.Pages;
 using MediatR;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Grand.Business.Catalog.Interfaces.Brands;
 
 namespace Grand.Web.Features.Handlers.Common

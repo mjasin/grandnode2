@@ -36,10 +36,6 @@ using Grand.SharedKernel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Grand.Business.System.Services.Installation
 {
@@ -761,7 +757,7 @@ namespace Grand.Business.System.Services.Installation
         {
             try
             {
-                var dataSettings = DataSettingsManager.LoadSettings();
+                var dataSettings = DataSettingsManager.LoadSettings(reloadSettings: true);
                 var dbContext = _serviceProvider.GetRequiredService<IDatabaseContext>();
                 dbContext.SetConnection(dataSettings.ConnectionString);
 

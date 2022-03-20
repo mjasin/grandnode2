@@ -1,8 +1,6 @@
-﻿using Grand.Web.Common.Localization;
-using Grand.Web.Common.Models;
+﻿using Grand.Web.Common.Models;
 using Grand.Infrastructure.ModelBinding;
 using Grand.Infrastructure.Models;
-using System.Collections.Generic;
 
 namespace Payments.CashOnDelivery.Models
 {

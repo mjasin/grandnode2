@@ -10,7 +10,6 @@ using Grand.Business.Messages.Interfaces;
 using Grand.Business.Storage.Interfaces;
 using Grand.Web.Common.Extensions;
 using Grand.Domain.Common;
-using Grand.Domain.Customers;
 using Grand.Domain.Directory;
 using Grand.Domain.Localization;
 using Grand.Domain.Orders;
@@ -20,10 +19,6 @@ using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Common;
 using Grand.Web.Admin.Models.Orders;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
 namespace Grand.Web.Admin.Services

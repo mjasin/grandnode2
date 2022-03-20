@@ -17,10 +17,6 @@ using Grand.Domain.Orders;
 using Grand.Infrastructure;
 using Grand.SharedKernel.Extensions;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 
 namespace Grand.Business.Checkout.Services.Orders
@@ -846,12 +842,7 @@ namespace Grand.Business.Checkout.Services.Orders
                 warnings.Add("Wishlist is disabled");
                 return warnings;
             }
-            if (customer.IsSystemAccount())
-            {
-                warnings.Add("System account can't add to cart");
-                return warnings;
-            }
-
+            
             if (quantity <= 0)
             {
                 warnings.Add(_translationService.GetResource("ShoppingCart.QuantityShouldPositive"));

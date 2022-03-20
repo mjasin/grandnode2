@@ -2,7 +2,6 @@
 using Grand.Business.Common.Interfaces.Localization;
 using Grand.Business.Common.Interfaces.Logging;
 using Grand.Business.Common.Interfaces.Security;
-using Grand.Business.Common.Interfaces.Stores;
 using Grand.Business.Common.Services.Security;
 using Grand.Business.Marketing.Interfaces.Courses;
 using Grand.Business.Marketing.Interfaces.Customers;
@@ -16,7 +15,6 @@ using MediatR;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using System.Threading.Tasks;
 
 namespace Grand.Web.Controllers
 {
@@ -120,8 +118,7 @@ namespace Grand.Web.Controllers
             await _customerActionEventService.Viewed(customer, HttpContext.Request.Path.ToString(), Request.Headers[HeaderNames.Referer].ToString() != null ? Request.Headers["Referer"].ToString() : "");
 
             //model
-            var model = await _mediator.Send(new GetCourse()
-            {
+            var model = await _mediator.Send(new GetCourse() {
                 Course = course,
                 Customer = _workContext.CurrentCustomer,
                 Language = _workContext.WorkingLanguage
@@ -158,8 +155,7 @@ namespace Grand.Web.Controllers
             await _customerActionEventService.Viewed(customer, HttpContext.Request.Path.ToString(), Request.Headers[HeaderNames.Referer].ToString() != null ? Request.Headers["Referer"].ToString() : "");
 
             //model
-            var model = await _mediator.Send(new GetLesson()
-            {
+            var model = await _mediator.Send(new GetLesson() {
                 Course = course,
                 Customer = _workContext.CurrentCustomer,
                 Language = _workContext.WorkingLanguage,
@@ -198,8 +194,7 @@ namespace Grand.Web.Controllers
             string contentType = !string.IsNullOrWhiteSpace(download.ContentType)
                 ? download.ContentType
                 : "application/octet-stream";
-            return new FileContentResult(download.DownloadBinary, contentType)
-            {
+            return new FileContentResult(download.DownloadBinary, contentType) {
                 FileDownloadName = fileName + download.Extension
             };
         }
@@ -234,8 +229,7 @@ namespace Grand.Web.Controllers
             string contentType = !string.IsNullOrWhiteSpace(download.ContentType)
                 ? download.ContentType
                 : "video/mp4";
-            return new FileContentResult(download.DownloadBinary, contentType)
-            {
+            return new FileContentResult(download.DownloadBinary, contentType) {
                 FileDownloadName = fileName + download.Extension
             };
         }

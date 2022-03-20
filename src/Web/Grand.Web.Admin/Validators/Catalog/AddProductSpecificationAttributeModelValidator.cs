@@ -3,11 +3,8 @@ using Grand.Business.Catalog.Interfaces.Products;
 using Grand.Business.Common.Interfaces.Localization;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Validators;
-using Grand.Domain.Customers;
 using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Models.Catalog;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Grand.Web.Admin.Validators.Catalog
 {
