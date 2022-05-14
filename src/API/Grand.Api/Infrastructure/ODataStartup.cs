@@ -1,6 +1,7 @@
 ﻿using Grand.Api.Constants;
 using Grand.Api.DTOs.Catalog;
 using Grand.Api.DTOs.Common;
+using Grand.Api.DTOs.Customers;
 using Grand.Api.DTOs.Shipping;
 using Grand.Api.Infrastructure.DependencyManagement;
 using Grand.Api.Queries.Handlers.Common;
@@ -23,7 +24,7 @@ namespace Grand.Api.Infrastructure
     {
         public void Configure(IApplicationBuilder application, IWebHostEnvironment webHostEnvironment)
         {
-            var apiConfig = application.ApplicationServices.GetService<ApiConfig>();
+            var apiConfig = application.ApplicationServices.GetService<BackendAPIConfig>();
             if (apiConfig.Enabled)
             {
                 application.UseCors(Configurations.CorsPolicyName);
@@ -33,7 +34,7 @@ namespace Grand.Api.Infrastructure
         public void ConfigureServices(IServiceCollection services,
             IConfiguration configuration)
         {
-            var apiConfig = services.BuildServiceProvider().GetService<ApiConfig>();
+            var apiConfig = services.BuildServiceProvider().GetService<BackendAPIConfig>();
             if (apiConfig.Enabled)
             {
                 //register RequestHandler
@@ -60,7 +61,7 @@ namespace Grand.Api.Infrastructure
         public bool BeforeConfigure => false;
 
 
-        private IEdmModel GetEdmModel(ApiConfig apiConfig)
+        private IEdmModel GetEdmModel(BackendAPIConfig apiConfig)
         {
             var builder = new ODataConventionModelBuilder {
                 Namespace = Configurations.ODataModelBuilderNamespace
@@ -69,7 +70,7 @@ namespace Grand.Api.Infrastructure
             return builder.GetEdmModel();
         }
 
-        private void RegisterDependencies(ODataConventionModelBuilder builder, ApiConfig apiConfig)
+        private void RegisterDependencies(ODataConventionModelBuilder builder, BackendAPIConfig apiConfig)
         {
             var typeFinder = new AppTypeSearcher();
 
@@ -127,6 +128,21 @@ namespace Grand.Api.Infrastructure
 
             services.AddScoped(typeof(IRequestHandler<GetGenericQuery<DeliveryDateDto, Domain.Shipping.DeliveryDate>,
                 IQueryable<DeliveryDateDto>>), typeof(GetGenericQueryHandler<DeliveryDateDto, Domain.Shipping.DeliveryDate>));
+
+            services.AddScoped(typeof(IRequestHandler<GetGenericQuery<VendorDto, Domain.Vendors.Vendor>,
+                IQueryable<VendorDto>>), typeof(GetGenericQueryHandler<VendorDto, Domain.Vendors.Vendor>));
+
+            services.AddScoped(typeof(IRequestHandler<GetGenericQuery<CustomerGroupDto, Domain.Customers.CustomerGroup>,
+                IQueryable<CustomerGroupDto>>), typeof(GetGenericQueryHandler<CustomerGroupDto, Domain.Customers.CustomerGroup>));
+
+            services.AddScoped(typeof(IRequestHandler<GetGenericQuery<StoreDto, Domain.Stores.Store>,
+                IQueryable<StoreDto>>), typeof(GetGenericQueryHandler<StoreDto, Domain.Stores.Store>));
+
+            services.AddScoped(typeof(IRequestHandler<GetGenericQuery<LanguageDto, Domain.Localization.Language>,
+                IQueryable<LanguageDto>>), typeof(GetGenericQueryHandler<LanguageDto, Domain.Localization.Language>));
+
+            services.AddScoped(typeof(IRequestHandler<GetGenericQuery<PictureDto, Domain.Media.Picture>,
+                IQueryable<PictureDto>>), typeof(GetGenericQueryHandler<PictureDto, Domain.Media.Picture>));
 
         }
     }

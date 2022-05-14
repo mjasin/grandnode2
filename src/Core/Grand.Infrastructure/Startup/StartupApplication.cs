@@ -25,20 +25,24 @@ namespace Grand.Infrastructure.Startup
 
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            var config = new LiteDbConfig();
-            configuration.GetSection("LiteDb").Bind(config);
-            RegisterDataLayer(services, config);
+            RegisterDataLayer(services, configuration);
         }
 
-        private void RegisterDataLayer(IServiceCollection serviceCollection, LiteDbConfig litedbConfig)
+        private void RegisterDataLayer(IServiceCollection serviceCollection, IConfiguration configuration)
         {
+            var dbConfig = new DatabaseConfig();
+            configuration.GetSection("Database").Bind(dbConfig);
+
+            var applicationInsights = new ApplicationInsightsConfig();
+            configuration.GetSection("ApplicationInsights").Bind(applicationInsights);
+
             var dataProviderSettings = DataSettingsManager.LoadSettings();
             if (string.IsNullOrEmpty(dataProviderSettings.ConnectionString))
             {
                 serviceCollection.AddTransient(c => dataProviderSettings);
 
-                if(litedbConfig.UseLiteDb) 
-                    serviceCollection.AddSingleton(c => new LiteDatabase(litedbConfig.LiteDbConnectionString));
+                if (dbConfig.UseLiteDb)
+                    serviceCollection.AddSingleton(c => new LiteDatabase(dbConfig.LiteDbConnectionString));
             }
             if (dataProviderSettings != null && dataProviderSettings.IsValid())
             {
@@ -49,18 +53,23 @@ namespace Grand.Infrastructure.Startup
                     var databaseName = mongourl.DatabaseName;
                     var clientSettings = MongoClientSettings.FromConnectionString(connectionString);
                     clientSettings.LinqProvider = MongoDB.Driver.Linq.LinqProvider.V3;
+
+                    if (applicationInsights.Enabled)
+                        clientSettings.ClusterConfigurator = builder => { builder.Subscribe(new ApplicationInsightsSubscriber(serviceCollection)); };
+
                     serviceCollection.AddScoped(c => new MongoClient(clientSettings).GetDatabase(databaseName));
+
                 }
                 else
                 {
-                    if(litedbConfig.Singleton)
+                    if (dbConfig.Singleton)
                         serviceCollection.AddSingleton(c => new LiteDatabase(dataProviderSettings.ConnectionString) { UtcDate = true });
                     else
                         serviceCollection.AddScoped(c => new LiteDatabase(dataProviderSettings.ConnectionString) { UtcDate = true });
 
                 }
             }
-            if (!litedbConfig.UseLiteDb)
+            if (!dbConfig.UseLiteDb)
             {
                 //database context
                 serviceCollection.AddScoped<IDatabaseContext, MongoDBContext>();

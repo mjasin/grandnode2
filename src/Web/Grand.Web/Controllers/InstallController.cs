@@ -1,8 +1,8 @@
-﻿using Grand.Business.Common.Interfaces.Logging;
-using Grand.Business.Common.Interfaces.Security;
-using Grand.Business.Common.Services.Security;
-using Grand.Business.System.Commands.Models.Security;
-using Grand.Business.System.Interfaces.Installation;
+﻿using Grand.Business.Core.Interfaces.Common.Logging;
+using Grand.Business.Core.Interfaces.Common.Security;
+using Grand.Business.Core.Utilities.Common.Security;
+using Grand.Business.Core.Commands.System.Security;
+using Grand.Business.Core.Interfaces.System.Installation;
 using Grand.Domain.Data;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Configuration;
@@ -28,7 +28,7 @@ namespace Grand.Web.Controllers
         private readonly IServiceProvider _serviceProvider;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly IMediator _mediator;
-        private readonly LiteDbConfig _litedbConfig;
+        private readonly DatabaseConfig _dbConfig;
 
         /// <summary>
         /// Cookie name to language for the installation page
@@ -44,13 +44,13 @@ namespace Grand.Web.Controllers
             IHostApplicationLifetime applicationLifetime,
             IServiceProvider serviceProvider,
             IMediator mediator,
-            LiteDbConfig litedbConfig)
+            DatabaseConfig litedbConfig)
         {
             _cacheBase = cacheBase;
             _applicationLifetime = applicationLifetime;
             _serviceProvider = serviceProvider;
             _mediator = mediator;
-            _litedbConfig = litedbConfig;
+            _dbConfig = litedbConfig;
         }
 
         #endregion
@@ -163,13 +163,13 @@ namespace Grand.Web.Controllers
                 }
                 else
                 {
-                    if (!_litedbConfig.UseLiteDb)
+                    if (!_dbConfig.UseLiteDb)
                         ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "InfoLiteDb"));
 
-                    if (string.IsNullOrEmpty(_litedbConfig.LiteDbConnectionString))
+                    if (string.IsNullOrEmpty(_dbConfig.LiteDbConnectionString))
                         ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "InfoLiteDbConnectionString"));
 
-                    connectionString = _litedbConfig.LiteDbConnectionString;
+                    connectionString = _dbConfig.LiteDbConnectionString;
                 }
             }
             return connectionString;
@@ -177,11 +177,11 @@ namespace Grand.Web.Controllers
 
         protected async Task CheckConnectionString(IInstallationLocalizedService locService, string connectionString, InstallModel model)
         {
-            if (!_litedbConfig.UseLiteDb && model.DataProvider == DbProvider.LiteDB)
+            if (!_dbConfig.UseLiteDb && model.DataProvider == DbProvider.LiteDB)
             {
                 ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "UseLiteDbEnable"));
             }
-            if (_litedbConfig.UseLiteDb && model.DataProvider != DbProvider.LiteDB)
+            if (_dbConfig.UseLiteDb && model.DataProvider != DbProvider.LiteDB)
             {
                 ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "UseLiteDbDisable"));
             }
@@ -264,20 +264,15 @@ namespace Grand.Web.Controllers
                     }
 
                     //register default permissions
-                    var permissionProviders = new List<Type>();
-                    permissionProviders.Add(typeof(PermissionProvider));
-                    foreach (var providerType in permissionProviders)
-                    {
-                        var provider = (IPermissionProvider)Activator.CreateInstance(providerType);
-                        await _mediator.Send(new InstallPermissionsCommand() { PermissionProvider = provider });
-                    }
+                    var permissionProvider = _serviceProvider.GetRequiredService<IPermissionProvider>();
+                    await _mediator.Send(new InstallPermissionsCommand() { PermissionProvider = permissionProvider });
 
                     //install migration process - install only header
                     var migrationProcess = _serviceProvider.GetRequiredService<IMigrationProcess>();
                     migrationProcess.InstallApplication();
 
                     //restart application
-                    await _cacheBase.GetAsync("Installed", () => Task.FromResult(true), 120);
+                    await _cacheBase.GetAsync("Installed", () => Task.FromResult(true));
                     return View(new InstallModel() { Installed = true });
                 }
                 catch (Exception exception)

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using FluentValidation.AspNetCore;
+using Grand.Domain.Data;
 using Grand.Infrastructure.Caching.RabbitMq;
 using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Mapper;
@@ -29,6 +29,21 @@ namespace Grand.Infrastructure
         #region Utilities
 
         /// <summary>
+        /// Init Database
+        /// </summary>
+        private static void InitDatabase(IServiceCollection services, IConfiguration configuration)
+        {
+            var advancedConfig = services.StartupConfig<AdvancedConfig>(configuration.GetSection("Advanced"));
+            if (!string.IsNullOrEmpty(advancedConfig.DbConnectionString))
+            {
+                DataSettingsManager.LoadDataSettings(new DataSettings() {
+                    ConnectionString = advancedConfig.DbConnectionString,
+                    DbProvider = (DbProvider)advancedConfig.DbProvider,
+                });
+            }
+        }
+
+        /// <summary>
         /// Register and init AutoMapper
         /// </summary>
         /// <param name="typeSearcher">Type finder</param>
@@ -54,24 +69,6 @@ namespace Grand.Infrastructure
 
             //register automapper
             AutoMapperConfig.Init(config);
-        }
-
-        /// <summary>
-        /// Add FluenValidation
-        /// </summary>
-        /// <param name="mvcCoreBuilder"></param>
-        /// <param name="typeSearcher"></param>
-        private static void AddFluentValidation(IMvcCoreBuilder mvcCoreBuilder, ITypeSearcher typeSearcher)
-        {
-            //Add fluentValidation
-            mvcCoreBuilder.AddFluentValidation(configuration =>
-            {
-                var assemblies = typeSearcher.GetAssemblies();
-                configuration.RegisterValidatorsFromAssemblies(assemblies);
-                configuration.DisableDataAnnotationsValidation = true;
-                //implicit/automatic validation of child properties
-                configuration.ImplicitlyValidateChildProperties = true;
-            });
         }
 
         /// <summary>
@@ -123,14 +120,11 @@ namespace Grand.Infrastructure
         /// <param name="configuration"></param>
         private static void RegisterExtensions(IMvcCoreBuilder mvcCoreBuilder, IConfiguration configuration)
         {
-            var config = new AppConfig();
-            configuration.GetSection("Application").Bind(config);
-
             //Load plugins
-            PluginManager.Load(mvcCoreBuilder, config);
+            PluginManager.Load(mvcCoreBuilder, configuration);
 
             //Load CTX sctipts
-            RoslynCompiler.Load(mvcCoreBuilder.PartManager, config);
+            RoslynCompiler.Load(mvcCoreBuilder.PartManager, configuration);
         }
 
         /// <summary>
@@ -173,8 +167,6 @@ namespace Grand.Infrastructure
                     cfg.ConfigureEndpoints(context);
                 });
             });
-            //for automaticly start/stop bus
-            services.AddMassTransitHostedService();
         }
 
         /// <summary>
@@ -190,16 +182,21 @@ namespace Grand.Infrastructure
             services.AddWkhtmltopdf();
 
             //add AppConfig configuration parameters
-            var config = services.StartupConfig<AppConfig>(configuration.GetSection("Application"));
-            services.StartupConfig<HostingConfig>(configuration.GetSection("Hosting"));
+            services.StartupConfig<AppConfig>(configuration.GetSection("Application"));
+            var performanceConfig = services.StartupConfig<PerformanceConfig>(configuration.GetSection("Performance"));
+            var securityConfig = services.StartupConfig<SecurityConfig>(configuration.GetSection("Security"));
+            services.StartupConfig<ExtensionsConfig>(configuration.GetSection("Extensions"));
             services.StartupConfig<UrlRewriteConfig>(configuration.GetSection("UrlRewrite"));
             services.StartupConfig<RedisConfig>(configuration.GetSection("Redis"));
             services.StartupConfig<RabbitConfig>(configuration.GetSection("Rabbit"));
-            services.StartupConfig<ApiConfig>(configuration.GetSection("Api"));
-            services.StartupConfig<GrandWebApiConfig>(configuration.GetSection("GrandWebApi"));
-            services.StartupConfig<LiteDbConfig>(configuration.GetSection("LiteDb"));
+            services.StartupConfig<BackendAPIConfig>(configuration.GetSection("BackendAPI"));
+            services.StartupConfig<FrontendAPIConfig>(configuration.GetSection("FrontendAPI"));
+            services.StartupConfig<DatabaseConfig>(configuration.GetSection("Database"));
             services.StartupConfig<AmazonConfig>(configuration.GetSection("Amazon"));
             services.StartupConfig<AzureConfig>(configuration.GetSection("Azure"));
+            services.StartupConfig<ApplicationInsightsConfig>(configuration.GetSection("ApplicationInsights"));
+
+            InitDatabase(services, configuration);
 
             //set base application path
             var provider = services.BuildServiceProvider();
@@ -210,11 +207,11 @@ namespace Grand.Infrastructure
 
             CommonPath.WebHostEnvironment = hostingEnvironment.WebRootPath;
             CommonPath.BaseDirectory = hostingEnvironment.ContentRootPath;
-            CommonHelper.CacheTimeMinutes = config.DefaultCacheTimeMinutes;
-            CommonHelper.CookieAuthExpires = config.CookieAuthExpires > 0 ? config.CookieAuthExpires : 24 * 365;
+            CommonHelper.CacheTimeMinutes = performanceConfig.DefaultCacheTimeMinutes;
+            CommonHelper.CookieAuthExpires = securityConfig.CookieAuthExpires > 0 ? securityConfig.CookieAuthExpires : 24 * 365;
 
-            CommonHelper.IgnoreAcl = config.IgnoreAcl;
-            CommonHelper.IgnoreStoreLimitations = config.IgnoreStoreLimitations;
+            CommonHelper.IgnoreAcl = performanceConfig.IgnoreAcl;
+            CommonHelper.IgnoreStoreLimitations = performanceConfig.IgnoreStoreLimitations;
 
             var mvcCoreBuilder = services.AddMvcCore();
 
@@ -259,9 +256,6 @@ namespace Grand.Infrastructure
 
             //register mapper configurations
             InitAutoMapper(typeSearcher);
-
-            //add fluenvalidation
-            AddFluentValidation(mvcBuilder, typeSearcher);
 
             //Register custom type converters
             RegisterTypeConverter(typeSearcher);
