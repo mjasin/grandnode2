@@ -370,7 +370,7 @@ namespace Grand.Web.Controllers
             await _userFieldService.SaveField<string>(_workContext.CurrentCustomer,
                 SystemCustomerFieldNames.SelectedPaymentMethod, null, _workContext.CurrentStore.Id);
 
-            var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer });
+            var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer, Language = _workContext.WorkingLanguage, Store = _workContext.CurrentStore });
             return Json(new
             {
                 update_section = new UpdateSectionJsonModel {
@@ -383,11 +383,11 @@ namespace Grand.Web.Controllers
 
         public virtual async Task<IActionResult> GetShippingFormPartialView(string shippingOption)
         {
-            var viewcomponent = await GetShippingComputation(shippingOption).GetPublicViewComponentName();
-            if (string.IsNullOrEmpty(viewcomponent))
+            var routeName = await GetShippingComputation(shippingOption).GetControllerRouteName();
+            if (string.IsNullOrEmpty(routeName))
                 return Content("");
 
-            return ViewComponent(viewcomponent, new { shippingOption = shippingOption });
+            return RedirectToRoute(routeName, new { shippingOption });
         }
 
         [NonAction]
@@ -397,7 +397,7 @@ namespace Grand.Web.Controllers
                     (paymentMethod.PaymentMethodType == PaymentMethodType.Redirection
                     && _paymentSettings.SkipPaymentInfo))
             {
-                var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer });
+                var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer, Language = _workContext.WorkingLanguage, Store = _workContext.CurrentStore });
                 return Json(new
                 {
                     update_section = new UpdateSectionJsonModel {
@@ -854,7 +854,7 @@ namespace Grand.Web.Controllers
                     await _userFieldService.SaveField<string>(_workContext.CurrentCustomer,
                         SystemCustomerFieldNames.SelectedPaymentMethod, null, _workContext.CurrentStore.Id);
 
-                    var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer });
+                    var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer, Language = _workContext.WorkingLanguage, Store = _workContext.CurrentStore });
                     return Json(new
                     {
                         update_section = new UpdateSectionJsonModel {
@@ -923,7 +923,7 @@ namespace Grand.Web.Controllers
                             SystemCustomerFieldNames.PaymentTransaction, paymentTransaction.Id, _workContext.CurrentStore.Id);
                     }
 
-                    var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer });
+                    var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer, Language = _workContext.WorkingLanguage, Store = _workContext.CurrentStore });
                     return Json(new
                     {
                         update_section = new UpdateSectionJsonModel {
@@ -996,7 +996,7 @@ namespace Grand.Web.Controllers
                 }
 
                 //error
-                var confirmOrderModel = new CheckoutConfirmModel();
+                var confirmOrderModel = await _mediator.Send(new GetConfirmOrder() { Cart = cart, Customer = _workContext.CurrentCustomer, Language = _workContext.WorkingLanguage, Store = _workContext.CurrentStore });
                 foreach (var error in placeOrderResult.Errors)
                     confirmOrderModel.Warnings.Add(error);
 

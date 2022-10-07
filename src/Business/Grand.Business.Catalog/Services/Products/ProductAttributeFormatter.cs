@@ -1,16 +1,14 @@
+using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Catalog.Prices;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Catalog.Tax;
-using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Infrastructure;
 using Grand.Domain.Catalog;
 using Grand.Domain.Common;
 using Grand.Domain.Customers;
+using Grand.Infrastructure;
 using Grand.SharedKernel.Extensions;
 using System.Net;
-using Grand.Business.Core.Interfaces.Storage;
 
 namespace Grand.Business.Catalog.Services.Products
 {
@@ -22,33 +20,27 @@ namespace Grand.Business.Catalog.Services.Products
         private readonly IWorkContext _workContext;
         private readonly IProductAttributeService _productAttributeService;
         private readonly IProductAttributeParser _productAttributeParser;
-        private readonly ICurrencyService _currencyService;
         private readonly ITranslationService _translationService;
         private readonly ITaxService _taxService;
         private readonly IPriceFormatter _priceFormatter;
-        private readonly IDownloadService _downloadService;
         private readonly IPricingService _pricingService;
         private readonly IProductService _productService;
 
         public ProductAttributeFormatter(IWorkContext workContext,
             IProductAttributeService productAttributeService,
             IProductAttributeParser productAttributeParser,
-            ICurrencyService currencyService,
             ITranslationService translationService,
             ITaxService taxService,
             IPriceFormatter priceFormatter,
-            IDownloadService downloadService,
             IPricingService priceCalculationService,
             IProductService productService)
         {
             _workContext = workContext;
             _productAttributeService = productAttributeService;
             _productAttributeParser = productAttributeParser;
-            _currencyService = currencyService;
             _translationService = translationService;
             _taxService = taxService;
             _priceFormatter = priceFormatter;
-            _downloadService = downloadService;
             _pricingService = priceCalculationService;
             _productService = productService;
         }
@@ -206,29 +198,15 @@ namespace Grand.Business.Catalog.Services.Products
                         else if (attribute.AttributeControlTypeId == AttributeControlType.FileUpload)
                         {
                             //file upload
-                            Guid downloadGuid;
-                            Guid.TryParse(valueStr, out downloadGuid);
-                            var download = await _downloadService.GetDownloadByGuid(downloadGuid);
-                            if (download != null)
+                            if (Guid.TryParse(valueStr, out var downloadGuid))
                             {
-                                string attributeText = "";
-                                var fileName = string.Format("{0}{1}", download.Filename ?? download.DownloadGuid.ToString(), download.Extension);
-                                if (htmlEncode)
-                                    fileName = WebUtility.HtmlEncode(fileName);
+                                var attributeText = string.Empty;
+                                var attributeName = productAttribute.GetTranslation(a => a.Name, langId);
                                 if (allowHyperlinks)
                                 {
-                                    var downloadLink = string.Format("{0}/download/getfileupload/?downloadId={1}", _workContext.CurrentHost.Url.TrimEnd('/'), download.DownloadGuid);
-                                    attributeText = string.Format("<a href=\"{0}\" class=\"fileuploadattribute\">{1}</a>", downloadLink, fileName);
+                                    var downloadLink = string.Format("{0}/download/getfileupload/?downloadId={1}", _workContext.CurrentHost.Url.TrimEnd('/'), downloadGuid);
+                                    attributeText = string.Format("<a href=\"{0}\" class=\"fileuploadattribute\">{1}</a>", downloadLink, attribute.GetTranslation(a => a.TextPrompt, langId));
                                 }
-                                else
-                                {
-                                    //hyperlinks aren't allowed
-                                    attributeText = fileName;
-                                }
-                                var attributeName = productAttribute.GetTranslation(a => a.Name, langId);
-                                //encode (if required)
-                                if (htmlEncode)
-                                    attributeName = WebUtility.HtmlEncode(attributeName);
                                 formattedAttribute = string.Format("{0}: {1}", attributeName, attributeText);
                             }
                         }
@@ -269,7 +247,7 @@ namespace Grand.Business.Catalog.Services.Products
                                         formattedAttribute += string.Format(" [-{0}]", priceAdjustmentStr);
                                     }
                                 }
-                                
+
                             }
                             else
                             {

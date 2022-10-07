@@ -24,7 +24,7 @@ using Grand.Web.Models.Catalog;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
+using Grand.Web.Common.Extensions;
 
 namespace Grand.Web.Controllers
 {
@@ -171,7 +171,7 @@ namespace Grand.Web.Controllers
             //activity log
             _ = _customerActivityService.InsertActivity("PublicStore.ViewProduct", product.Id, _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
                 _translationService.GetResource("ActivityLog.PublicStore.ViewProduct"), product.Name);
-            await _customerActionEventService.Viewed(customer, this.HttpContext.Request.Path.ToString(), Request.Headers[HeaderNames.Referer].ToString() != null ? Request.Headers[HeaderNames.Referer].ToString() : "");
+            await _customerActionEventService.Viewed(customer, HttpContext.Request.Path.ToString(), Request.GetTypedHeaders().Referer?.ToString());
             await _productService.UpdateMostView(product);
 
             return View(productLayoutViewPath, model);
@@ -418,7 +418,7 @@ namespace Grand.Web.Controllers
             //activity log
             _ = _customerActivityService.InsertActivity("PublicStore.ViewProduct", product.Id, _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
                 _translationService.GetResource("ActivityLog.PublicStore.ViewProduct"), product.Name);
-            await _customerActionEventService.Viewed(customer, HttpContext.Request.Path.ToString(), Request.Headers[HeaderNames.Referer].ToString() != null ? Request.Headers[HeaderNames.Referer].ToString() : "");
+            await _customerActionEventService.Viewed(customer, HttpContext.Request.Path.ToString(), Request.GetTypedHeaders().Referer?.ToString());
             await _productService.UpdateMostView(product);
 
             return Json(new
@@ -451,6 +451,29 @@ namespace Grand.Web.Controllers
         }
 
         #endregion
+
+        #region Related products
+
+        public virtual async Task<IActionResult> RelatedProducts(string productId, int? productThumbPictureSize)
+        {
+            var productIds = (await _productService.GetProductById(productId)).RelatedProducts.OrderBy(x => x.DisplayOrder).Select(x => x.ProductId2).ToArray();
+
+            //load products
+            var products = await _productService.GetProductsByIds(productIds);
+
+            var model = await _mediator.Send(new GetProductOverview() {
+                PreparePictureModel = true,
+                PreparePriceModel = true,
+                PrepareSpecificationAttributes = _catalogSettings.ShowSpecAttributeOnCatalogPages,
+                ProductThumbPictureSize = productThumbPictureSize,
+                Products = products
+            });
+
+            return View(model);
+        }
+
+        #endregion
+
 
         #region Recently added products
 
