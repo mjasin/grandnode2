@@ -6,6 +6,7 @@ using Grand.Business.Core.Interfaces.Messages;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Domain.Catalog;
 using Grand.Domain.Common;
+using Grand.Domain.Messages;
 using Grand.Domain.Stores;
 using Grand.Infrastructure;
 using Grand.SharedKernel.Extensions;
@@ -286,8 +287,7 @@ namespace Grand.Web.Commands.Handler.Common
             var contactAttributes = await _contactAttributeService.GetAllContactAttributes(storeId);
             foreach (var attribute in contactAttributes)
             {
-                var attributeModel = new ContactUsModel.ContactAttributeModel
-                {
+                var attributeModel = new ContactUsModel.ContactAttributeModel {
                     Id = attribute.Id,
                     Name = attribute.GetTranslation(x => x.Name, _workContext.WorkingLanguage.Id),
                     TextPrompt = attribute.GetTranslation(x => x.TextPrompt, _workContext.WorkingLanguage.Id),
@@ -308,8 +308,7 @@ namespace Grand.Web.Commands.Handler.Common
                     var attributeValues = attribute.ContactAttributeValues;
                     foreach (var attributeValue in attributeValues)
                     {
-                        var attributeValueModel = new ContactUsModel.ContactAttributeValueModel
-                        {
+                        var attributeValueModel = new ContactUsModel.ContactAttributeValueModel {
                             Id = attributeValue.Id,
                             Name = attributeValue.GetTranslation(x => x.Name, _workContext.WorkingLanguage.Id),
                             ColorSquaresRgb = attributeValue.ColorSquaresRgb,
@@ -328,7 +327,7 @@ namespace Grand.Web.Commands.Handler.Common
                     case AttributeControlType.ColorSquares:
                     case AttributeControlType.ImageSquares:
                         {
-                            if (selectedContactAttributes != null || selectedContactAttributes.Any())
+                            if (selectedContactAttributes != null && selectedContactAttributes.Any())
                             {
                                 //clear default selection
                                 foreach (var item in attributeModel.Values)
@@ -353,7 +352,7 @@ namespace Grand.Web.Commands.Handler.Common
                     case AttributeControlType.TextBox:
                     case AttributeControlType.MultilineTextbox:
                         {
-                            if (selectedContactAttributes != null || selectedContactAttributes.Any())
+                            if (selectedContactAttributes != null && selectedContactAttributes.Any())
                             {
                                 var enteredText = selectedContactAttributes.Where(x => x.Key == attribute.Id).Select(x => x.Value).ToList(); ;
                                 if (enteredText.Any())
@@ -363,7 +362,7 @@ namespace Grand.Web.Commands.Handler.Common
                         break;
                     case AttributeControlType.Datepicker:
                         {
-                            if (selectedContactAttributes != null || selectedContactAttributes.Any())
+                            if (selectedContactAttributes != null && selectedContactAttributes.Any())
                             {
                                 //keep in mind my that the code below works only in the current culture
                                 var selectedDateStr = selectedContactAttributes.Where(x => x.Key == attribute.Id).Select(x => x.Value).ToList();
@@ -384,7 +383,7 @@ namespace Grand.Web.Commands.Handler.Common
                         break;
                     case AttributeControlType.FileUpload:
                         {
-                            if (selectedContactAttributes != null || selectedContactAttributes.Any())
+                            if (selectedContactAttributes != null && selectedContactAttributes.Any())
                             {
                                 var downloadGuidStr = selectedContactAttributes.Where(x => x.Key == attribute.Id).Select(x => x.Value).FirstOrDefault();
                                 Guid.TryParse(downloadGuidStr, out Guid downloadGuid);
@@ -410,7 +409,7 @@ namespace Grand.Web.Commands.Handler.Common
             var body = FormatText.ConvertText(request.Model.Enquiry);
 
             await _messageProviderService.SendContactUsMessage
-                (_workContext.CurrentCustomer, store, _workContext.WorkingLanguage.Id, request.Model.Email.Trim(), request.Model.FullName, subject, 
+                (_workContext.CurrentCustomer, store, _workContext.WorkingLanguage.Id, request.Model.Email.Trim(), request.Model.FullName, subject,
                 body, request.Model.ContactAttributeInfo, request.Model.ContactAttribute, request.IpAddress);
 
             request.Model.SuccessfullySent = true;
