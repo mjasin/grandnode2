@@ -618,7 +618,7 @@ namespace Grand.Business.Catalog.Services.Prices
                 {
                     if (product.ProductTypeId != ProductType.BundledProduct)
                     {
-                        var attributeValues = _productAttributeParser.ParseProductAttributeValues(product, attributes);
+                        var attributeValues = product.ParseProductAttributeValues(attributes);
                         if (attributeValues != null)
                         {
                             foreach (var attributeValue in attributeValues)
