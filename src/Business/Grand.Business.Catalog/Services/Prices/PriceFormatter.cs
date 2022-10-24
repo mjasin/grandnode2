@@ -48,26 +48,31 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <param name="amount">Amount</param>
         /// <param name="targetCurrency">Target currency</param>
         /// <returns>Currency string without exchange rate</returns>
-        protected virtual string GetCurrencyString(double amount, Currency targetCurrency)
+        protected virtual string GetCurrencyString(double amount, Currency targetCurrency, bool isCostIncrementByPercentage = false)
         {
+            if (isCostIncrementByPercentage)
+            {
+                return (amount/100).ToString("P", CultureInfo.InvariantCulture);
+            }
+
             if (targetCurrency == null)
                 return amount.ToString("C");
 
-            string result = "";
-            if (!String.IsNullOrEmpty(targetCurrency.CustomFormatting))
+            string result;
+            if (!string.IsNullOrEmpty(targetCurrency.CustomFormatting))
             {
-                var cultureInfo = !String.IsNullOrEmpty(targetCurrency.DisplayLocale) ? new CultureInfo(targetCurrency.DisplayLocale) : null;
+                var cultureInfo = !string.IsNullOrEmpty(targetCurrency.DisplayLocale) ? new CultureInfo(targetCurrency.DisplayLocale) : null;
                 result = amount.ToString(targetCurrency.CustomFormatting, cultureInfo);
             }
             else
             {
-                if (!String.IsNullOrEmpty(targetCurrency.DisplayLocale))
+                if (!string.IsNullOrEmpty(targetCurrency.DisplayLocale))
                 {
                     result = amount.ToString("C", new CultureInfo(targetCurrency.DisplayLocale));
                 }
                 else
                 {
-                    result = String.Format("{0} ({1})", amount.ToString("N"), targetCurrency.CurrencyCode);
+                    result = string.Format("{0} ({1})", amount.ToString("N"), targetCurrency.CurrencyCode);
                     return result;
                 }
             }
@@ -95,10 +100,10 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <param name="price">Price</param>
         /// <param name="targetCurrency">Target currency</param>
         /// <returns>Price</returns>
-        public virtual string FormatPrice(double price, Currency targetCurrency)
+        public virtual string FormatPrice(double price, Currency targetCurrency, bool isCostIncrementByPercentage = false)
         {
-            bool priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
-            return FormatPrice(price, targetCurrency, _workContext.WorkingLanguage, priceIncludesTax);
+            var priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+            return FormatPrice(price, targetCurrency, _workContext.WorkingLanguage, priceIncludesTax, isCostIncrementByPercentage);
         }
 
         /// <summary>
@@ -107,10 +112,10 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <param name="price">Price</param>
         /// <param name="showTax">Indicates if it should show tax suffix</param>
         /// <returns>Price</returns>
-        public virtual string FormatPrice(double price, bool showTax)
+        public virtual string FormatPrice(double price, bool showTax, bool isCostIncrementByPercentage = false)
         {
             bool priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
-            return FormatPrice(price, _workContext.WorkingCurrency, _workContext.WorkingLanguage, priceIncludesTax, showTax);
+            return FormatPrice(price, _workContext.WorkingCurrency, _workContext.WorkingLanguage, priceIncludesTax, showTax, isCostIncrementByPercentage);
         }
 
         /// <summary>
@@ -164,9 +169,9 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <param name="priceIncludesTax">Indicates if price includes tax</param>
         /// <param name="showTax">Indicates if it should show tax suffix</param>
         /// <returns>Price</returns>
-        public string FormatPrice(double price, Currency targetCurrency, Language language, bool priceIncludesTax, bool showTax)
+        public string FormatPrice(double price, Currency targetCurrency, Language language, bool priceIncludesTax, bool showTax, bool isCostIncrementByPercentage = false)
         {
-            string currencyString = GetCurrencyString(price, targetCurrency);
+            var currencyString = GetCurrencyString(price, targetCurrency, isCostIncrementByPercentage);
             if (showTax)
             {
                 //show tax suffix
@@ -174,13 +179,13 @@ namespace Grand.Business.Catalog.Services.Prices
                 if (priceIncludesTax)
                 {
                     formatStr = _translationService.GetResource("Products.InclTaxSuffix", language.Id);
-                    if (String.IsNullOrEmpty(formatStr))
+                    if (string.IsNullOrEmpty(formatStr))
                         formatStr = "{0} incl tax";
                 }
                 else
                 {
                     formatStr = _translationService.GetResource("Products.ExclTaxSuffix", language.Id);
-                    if (String.IsNullOrEmpty(formatStr))
+                    if (string.IsNullOrEmpty(formatStr))
                         formatStr = "{0} excl tax";
                 }
                 return string.Format(formatStr, currencyString);

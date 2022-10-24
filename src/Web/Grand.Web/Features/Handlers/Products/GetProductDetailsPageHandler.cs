@@ -852,9 +852,9 @@ namespace Grand.Web.Features.Handlers.Products
                             var productprice = await _taxService.GetProductPrice(product, attributeValuePriceAdjustment);
                             double taxRate = productprice.taxRate;
                             if (productprice.productprice > 0)
-                                valueModel.PriceAdjustment = "+" + _priceFormatter.FormatPrice(productprice.productprice, false);
+                                valueModel.PriceAdjustment = "+" + _priceFormatter.FormatPrice(productprice.productprice, false, attributeValue.IsCostIncrementByPercentage);
                             else if (productprice.productprice < 0)
-                                valueModel.PriceAdjustment = "-" + _priceFormatter.FormatPrice(-productprice.productprice, false);
+                                valueModel.PriceAdjustment = "-" + _priceFormatter.FormatPrice(-productprice.productprice, false, attributeValue.IsCostIncrementByPercentage);
 
                             valueModel.PriceAdjustmentValue = productprice.productprice;
                         }

@@ -19,7 +19,7 @@ namespace Grand.Business.Core.Interfaces.Catalog.Prices
         /// <param name="price">Price</param>
         /// <param name="targetCurrency">Target currency</param>
         /// <returns>Price</returns>
-        string FormatPrice(double price, Currency targetCurrency);
+        string FormatPrice(double price, Currency targetCurrency, bool isCostIncrementByPercentage = false);
 
         /// <summary>
         /// Formats price
@@ -27,7 +27,7 @@ namespace Grand.Business.Core.Interfaces.Catalog.Prices
         /// <param name="price">Price</param>
         /// <param name="showTax">A value that indicates if it should shows tax suffix</param>
         /// <returns>Price</returns>
-        string FormatPrice(double price, bool showTax);
+        string FormatPrice(double price, bool showTax, bool isCostIncrementByPercentage = false);
 
         /// <summary>
         /// Formats price
@@ -68,7 +68,7 @@ namespace Grand.Business.Core.Interfaces.Catalog.Prices
         /// <param name="priceIncludesTax">A value indicating whether price includes tax</param>
         /// <param name="showTax">A value indicating whether to show tax suffix</param>
         /// <returns>Price</returns>
-        string FormatPrice(double price, Currency targetCurrency, Language language, bool priceIncludesTax, bool showTax);
+        string FormatPrice(double price, Currency targetCurrency, Language language, bool priceIncludesTax, bool showTax, bool isCostIncrementByPercentage = false);
 
         /// <summary>
         /// Formats the price of rental product (with rental period)
