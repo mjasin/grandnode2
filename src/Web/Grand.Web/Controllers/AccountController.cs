@@ -8,7 +8,6 @@ using Grand.Business.Core.Interfaces.Customers;
 using Grand.Business.Core.Queries.Customers;
 using Grand.Business.Core.Utilities.Customers;
 using Grand.Business.Core.Interfaces.Messages;
-using Grand.Business.Core.Interfaces.System.ExportImport;
 using Grand.Domain.Common;
 using Grand.Domain.Customers;
 using Grand.Domain.Stores;
@@ -24,6 +23,7 @@ using Grand.Web.Models.Customer;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Grand.Business.Core.Interfaces.ExportImport;
 
 namespace Grand.Web.Controllers
 {
@@ -694,8 +694,8 @@ namespace Grand.Web.Controllers
             });
         }
 
-
-        public virtual async Task<IActionResult> Export([FromServices] IExportManager exportManager)
+        //TODO
+        public virtual async Task<IActionResult> Export()
         {
             if (!await _groupService.IsRegistered(_workContext.CurrentCustomer))
                 return Challenge();
@@ -703,9 +703,9 @@ namespace Grand.Web.Controllers
             if (!_customerSettings.AllowUsersToExportData)
                 return Challenge();
 
-            var customer = _workContext.CurrentCustomer;
-            byte[] bytes = await exportManager.ExportCustomerToXlsx(customer, _workContext.CurrentStore.Id);
-            return File(bytes, "text/xls", "PersonalInfo.xlsx");
+            var model = await _mediator.Send(new GetCustomerData(_workContext.CurrentCustomer));
+
+            return File(model, "text/xls", "PersonalInfo.xlsx");
 
         }
         #endregion

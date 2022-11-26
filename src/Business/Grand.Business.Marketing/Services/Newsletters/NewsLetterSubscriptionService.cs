@@ -8,6 +8,7 @@ using Grand.Domain.Data;
 using Grand.Domain.Messages;
 using Grand.SharedKernel.Extensions;
 using MediatR;
+using Grand.SharedKernel;
 
 namespace Grand.Business.Marketing.Services.Newsteletters
 {
@@ -244,6 +245,143 @@ namespace Grand.Business.Marketing.Services.Newsteletters
 
             query = query.OrderBy(nls => nls.Email);
             return await PagedList<NewsLetterSubscription>.Create(query, pageIndex, pageSize);
+        }
+
+        /// <summary>
+        /// Export newsletter subscribers to TXT
+        /// </summary>
+        /// <param name="subscriptions">Subscriptions</param>
+        /// <returns>Result in TXT (string) format</returns>
+        public virtual string ExportNewsletterSubscribersToTxt(IList<NewsLetterSubscription> subscriptions)
+        {
+            if (subscriptions == null)
+                throw new ArgumentNullException(nameof(subscriptions));
+
+            const string separator = ",";
+            var sb = new StringBuilder();
+            foreach (var subscription in subscriptions)
+            {
+                sb.Append(subscription.Email);
+                sb.Append(separator);
+                sb.Append(subscription.Active);
+                sb.Append(separator);
+                sb.Append(subscription.CreatedOnUtc.ToString("dd.MM.yyyy HH:mm:ss"));
+                sb.Append(separator);
+                sb.Append(subscription.StoreId);
+                sb.Append(separator);
+                sb.Append(string.Join(';', subscription.Categories));
+                sb.Append(Environment.NewLine);  //new line
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Import newsletter subscribers from TXT file
+        /// </summary>
+        /// <param name="stream">Stream</param>
+        /// <param name="currentStoreId">Current store ident</param>
+        /// <returns>Number of imported subscribers</returns>
+        public virtual async Task<int> ImportNewsletterSubscribersFromTxt(Stream stream, string currentStoreId)
+        {
+            int count = 0;
+            using (var reader = new StreamReader(stream))
+            {
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+                    string[] tmp = line.Split(',');
+
+                    var email = "";
+                    bool isActive = true;
+                    var categories = new List<string>();
+                    bool iscategories = false;
+                    string storeId = currentStoreId;
+                    //parse
+                    if (tmp.Length == 1)
+                    {
+                        //"email" only
+                        email = tmp[0].Trim();
+                    }
+                    else if (tmp.Length == 2)
+                    {
+                        //"email" and "active" fields specified
+                        email = tmp[0].Trim();
+                        isActive = Boolean.Parse(tmp[1].Trim());
+                    }
+                    else if (tmp.Length == 3)
+                    {
+                        //"email" and "active" and "storeId" fields specified
+                        email = tmp[0].Trim();
+                        isActive = Boolean.Parse(tmp[1].Trim());
+                        storeId = tmp[2].Trim();
+                    }
+                    else if (tmp.Length == 4)
+                    {
+                        //"email" and "active" and "storeId" and categories fields specified
+                        email = tmp[0].Trim();
+                        isActive = Boolean.Parse(tmp[1].Trim());
+                        storeId = tmp[2].Trim();
+                        try
+                        {
+                            var items = tmp[3].Trim().Split(';').ToList();
+                            foreach (var item in items)
+                            {
+                                if (!string.IsNullOrEmpty(item))
+                                {
+                                    categories.Add(item);
+                                }
+                            }
+                            iscategories = true;
+                        }
+                        catch { };
+                    }
+                    else
+                        throw new GrandException("Wrong file format");
+
+                    //import
+                    await ImportSubscription(email, storeId, isActive, iscategories, categories);
+
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        protected virtual async Task ImportSubscription(string email, string storeId, bool isActive, bool iscategories, List<string> categories)
+        {
+            var subscription = await GetNewsLetterSubscriptionByEmailAndStoreId(email, storeId);
+            if (subscription != null)
+            {
+                subscription.Email = email;
+                subscription.Active = isActive;
+                if (iscategories)
+                {
+                    subscription.Categories.Clear();
+                    foreach (var item in categories)
+                    {
+                        subscription.Categories.Add(item);
+                    }
+                }
+                await UpdateNewsLetterSubscription(subscription);
+            }
+            else
+            {
+                subscription = new NewsLetterSubscription {
+                    Active = isActive,
+                    CreatedOnUtc = DateTime.UtcNow,
+                    Email = email,
+                    StoreId = storeId,
+                    NewsLetterSubscriptionGuid = Guid.NewGuid()
+                };
+                foreach (var item in categories)
+                {
+                    subscription.Categories.Add(item);
+                }
+                await InsertNewsLetterSubscription(subscription);
+            }
         }
 
         #endregion
