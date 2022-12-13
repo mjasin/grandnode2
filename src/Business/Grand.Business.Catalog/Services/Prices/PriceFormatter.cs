@@ -171,7 +171,7 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <returns>Price</returns>
         public string FormatPrice(double price, Currency targetCurrency, Language language, bool priceIncludesTax, bool showTax, bool isCostIncrementByPercentage = false)
         {
-            string currencyString = GetCurrencyString(price, targetCurrency, isCostIncrementByPercentage);
+            var currencyString = GetCurrencyString(price, targetCurrency, isCostIncrementByPercentage);
             if (showTax)
             {
                 //show tax suffix
@@ -179,18 +179,19 @@ namespace Grand.Business.Catalog.Services.Prices
                 if (priceIncludesTax)
                 {
                     formatStr = _translationService.GetResource("Products.InclTaxSuffix", language.Id);
-                    if (String.IsNullOrEmpty(formatStr))
+                    if (string.IsNullOrEmpty(formatStr))
                         formatStr = "{0} incl tax";
                 }
                 else
                 {
                     formatStr = _translationService.GetResource("Products.ExclTaxSuffix", language.Id);
-                    if (String.IsNullOrEmpty(formatStr))
+                    if (string.IsNullOrEmpty(formatStr))
                         formatStr = "{0} excl tax";
                 }
                 return string.Format(formatStr, currencyString);
             }
 
+            return currencyString;
         }
 
 
