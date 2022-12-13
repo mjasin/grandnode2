@@ -14,7 +14,7 @@ namespace Grand.Business.Catalog.Services.Prices
     /// <summary>
     /// Price formatter
     /// </summary>
-    public partial class PriceFormatter : IPriceFormatter
+    public class PriceFormatter : IPriceFormatter
     {
         #region Fields
 
@@ -58,7 +58,7 @@ namespace Grand.Business.Catalog.Services.Prices
             if (targetCurrency == null)
                 return amount.ToString("C");
 
-            string result;
+            var result = "";
             if (!string.IsNullOrEmpty(targetCurrency.CustomFormatting))
             {
                 var cultureInfo = !string.IsNullOrEmpty(targetCurrency.DisplayLocale) ? new CultureInfo(targetCurrency.DisplayLocale) : null;
@@ -72,7 +72,7 @@ namespace Grand.Business.Catalog.Services.Prices
                 }
                 else
                 {
-                    result = string.Format("{0} ({1})", amount.ToString("N"), targetCurrency.CurrencyCode);
+                    result = $"{amount:N} ({targetCurrency.CurrencyCode})";
                     return result;
                 }
             }
@@ -114,7 +114,7 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <returns>Price</returns>
         public virtual string FormatPrice(double price, bool showTax, bool isCostIncrementByPercentage = false)
         {
-            bool priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+            var priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
             return FormatPrice(price, _workContext.WorkingCurrency, _workContext.WorkingLanguage, priceIncludesTax, showTax, isCostIncrementByPercentage);
         }
 
@@ -129,7 +129,7 @@ namespace Grand.Business.Catalog.Services.Prices
         public virtual async Task<string> FormatPrice(double price, string currencyCode, bool showTax, Language language)
         {
             var currency = !string.IsNullOrEmpty(currencyCode) ? await _currencyService.GetCurrencyByCode(currencyCode) : null;
-            bool priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+            var priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
             return FormatPrice(price, currency, language, priceIncludesTax, showTax);
         }
 
@@ -171,7 +171,7 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <returns>Price</returns>
         public string FormatPrice(double price, Currency targetCurrency, Language language, bool priceIncludesTax, bool showTax, bool isCostIncrementByPercentage = false)
         {
-            var currencyString = GetCurrencyString(price, targetCurrency, isCostIncrementByPercentage);
+            string currencyString = GetCurrencyString(price, targetCurrency, isCostIncrementByPercentage);
             if (showTax)
             {
                 //show tax suffix
@@ -179,19 +179,18 @@ namespace Grand.Business.Catalog.Services.Prices
                 if (priceIncludesTax)
                 {
                     formatStr = _translationService.GetResource("Products.InclTaxSuffix", language.Id);
-                    if (string.IsNullOrEmpty(formatStr))
+                    if (String.IsNullOrEmpty(formatStr))
                         formatStr = "{0} incl tax";
                 }
                 else
                 {
                     formatStr = _translationService.GetResource("Products.ExclTaxSuffix", language.Id);
-                    if (string.IsNullOrEmpty(formatStr))
+                    if (String.IsNullOrEmpty(formatStr))
                         formatStr = "{0} excl tax";
                 }
                 return string.Format(formatStr, currencyString);
             }
 
-            return currencyString;
         }
 
 
@@ -203,7 +202,7 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <returns>Price</returns>
         public virtual string FormatShippingPrice(double price)
         {
-            bool priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+            var priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
             return FormatShippingPrice(price, _workContext.WorkingCurrency, _workContext.WorkingLanguage, priceIncludesTax);
         }
 
@@ -217,7 +216,7 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <returns>Price</returns>
         public virtual string FormatShippingPrice(double price, Currency targetCurrency, Language language, bool priceIncludesTax)
         {
-            bool showTax = _taxSettings.ShippingIsTaxable && _taxSettings.DisplayTaxSuffix;
+            var showTax = _taxSettings.ShippingIsTaxable && _taxSettings.DisplayTaxSuffix;
             return FormatShippingPrice(price, targetCurrency, language, priceIncludesTax, showTax);
         }
 
@@ -264,24 +263,18 @@ namespace Grand.Business.Catalog.Services.Prices
             if (product.ProductTypeId != ProductType.Reservation)
                 return price;
 
-            if (String.IsNullOrWhiteSpace(price))
+            if (string.IsNullOrWhiteSpace(price))
                 return price;
 
-            string result;
-            switch (product.IntervalUnitId)
-            {
-                case IntervalUnit.Day:
-                    result = string.Format(_translationService.GetResource("Products.Price.Reservation.Days"), price, product.Interval);
-                    break;
-                case IntervalUnit.Hour:
-                    result = string.Format(_translationService.GetResource("Products.Price.Reservation.Hour"), price, product.Interval);
-                    break;
-                case IntervalUnit.Minute:
-                    result = string.Format(_translationService.GetResource("Products.Price.Reservation.Minute"), price, product.Interval);
-                    break;
-                default:
-                    throw new GrandException("Not supported reservation period");
-            }
+            var result = product.IntervalUnitId switch {
+                IntervalUnit.Day => string.Format(_translationService.GetResource("Products.Price.Reservation.Days"),
+                    price, product.Interval),
+                IntervalUnit.Hour => string.Format(_translationService.GetResource("Products.Price.Reservation.Hour"),
+                    price, product.Interval),
+                IntervalUnit.Minute => string.Format(
+                    _translationService.GetResource("Products.Price.Reservation.Minute"), price, product.Interval),
+                _ => throw new GrandException("Not supported reservation period")
+            };
 
             return result;
         }
@@ -294,7 +287,7 @@ namespace Grand.Business.Catalog.Services.Prices
         /// <returns>Price</returns>
         public virtual string FormatPaymentMethodAdditionalFee(double price)
         {
-            bool priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+            var priceIncludesTax = _workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
             return FormatPaymentMethodAdditionalFee(price, _workContext.WorkingCurrency,
                 _workContext.WorkingLanguage, priceIncludesTax);
         }
@@ -310,7 +303,7 @@ namespace Grand.Business.Catalog.Services.Prices
         public virtual string FormatPaymentMethodAdditionalFee(double price,
             Currency targetCurrency, Language language, bool priceIncludesTax)
         {
-            bool showTax = _taxSettings.PaymentMethodAdditionalFeeIsTaxable && _taxSettings.DisplayTaxSuffix;
+            var showTax = _taxSettings.PaymentMethodAdditionalFeeIsTaxable && _taxSettings.DisplayTaxSuffix;
             return FormatPaymentMethodAdditionalFee(price, targetCurrency, language, priceIncludesTax, showTax);
         }
 
