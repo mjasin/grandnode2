@@ -8,16 +8,14 @@ using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Interfaces.Customers;
-using Grand.Business.Core.Queries.Checkout.Orders;
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Orders;
 using Grand.Domain.Vendors;
 using Grand.Infrastructure;
 using Grand.Web.Commands.Models.Vendors;
+using Grand.Web.Common.Controllers;
 using Grand.Web.Common.Filters;
-using Grand.Web.Common.Security.Captcha;
 using Grand.Web.Features.Models.Catalog;
 using Grand.Web.Features.Models.Vendors;
 using Grand.Web.Models.Catalog;
@@ -105,7 +103,7 @@ namespace Grand.Web.Controllers
         #endregion
 
         #region Categories
-
+        [HttpGet]
         public virtual async Task<IActionResult> Category(string categoryId, CatalogPagingFilteringModel command)
         {
             var category = await _categoryService.GetCategoryById(categoryId);
@@ -154,11 +152,23 @@ namespace Grand.Web.Controllers
 
             return View(layoutViewPath, model);
         }
+        [HttpGet]
+        public virtual async Task<IActionResult> CategoryAll(CategoryPagingModel command)
+        {
+            var model = await _mediator.Send(new GetCategoryAll {
+                Customer = _workContext.CurrentCustomer,
+                Language = _workContext.WorkingLanguage,
+                Store = _workContext.CurrentStore,
+                Command = command
+            });
+            return View(model);
+        }
+
 
         #endregion
 
         #region Brands
-
+        [HttpGet]
         public virtual async Task<IActionResult> Brand(string brandId, CatalogPagingFilteringModel command)
         {
             var brand = await _brandService.GetBrandById(brandId);
@@ -207,13 +217,14 @@ namespace Grand.Web.Controllers
 
             return View(layoutViewPath, model);
         }
-
-        public virtual async Task<IActionResult> BrandAll()
+        [HttpGet]
+        public virtual async Task<IActionResult> BrandAll(BrandPagingModel command)
         {
             var model = await _mediator.Send(new GetBrandAll {
                 Customer = _workContext.CurrentCustomer,
                 Language = _workContext.WorkingLanguage,
-                Store = _workContext.CurrentStore
+                Store = _workContext.CurrentStore,
+                Command = command
             });
             return View(model);
         }
@@ -221,7 +232,7 @@ namespace Grand.Web.Controllers
         #endregion
 
         #region Collections
-
+        [HttpGet]
         public virtual async Task<IActionResult> Collection(string collectionId, CatalogPagingFilteringModel command)
         {
             var collection = await _collectionService.GetCollectionById(collectionId);
@@ -270,13 +281,14 @@ namespace Grand.Web.Controllers
 
             return View(layoutViewPath, model);
         }
-
-        public virtual async Task<IActionResult> CollectionAll()
+        [HttpGet]
+        public virtual async Task<IActionResult> CollectionAll(CollectionPagingModel command)
         {
             var model = await _mediator.Send(new GetCollectionAll {
                 Customer = _workContext.CurrentCustomer,
                 Language = _workContext.WorkingLanguage,
-                Store = _workContext.CurrentStore
+                Store = _workContext.CurrentStore,
+                Command = command
             });
             return View(model);
         }
@@ -284,7 +296,7 @@ namespace Grand.Web.Controllers
         #endregion
 
         #region Vendors
-
+        [HttpGet]
         public virtual async Task<IActionResult> Vendor(string vendorId, CatalogPagingFilteringModel command)
         {
             var vendor = await _vendorService.GetVendorById(vendorId);
@@ -316,14 +328,14 @@ namespace Grand.Web.Controllers
 
             return View(model);
         }
-
-        public virtual async Task<IActionResult> VendorAll()
+        [HttpGet]
+        public virtual async Task<IActionResult> VendorAll(VendorPagingModel command)
         {
             //we don't allow viewing of vendors if "vendors" block is hidden
             if (_vendorSettings.VendorsBlockItemsToDisplay == 0)
                 return RedirectToRoute("HomePage");
 
-            var model = await _mediator.Send(new GetVendorAll { Language = _workContext.WorkingLanguage });
+            var model = await _mediator.Send(new GetVendorAll { Language = _workContext.WorkingLanguage, Command = command });
             return View(model);
         }
 
@@ -333,47 +345,14 @@ namespace Grand.Web.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        [ValidateCaptcha]
         [DenySystemAccount]
         public virtual async Task<IActionResult> VendorReviews(
-            VendorReviewsModel model, bool captchaValid,
-            [FromServices] CaptchaSettings captchaSettings)
+            VendorReviewsModel model)
         {
             var vendor = await _vendorService.GetVendorById(model.VendorId);
             if (vendor is not { Active: true } || !vendor.AllowCustomerReviews)
                 return Content("");
-
-            //validate CAPTCHA
-            if (captchaSettings.Enabled && captchaSettings.ShowOnVendorReviewPage && !captchaValid)
-            {
-                ModelState.AddModelError("", captchaSettings.GetWrongCaptchaMessage(_translationService));
-            }
-
-            if (await _groupService.IsGuest(_workContext.CurrentCustomer) && !_vendorSettings.AllowAnonymousUsersToReviewVendor)
-            {
-                ModelState.AddModelError("", _translationService.GetResource("VendorReviews.OnlyRegisteredUsersCanWriteReviews"));
-            }
-
-            //allow reviews only by customer that bought something from this vendor
-            if (_vendorSettings.VendorReviewPossibleOnlyAfterPurchasing &&
-                    !(await _mediator.Send(new GetOrderQuery {
-                        CustomerId = _workContext.CurrentCustomer.Id,
-                        VendorId = vendor.Id,
-                        Os = (int)OrderStatusSystem.Complete,
-                        PageSize = 1
-                    })).Any())
-                ModelState.AddModelError(string.Empty, _translationService.GetResource("VendorReviews.VendorReviewPossibleOnlyAfterPurchasing"));
-
-            if (ModelState.IsValid && _vendorSettings.VendorReviewPossibleOnlyOnce)
-            {
-                if ((await _vendorService.GetAllVendorReviews(
-                    customerId: _workContext.CurrentCustomer.Id,
-                    approved: null,
-                    vendorId: vendor.Id,
-                    pageSize: 1)).Any())
-                    ModelState.AddModelError(string.Empty, _translationService.GetResource("VendorReviews.VendorReviewPossibleOnlyOnce"));
-            }
-
+            
             if (ModelState.IsValid)
             {
                 var vendorReview = await _mediator.Send(new InsertVendorReviewCommand { Vendor = vendor, Store = _workContext.CurrentStore, Model = model });
@@ -401,13 +380,13 @@ namespace Grand.Web.Controllers
                 return Json(model);
             }
 
-            var returnmodel = await _mediator.Send(new GetVendorReviews { Vendor = vendor });
-            returnmodel.AddVendorReview.ReviewText = model.AddVendorReview.ReviewText;
-            returnmodel.AddVendorReview.Title = model.AddVendorReview.Title;
-            returnmodel.AddVendorReview.SuccessfullyAdded = false;
-            returnmodel.AddVendorReview.Result = string.Join("; ", ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
+            var returnModel = await _mediator.Send(new GetVendorReviews { Vendor = vendor });
+            returnModel.AddVendorReview.ReviewText = model.AddVendorReview.ReviewText;
+            returnModel.AddVendorReview.Title = model.AddVendorReview.Title;
+            returnModel.AddVendorReview.SuccessfullyAdded = false;
+            returnModel.AddVendorReview.Result = string.Join("; ", ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
 
-            return Json(returnmodel);
+            return Json(returnModel);
         }
 
         [DenySystemAccount]
@@ -460,7 +439,7 @@ namespace Grand.Web.Controllers
         #endregion
 
         #region Product tags
-
+        [HttpGet]
         public virtual async Task<IActionResult> ProductsByTag(string productTagId, CatalogPagingFilteringModel command, [FromServices] IProductTagService productTagService)
         {
             var productTag = await productTagService.GetProductTagById(productTagId);
@@ -476,6 +455,7 @@ namespace Grand.Web.Controllers
             });
             return View(model);
         }
+        [HttpGet]
         public virtual async Task<IActionResult> ProductsByTagName(string seName, CatalogPagingFilteringModel command, [FromServices] IProductTagService productTagService)
         {
             var productTag = await productTagService.GetProductTagBySeName(seName);
@@ -491,7 +471,7 @@ namespace Grand.Web.Controllers
             });
             return View("ProductsByTag", model);
         }
-
+        [HttpGet]
         public virtual async Task<IActionResult> ProductTagsAll()
         {
             var model = await _mediator.Send(new GetProductTagsAll {
@@ -504,19 +484,19 @@ namespace Grand.Web.Controllers
         #endregion
 
         #region Searching
-
-        public virtual async Task<IActionResult> Search(SearchModel model, CatalogPagingFilteringModel command, string searchCategoryId)
+        [HttpGet]
+        public virtual async Task<IActionResult> Search(SearchModel model, CatalogPagingFilteringModel command)
         {
             //'Continue shopping' URL
             await SaveLastContinueShoppingPage(_workContext.CurrentCustomer);
-            if (model != null && !string.IsNullOrEmpty(searchCategoryId))
+            if (model != null && !string.IsNullOrEmpty(model.SearchCategoryId))
             {
-                model.cid = searchCategoryId;
+                model.cid = model.SearchCategoryId;
                 model.adv = true;
             }
             //Prepare model
             var isSearchTermSpecified = HttpContext?.Request?.Query.ContainsKey("q");
-            var searchmodel = await _mediator.Send(new GetSearch {
+            var searchModel = await _mediator.Send(new GetSearch {
                 Command = command,
                 Currency = _workContext.WorkingCurrency,
                 Customer = _workContext.CurrentCustomer,
@@ -525,9 +505,9 @@ namespace Grand.Web.Controllers
                 Model = model,
                 Store = _workContext.CurrentStore
             });
-            return View(searchmodel);
+            return View(searchModel);
         }
-
+        [HttpGet]
         public virtual async Task<IActionResult> SearchTermAutoComplete(string term, string categoryId, [FromServices] CatalogSettings catalogSettings)
         {
             if (string.IsNullOrWhiteSpace(term) || term.Length < catalogSettings.ProductSearchTermMinimumLength)

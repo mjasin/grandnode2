@@ -1,20 +1,22 @@
-﻿using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Cms;
+﻿using Grand.Business.Core.Interfaces.Cms;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Utilities.Common.Security;
+using Grand.Domain.Customers;
 using Grand.Domain.News;
 using Grand.Infrastructure;
 using Grand.Web.Commands.Models.News;
+using Grand.Web.Common.Controllers;
 using Grand.Web.Common.Filters;
-using Grand.Web.Common.Security.Captcha;
 using Grand.Web.Events;
 using Grand.Web.Features.Models.News;
 using Grand.Web.Models.News;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Grand.Web.Controllers
 {
@@ -30,7 +32,6 @@ namespace Grand.Web.Controllers
         private readonly IPermissionService _permissionService;
         private readonly IMediator _mediator;
         private readonly NewsSettings _newsSettings;
-        private readonly CaptchaSettings _captchaSettings;
 
         #endregion
 
@@ -43,8 +44,7 @@ namespace Grand.Web.Controllers
             IAclService aclService,
             IPermissionService permissionService,
             IMediator mediator,
-            NewsSettings newsSettings,
-            CaptchaSettings captchaSettings)
+            NewsSettings newsSettings)
         {
             _newsService = newsService;
             _workContext = workContext;
@@ -54,13 +54,13 @@ namespace Grand.Web.Controllers
             _permissionService = permissionService;
             _mediator = mediator;
             _newsSettings = newsSettings;
-            _captchaSettings = captchaSettings;
         }
 
         #endregion
 
         #region Methods
-
+        [HttpGet]
+        [ProducesResponseType(typeof(NewsItemListModel), StatusCodes.Status200OK)]
         public virtual async Task<IActionResult> List(NewsPagingFilteringModel command)
         {
             if (!_newsSettings.Enabled)
@@ -69,6 +69,8 @@ namespace Grand.Web.Controllers
             var model = await _mediator.Send(new GetNewsItemList { Command = command });
             return View(model);
         }
+        [HttpGet]
+        [ProducesResponseType(typeof(NewsItemModel), StatusCodes.Status200OK)]
         public virtual async Task<IActionResult> NewsItem(string newsItemId)
         {
             if (!_newsSettings.Enabled)
@@ -93,50 +95,51 @@ namespace Grand.Web.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        [ValidateCaptcha]
         [DenySystemAccount]
-        public virtual async Task<IActionResult> NewsCommentAdd(string newsItemId,
-            NewsItemModel model, bool captchaValid,
-            [FromServices] IGroupService groupService
-            )
+        public virtual async Task<IActionResult> NewsCommentAdd(AddNewsCommentModel model)
         {
             if (!_newsSettings.Enabled)
-                return RedirectToRoute("HomePage");
+                return Json(new
+                {
+                    success = false
+                });
 
-            var newsItem = await _newsService.GetNewsById(newsItemId);
+            var newsItem = await _newsService.GetNewsById(model.Id);
             if (newsItem is not { Published: true } || !newsItem.AllowComments)
-                return RedirectToRoute("HomePage");
-
-            //validate CAPTCHA
-            if (_captchaSettings.Enabled && _captchaSettings.ShowOnNewsCommentPage && !captchaValid)
-            {
-                ModelState.AddModelError("", _captchaSettings.GetWrongCaptchaMessage(_translationService));
-            }
-
-            if (await groupService.IsGuest(_workContext.CurrentCustomer) && !_newsSettings.AllowNotRegisteredUsersToLeaveComments)
-            {
-                ModelState.AddModelError("", _translationService.GetResource("News.Comments.OnlyRegisteredUsersLeaveComments"));
-            }
+                return Json(new
+                {
+                    success = false
+                });
 
             if (ModelState.IsValid)
             {
-                await _mediator.Send(new InsertNewsCommentCommand { NewsItem = newsItem, Model = model });
+                var newsComment = await _mediator.Send(new InsertNewsCommentCommand { NewsItem = newsItem, Model = model });
 
                 //notification
-                await _mediator.Publish(new NewsCommentEvent(newsItem, model.AddNewComment));
+                await _mediator.Publish(new NewsCommentEvent(newsItem, model));
 
                 //activity log
                 _ = _customerActivityService.InsertActivity("PublicStore.AddNewsComment", newsItem.Id,
                     _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
                     _translationService.GetResource("ActivityLog.PublicStore.AddNewsComment"));
 
-                //The text boxes should be cleared after a comment has been posted
-                TempData["Grand.news.addcomment.result"] = _translationService.GetResource("News.Comments.SuccessfullyAdded");
-                return RedirectToRoute("NewsItem", new { SeName = newsItem.GetSeName(_workContext.WorkingLanguage.Id) });
+                return Json(new
+                {
+                    success = true,
+                    message = _translationService.GetResource("News.Comments.SuccessfullyAdded"),
+                    model = new {
+                        newsComment.CommentText, 
+                        newsComment.CommentTitle,
+                        CreatedOn = HttpContext.RequestServices.GetService<IDateTimeService>().ConvertToUserTime(newsComment.CreatedOnUtc, DateTimeKind.Utc), 
+                        CustomerName = _workContext.CurrentCustomer.FormatUserName(HttpContext.RequestServices.GetService<CustomerSettings>().CustomerNameFormat) 
+                    }
+                });
             }
-
-            model = await _mediator.Send(new GetNewsItem { NewsItem = newsItem });
-            return View("NewsItem", model);
+            return Json(new
+            {
+                success = false,
+                message = string.Join(',', ModelState.Values.SelectMany(x => x.Errors.Select(x => x.ErrorMessage)))
+            });
         }
         #endregion
     }
