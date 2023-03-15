@@ -24,7 +24,9 @@ builder.Host.UseSerilog();
 builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {
     config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
-    config.AddJsonFile("App_Data/appsettings.json", optional: false, reloadOnChange: true);
+    const string appDataPath = "App_Data";
+    config.AddJsonFile(Path.Combine(appDataPath, "appsettings.json"), optional: false, reloadOnChange: true);
+    config.AddJsonFile(Path.Combine(appDataPath, $"appsettings.{builder.Environment}.json"), optional: true, reloadOnChange: true);
     config.AddEnvironmentVariables();
     if (args != null)
     {
@@ -33,9 +35,12 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
         var appsettings = settings["appsettings"];
         var param = settings["Directory"];
         if (!string.IsNullOrEmpty(appsettings) && !string.IsNullOrEmpty(param))
-            config.AddJsonFile($"App_Data/{param}/appsettings.json", optional: false, reloadOnChange: true);
+        {
+            var pathRoot = Path.Combine(appDataPath, param);
+            config.AddJsonFile(Path.Combine(pathRoot, "appsettings.json"), optional: false, reloadOnChange: true);
+            config.AddJsonFile(Path.Combine(pathRoot, $"appsettings.{builder.Environment}.json"), optional: true, reloadOnChange: true);
+        }
     }
-
 });
 
 //create logger
