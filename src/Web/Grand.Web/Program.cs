@@ -26,7 +26,7 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
     config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
     const string appDataPath = "App_Data";
     config.AddJsonFile(Path.Combine(appDataPath, "appsettings.json"), optional: false, reloadOnChange: true);
-    config.AddJsonFile(Path.Combine(appDataPath, $"appsettings.{builder.Environment}.json"), optional: true, reloadOnChange: true);
+    config.AddJsonFile(Path.Combine(appDataPath, $"appsettings.{builder.Environment.EnvironmentName}.json"), optional: true, reloadOnChange: true);
     config.AddEnvironmentVariables();
     if (args != null)
     {
@@ -38,7 +38,7 @@ builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
         {
             var pathRoot = Path.Combine(appDataPath, param);
             config.AddJsonFile(Path.Combine(pathRoot, "appsettings.json"), optional: false, reloadOnChange: true);
-            config.AddJsonFile(Path.Combine(pathRoot, $"appsettings.{builder.Environment}.json"), optional: true, reloadOnChange: true);
+            config.AddJsonFile(Path.Combine(pathRoot, $"appsettings.{builder.Environment.EnvironmentName}.json"), optional: true, reloadOnChange: true);
         }
     }
 });
