@@ -19,7 +19,7 @@ namespace Grand.Api.DTOs.Catalog
         public double PriceAdjustment { get; set; }
         public double WeightAdjustment { get; set; }
         public double Cost { get; set; }
-        public bool IsCostIncrementByPercentage { get; set; }
+        public bool IsCostIncrementByPercentage { get; set; } //TODO: zmiana na AdditionalFeePercentage
         public bool IsPreSelected { get; set; }
         public int DisplayOrder { get; set; }
     }
