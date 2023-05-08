@@ -2566,10 +2566,13 @@ namespace Grand.Web.Admin.Services
             if (allAttributesComb == null || allAttributesComb.Count == 0)
                 return;
 
-            var id = 1;
             foreach (var attributes in allAttributesComb)
             {
-                var existingCombination = product.FindProductAttributeCombination(attributes.ToList());
+                var customAttributes = attributes.ToList();
+                if (!customAttributes.Any())
+                    continue;
+                
+                var existingCombination = product.FindProductAttributeCombination(customAttributes);
 
                 //already exists?
                 if (existingCombination != null)
@@ -2577,7 +2580,7 @@ namespace Grand.Web.Admin.Services
 
                 //save combination
                 var combination = new ProductAttributeCombination {
-                    Attributes = attributes.ToList(),
+                    Attributes = customAttributes.ToList(),
                     StockQuantity = 0,
                     AllowOutOfStockOrders = false,
                     Sku = null,
@@ -2587,7 +2590,6 @@ namespace Grand.Web.Admin.Services
                     NotifyAdminForQuantityBelow = 1,
                 };
                 await _productAttributeService.InsertProductAttributeCombination(combination, product.Id);
-                id++;
             }
 
             if (product.ManageInventoryMethodId == ManageInventoryMethod.ManageStockByAttributes)

@@ -30,41 +30,25 @@ namespace Widgets.GoogleAnalytics
         }
 
         /// <summary>
-        /// Gets widget zones where this widget should be rendered
-        /// </summary>
-        /// <returns>Widget zones</returns>
-        public IList<string> GetWidgetZones()
-        {
-            return new List<string>
-            {
-                "body_end_html_tag_before", "clean_body_end_html_tag_before"
-            };
-        }
-
-        /// <summary>
         /// Install plugin
         /// </summary>
         public override async Task Install()
         {
             var settings = new GoogleAnalyticsEcommerceSettings
             {
-                GoogleId = "UA-0000000-0",
-                TrackingScript = @"<!-- Google code for Analytics tracking -->
+                GoogleId = "000000000",
+                TrackingScript = @"<!-- Google tag (gtag.js) -->
+                    <script async src='https://www.googletagmanager.com/gtag/js?id={GOOGLEID}'></script>
                     <script>
-                    var _gaq = _gaq || [];
-                    _gaq.push(['_setAccount', '{GOOGLEID}']);
-                    _gaq.push(['_trackPageview']);
-                    {ECOMMERCE}
-                    (function() {
-                        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                    })();
-                    </script>",
-                EcommerceScript = @"_gaq.push(['_addTrans', '{ORDERID}', '{SITE}', '{TOTAL}', '{TAX}', '{SHIP}', '{CITY}', '{STATEPROVINCE}', '{COUNTRY}']);
-                    {DETAILS} 
-                    _gaq.push(['_trackTrans']); ",
-                EcommerceDetailScript = @"_gaq.push(['_addItem', '{ORDERID}', '{PRODUCTSKU}', '{PRODUCTNAME}', '{CATEGORYNAME}', '{UNITPRICE}', '{QUANTITY}' ]); ",
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', '{GOOGLEID}');
+                        {ECOMMERCE}
+                    </script>
+                ",
+                EcommerceScript = @"gtag('event', 'purchase', {transaction_id: '{ORDERID}', value: {TOTAL}, tax: {TAX}, shipping: {SHIP}, currency: '{CURRENCY}', city: '{CITY}', state: '{STATEPROVINCE}', country: '{COUNTRY}', items: [{DETAILS}]});",
+                EcommerceDetailScript = @"{ item_id: '{PRODUCTID}', item_name: '{PRODUCTNAME}', item_category: '{CATEGORYNAME}', price: {UNITPRICE}, quantity: {QUANTITY} }, ",
                 ConsentName = "Google Analytics",
                 ConsentDescription = "Allows us to analyse the statistics of visits to our website."
             };

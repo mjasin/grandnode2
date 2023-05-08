@@ -69,4 +69,19 @@
 	<Resource Name="Admin.System.SystemInfo.GitCommit" Area="Front">
 		<Value>Git commit</Value>
 	</Resource>
+	<Resource Name="OutOfStockSubscriptions.OnlyRegistered" Area="Front">
+		<Value>Only registered customers can get notify</Value>
+	</Resource>
+	<Resource Name="OutOfStockSubscriptions.OnlyRegisteredText" Area="Front">
+		<Value>Only registered customers can use this feature</Value>
+	</Resource>
+	<Resource Name="Enums.Grand.Domain.Catalog.ProductSortingEnum.Rating" Area="Common">
+		<Value>Rating</Value>
+	</Resource>
+	<Resource Name="Admin.Settings.Catalog.FilterProductRating" Area="Admin">
+		<Value>Filtering by product rating - options (comma separator, e.g: 4.8,4.9,5)</Value>
+	</Resource>
+	<Resource Name="Catalog.Rating" Area="Front">
+		<Value>Product rating</Value>
+	</Resource>
 </Language>

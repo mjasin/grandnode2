@@ -6,6 +6,11 @@ namespace Grand.Domain.Media
     public partial class Download : BaseEntity
     {
         /// <summary>
+        /// Gets or sets a customer identifier
+        /// </summary>
+        public string CustomerId { get; set; }
+        
+        /// <summary>
         /// Gets or sets a GUID
         /// </summary>
         public Guid DownloadGuid { get; set; }
@@ -46,9 +51,14 @@ namespace Grand.Domain.Media
         public string Extension { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the download is new
+        /// Gets or sets an download type
         /// </summary>
-        public bool IsNew { get; set; }
+        public DownloadType DownloadType { get; set; }
+
+        /// <summary>
+        /// Gets or sets an object reference identifier
+        /// </summary>
+        public string ReferenceId { get; set; }
     }
 
 }

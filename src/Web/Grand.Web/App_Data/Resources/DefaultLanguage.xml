@@ -10011,6 +10011,9 @@
 	<Resource Name="Admin.Settings.Catalog.EmailAFriendEnabled" Area="Admin">
 		<Value>'Email a friend' enabled</Value>
 	</Resource>
+	<Resource Name="Admin.Settings.Catalog.FilterProductRating" Area="Admin">
+		<Value>Filtering by product rating - options (comma separator, e.g: 4.8,4.9,5)</Value>
+	</Resource>
 	<Resource Name="Admin.Settings.Catalog.General" Area="Admin">
 		<Value>General</Value>
 	</Resource>
@@ -12572,6 +12575,9 @@
 	<Resource Name="Catalog.PageSize.PerPage" Area="Front">
 		<Value>per page</Value>
 	</Resource>
+	<Resource Name="Catalog.Rating" Area="Front">
+		<Value>Product rating</Value>
+	</Resource>
 	<Resource Name="Catalog.Selectors.Fiters" Area="Front">
 		<Value>Filters</Value>
 	</Resource>
@@ -12959,6 +12965,9 @@
 	<Resource Name="ContactUs.EmailSubject" Area="Front">
 		<Value>{0}. Contact us</Value>
 	</Resource>
+	<Resource Name="ContactUs.Subject.Hint" Area="Front">
+		<Value>Enter your subject</Value>
+	</Resource>
 	<Resource Name="ContactUs.Enquiry" Area="Front">
 		<Value>Enquiry</Value>
 	</Resource>
@@ -13234,6 +13243,9 @@
 	</Resource>
 	<Resource Name="Enums.Grand.Domain.Catalog.ProductSortingEnum.PriceDesc" Area="Common">
 		<Value>Price: High to Low</Value>
+	</Resource>
+	<Resource Name="Enums.Grand.Domain.Catalog.ProductSortingEnum.Rating" Area="Common">
+		<Value>Rating</Value>
 	</Resource>
 	<Resource Name="Enums.Grand.Domain.Catalog.ProductType.BundledProduct" Area="Common">
 		<Value>Bundled product</Value>
@@ -14274,6 +14286,9 @@
 		<Value>Notify me when available</Value>
 	</Resource>
 	<Resource Name="OutOfStockSubscriptions.OnlyRegistered" Area="Front">
+		<Value>Only registered customers can get notify</Value>
+	</Resource>
+	<Resource Name="OutOfStockSubscriptions.OnlyRegisteredText" Area="Front">
 		<Value>Only registered customers can use this feature</Value>
 	</Resource>
 	<Resource Name="OutOfStockSubscriptions.PleaseWait" Area="Front">
