@@ -1,5 +1,4 @@
-﻿@using Grand.Infrastructure;
-@inject Grand.Domain.Localization.LanguageSettings languageSettings
+﻿@inject Grand.Domain.Localization.LanguageSettings languageSettings
 @inject IWorkContext workContext
 <script>
     const wwwrootpath = '@(Common.WwwRoot)';
@@ -23,6 +22,7 @@
     <link rel="stylesheet" type="text/css" href="@string.Format(Common.WwwRoot+"/administration/kendo/styles/{0}/kendo.material.min.css", kendoVersion)" />
     <link rel="stylesheet" type="text/css" href="@string.Format(Common.WwwRoot+"/administration/kendo/styles/{0}/kendo.common-material.min.css", kendoVersion)" />
 
+    <link rel="stylesheet" type="text/css" asp-src="@(Common.WwwRoot)/administration/farbtastic/farbtastic.css" />
 
     //CSS
     if (supportRtl)
@@ -47,7 +47,7 @@
     <script asp-location="Head" asp-src="@(Common.WwwRoot)/administration/admin.common.js"></script>
     <script asp-location="Head" asp-src="@string.Format(Common.WwwRoot+"/administration/kendo/scripts/{0}/kendo.ui.core.min.js", kendoVersion)"></script>
     <script asp-location="Head" asp-src="@string.Format(Common.WwwRoot+"/administration/kendo/scripts/{0}/kendo.grid.js", kendoVersion)"></script>
-    <script asp-location="Head" asp-src="@string.Format(Common.WwwRoot+"/administration/kendo/scripts/{0}/cultures/kendo.culture.{1}.min.js", kendoVersion, "en-US" )"></script>
+    <script asp-location="Head" asp-src="@string.Format(Common.WwwRoot+"/administration/kendo/scripts/{0}/cultures/kendo.culture.{1}.js", kendoVersion, @CultureInfo.CurrentCulture.Name)"></script>
 
 
     <script asp-location="Footer" asp-src="@(Common.WwwRoot)/administration/bootstrap/js/popper.min.js"></script>
@@ -58,4 +58,6 @@
     <script asp-location="Footer" asp-src="@(Common.WwwRoot)/administration/elfinder/js/elfinder.min.js"></script>
     <script asp-location="Footer" asp-src="@(Common.WwwRoot)/administration/magnific-popup/jquery.magnific-popup.min.js"></script>
     <script asp-location="Footer" asp-src="@(Common.WwwRoot)/administration/jquery.tmpl.min.js"></script>
+    <script asp-location="Footer" asp-src="@(Common.WwwRoot)/administration/farbtastic/farbtastic.js"></script>
+
 }

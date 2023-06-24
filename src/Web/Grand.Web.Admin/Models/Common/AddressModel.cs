@@ -2,11 +2,14 @@
 using Grand.Domain.Common;
 using Grand.Infrastructure.ModelBinding;
 using Grand.Infrastructure.Models;
+using Grand.Web.Common.Binders;
+using Grand.Web.Common.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Grand.Web.Admin.Models.Common
 {
-    public partial class AddressModel : BaseEntityModel
+    public class AddressModel : BaseEntityModel
     {
         public AddressModel()
         {
@@ -75,7 +78,9 @@ namespace Grand.Web.Admin.Models.Common
         public string FormattedCustomAddressAttributes { get; set; }
         public IList<AddressAttributeModel> CustomAddressAttributes { get; set; }
 
-
+        [ModelBinder(BinderType = typeof(CustomAttributesBinder))]
+        public IList<CustomAttributeModel> SelectedAttributes { get; set; }
+        
         public IList<SelectListItem> AvailableCountries { get; set; }
         public IList<SelectListItem> AvailableStates { get; set; }
 
@@ -113,7 +118,7 @@ namespace Grand.Web.Admin.Models.Common
 
         #region Nested classes
 
-        public partial class AddressAttributeModel : BaseEntityModel
+        public class AddressAttributeModel : BaseEntityModel
         {
             public AddressAttributeModel()
             {
@@ -134,7 +139,7 @@ namespace Grand.Web.Admin.Models.Common
             public IList<AddressAttributeValueModel> Values { get; set; }
         }
 
-        public partial class AddressAttributeValueModel : BaseEntityModel
+        public class AddressAttributeValueModel : BaseEntityModel
         {
             public string Name { get; set; }
 

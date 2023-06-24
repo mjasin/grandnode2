@@ -7,7 +7,7 @@ using Grand.Infrastructure;
 using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Filters;
 using Grand.Web.Common.Security.Authorization;
-using Grand.Web.Admin.Extensions;
+using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Pages;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Grand.Web.Admin.Controllers
 {
     [PermissionAuthorize(PermissionSystemName.Pages)]
-    public partial class PageController : BaseAdminController
+    public class PageController : BaseAdminController
     {
         #region Fields
 
@@ -150,10 +150,6 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost, ArgumentNameFilter(KeyName = "save-continue", Argument = "continueEditing")]
         public async Task<IActionResult> Edit(PageModel model, bool continueEditing)
         {
-            if (model.StartDateUtc.HasValue && model.EndDateUtc.HasValue && model.StartDateUtc >= model.EndDateUtc)
-            {
-                ModelState.AddModelError(nameof(model.StartDateUtc), "Start Date cannot be later than End Date");
-            }
             var page = await _pageService.GetPageById(model.Id);
             if (page == null)
                 //No page found with the specified id
@@ -167,7 +163,6 @@ namespace Grand.Web.Admin.Controllers
                 {
                     //selected tab
                     await SaveSelectedTabIndex();
-
                     return RedirectToAction("Edit", new { id = page.Id });
                 }
                 return RedirectToAction("List");

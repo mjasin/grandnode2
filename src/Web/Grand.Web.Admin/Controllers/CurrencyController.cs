@@ -7,7 +7,7 @@ using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Domain.Directory;
 using Grand.Infrastructure.Caching;
 using Grand.SharedKernel;
-using Grand.Web.Admin.Extensions;
+using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Directory;
 using Grand.Web.Common.DataSource;
@@ -21,7 +21,7 @@ using System.Globalization;
 namespace Grand.Web.Admin.Controllers
 {
     [PermissionAuthorize(PermissionSystemName.Currencies)]
-    public partial class CurrencyController : BaseAdminController
+    public class CurrencyController : BaseAdminController
     {
         #region Fields
 
@@ -107,10 +107,10 @@ namespace Grand.Web.Admin.Controllers
 
         [HttpPost]
         [PermissionAuthorizeAction(PermissionActionName.Edit)]
-        public async Task<IActionResult> List(IFormCollection formValues)
+        public async Task<IActionResult> List(ExchangeRateModel model)
         {
-            _currencySettings.ActiveExchangeRateProviderSystemName = formValues["exchangeRateProvider"];
-            _currencySettings.AutoUpdateEnabled = !formValues["autoUpdateEnabled"].Equals("false");
+            _currencySettings.ActiveExchangeRateProviderSystemName = model.ExchangeRateProvider;
+            _currencySettings.AutoUpdateEnabled = model.AutoUpdateEnabled;
             await _settingService.SaveSetting(_currencySettings);
             return RedirectToAction("List", "Currency");
         }

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Grand.Web.Admin.Controllers
 {
     [PermissionAuthorize(PermissionSystemName.MessageContactForm)]
-    public partial class ContactFormController : BaseAdminController
+    public class ContactFormController : BaseAdminController
     {
         private readonly IContactUsService _contactUsService;
         private readonly IContactFormViewModelService _contactFormViewModelService;
@@ -68,28 +68,18 @@ namespace Grand.Web.Admin.Controllers
 
         [HttpPost]
         [PermissionAuthorizeAction(PermissionActionName.Delete)]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(ContactFormDeleteModel model)
         {
-            var contactform = await _contactUsService.GetContactUsById(id);
-            if (contactform == null)
-                //No email found with the specified id
-                return RedirectToAction("List");
-
-            if (_workContext.CurrentVendor != null)
-            {
-                if (contactform.VendorId != _workContext.CurrentVendor.Id)
-                    ModelState.AddModelError("", "This is not your contact us form");
-            }
-
+            var contactForm = await _contactUsService.GetContactUsById(model.Id);
             if (ModelState.IsValid)
             {
-                await _contactUsService.DeleteContactUs(contactform);
+                await _contactUsService.DeleteContactUs(contactForm);
 
                 Success(_translationService.GetResource("Admin.System.ContactForm.Deleted"));
                 return RedirectToAction("List");
             }
             Error(ModelState);
-            return RedirectToAction("Details", new { id });
+            return RedirectToAction("Details", new { model.Id });
         }
 
         [HttpPost]

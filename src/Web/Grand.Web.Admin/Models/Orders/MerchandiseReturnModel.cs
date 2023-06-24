@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Grand.Web.Admin.Models.Orders
 {
-    public partial class MerchandiseReturnModel : BaseEntityModel
+    public class MerchandiseReturnModel : BaseEntityModel
     {
         public MerchandiseReturnModel()
         {
@@ -71,7 +71,7 @@ namespace Grand.Web.Admin.Models.Orders
         [GrandResourceDisplayName("Admin.Orders.MerchandiseReturns.MerchandiseReturnNotes.Fields.Download")]
         [UIHint("Download")]
         public string AddMerchandiseReturnNoteDownloadId { get; set; }
-
+        
         public class MerchandiseReturnItemModel : BaseEntityModel
         {
             public string ProductId { get; set; }
@@ -87,7 +87,7 @@ namespace Grand.Web.Admin.Models.Orders
             public string RequestedAction { get; set; }
         }
 
-        public partial class MerchandiseReturnNote : BaseEntityModel
+        public class MerchandiseReturnNote : BaseEntityModel
         {
             public string MerchandiseReturnId { get; set; }
             [GrandResourceDisplayName("Admin.Orders.MerchandiseReturns.MerchandiseReturnNotes.Fields.DisplayToCustomer")]

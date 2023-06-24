@@ -1,11 +1,14 @@
 ﻿using Grand.Domain.Catalog;
 using Grand.Infrastructure.ModelBinding;
 using Grand.Infrastructure.Models;
+using Grand.Web.Common.Binders;
+using Grand.Web.Common.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace Grand.Web.Admin.Models.Catalog
 {
-    public partial class ProductAttributeCombinationModel : BaseModel
+    public class ProductAttributeCombinationModel : BaseModel
     {
         public string Id { get; set; }
 
@@ -54,6 +57,9 @@ namespace Grand.Web.Admin.Models.Catalog
 
         public IList<ProductAttributeModel> ProductAttributes { get; set; }
 
+        [ModelBinder(BinderType = typeof(CustomAttributesBinder))]
+        public IList<CustomAttributeModel> SelectedAttributes { get; set; }
+        
         public IList<string> Warnings { get; set; }
 
         public string ProductId { get; set; }
@@ -65,7 +71,7 @@ namespace Grand.Web.Admin.Models.Catalog
 
         #region Nested classes
 
-        public partial class ProductAttributeModel : BaseEntityModel
+        public class ProductAttributeModel : BaseEntityModel
         {
             public ProductAttributeModel()
             {
@@ -80,14 +86,14 @@ namespace Grand.Web.Admin.Models.Catalog
             public IList<ProductAttributeValueModel> Values { get; set; }
         }
 
-        public partial class ProductAttributeValueModel : BaseEntityModel
+        public class ProductAttributeValueModel : BaseEntityModel
         {
             public string Name { get; set; }
 
             public bool IsPreSelected { get; set; }
         }
 
-        public partial class WarehouseInventoryModel : BaseEntityModel
+        public class WarehouseInventoryModel : BaseEntityModel
         {
             [GrandResourceDisplayName("Admin.Catalog.Products.ProductAttributes.AttributeCombination.WarehouseInventory.Fields.Warehouse")]
             public string WarehouseId { get; set; }

@@ -20,7 +20,7 @@ namespace Grand.Web.Admin.Interfaces
         Task<Product> InsertProductModel(ProductModel model);
         Task<Product> UpdateProductModel(Product product, ProductModel model);
         Task DeleteProduct(Product product);
-        Task DeleteSelected(IList<string> selectedIds);
+        Task DeleteSelected(IEnumerable<string> selectedIds);
         Task<ProductModel.AddRequiredProductModel> PrepareAddRequiredProductModel();
         Task<(IList<ProductModel> products, int totalCount)> PrepareProductModel(ProductModel.AddProductModel model, int pageIndex, int pageSize);
         Task<IList<ProductModel.ProductCategoryModel>> PrepareProductCategoryModel(Product product);
@@ -54,8 +54,8 @@ namespace Grand.Web.Admin.Interfaces
         Task<ProductModel.AddAssociatedProductModel> PrepareAssociatedProductModel();
         Task<BulkEditListModel> PrepareBulkEditListModel();
         Task<(IEnumerable<BulkEditProductModel> bulkEditProductModels, int totalCount)> PrepareBulkEditProductModel(BulkEditListModel model, int pageIndex, int pageSize);
-        Task UpdateBulkEdit(IList<BulkEditProductModel> products);
-        Task DeleteBulkEdit(IList<BulkEditProductModel> products);
+        Task UpdateBulkEdit(IEnumerable<BulkEditProductModel> products);
+        Task DeleteBulkEdit(IEnumerable<BulkEditProductModel> products);
         //tierprices
         Task<IList<ProductModel.TierPriceModel>> PrepareTierPriceModel(Product product);
         Task<(IEnumerable<ProductModel.BidModel> bidModels, int totalCount)> PrepareBidMode(string productId, int pageIndex, int pageSize);
@@ -69,7 +69,7 @@ namespace Grand.Web.Admin.Interfaces
         Task<ProductModel.ProductAttributeMappingModel> PrepareProductAttributeMappingModel(ProductAttributeMapping productAttributeMapping);
         Task UpdateProductAttributeValidationRulesModel(ProductAttributeMapping productAttributeMapping, ProductModel.ProductAttributeMappingModel model);
         Task<ProductAttributeConditionModel> PrepareProductAttributeConditionModel(Product product, ProductAttributeMapping productAttributeMapping);
-        Task UpdateProductAttributeConditionModel(Product product, ProductAttributeMapping productAttributeMapping, ProductAttributeConditionModel model, Dictionary<string, string> form);
+        Task UpdateProductAttributeConditionModel(Product product, ProductAttributeMapping productAttributeMapping, ProductAttributeConditionModel model);
         Task<ProductModel.ProductAttributeValueModel> PrepareProductAttributeValueModel(Product product, ProductAttributeMapping productAttributeMapping);
         Task<IList<ProductModel.ProductAttributeValueModel>> PrepareProductAttributeValueModels(Product product, ProductAttributeMapping productAttributeMapping);
         Task<ProductModel.ProductAttributeValueModel> PrepareProductAttributeValueModel(ProductAttributeMapping pa, ProductAttributeValue pav);
@@ -78,8 +78,7 @@ namespace Grand.Web.Admin.Interfaces
         Task<ProductModel.ProductAttributeValueModel.AssociateProductToAttributeValueModel> PrepareAssociateProductToAttributeValueModel();
         Task<IList<ProductModel.ProductAttributeCombinationModel>> PrepareProductAttributeCombinationModel(Product product);
         Task<ProductAttributeCombinationModel> PrepareProductAttributeCombinationModel(Product product, string combinationId);
-        //tier prices for combination
-        Task<IList<string>> InsertOrUpdateProductAttributeCombinationPopup(Product product, ProductAttributeCombinationModel model, Dictionary<string, string> form);
+        Task<IList<string>> InsertOrUpdateProductAttributeCombinationPopup(Product product, ProductAttributeCombinationModel model);
         Task GenerateAllAttributeCombinations(Product product);
 
         Task ClearAllAttributeCombinations(Product product);

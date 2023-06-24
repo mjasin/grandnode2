@@ -24,14 +24,14 @@ using Grand.Web.Admin.Models.Orders;
 using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Filters;
 using Grand.Web.Common.Security.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Grand.Business.Core.Interfaces.ExportImport;
+using Grand.Web.Common.Models;
 
 namespace Grand.Web.Admin.Controllers
 {
     [PermissionAuthorize(PermissionSystemName.Customers)]
-    public partial class CustomerController : BaseAdminController
+    public class CustomerController : BaseAdminController
     {
         #region Fields
 
@@ -104,22 +104,22 @@ namespace Grand.Web.Admin.Controllers
 
         #endregion
 
-        protected virtual async Task<IList<CustomAttribute>> ParseCustomCustomerAttributes(IFormCollection form)
+        protected virtual async Task<IList<CustomAttribute>> ParseCustomCustomerAttributes(IList<CustomAttributeModel> model)
         {
-            if (form == null)
-                throw new ArgumentNullException(nameof(form));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
             var customAttributes = new List<CustomAttribute>();
             var customerAttributes = await _customerAttributeService.GetAllCustomerAttributes();
             foreach (var attribute in customerAttributes)
             {
-                string controlId = string.Format("customer_attribute_{0}", attribute.Id);
+                var controlId = $"customer_attribute_{attribute.Id}";
                 switch (attribute.AttributeControlTypeId)
                 {
                     case AttributeControlType.DropdownList:
                     case AttributeControlType.RadioList:
                         {
-                            form.TryGetValue(controlId, out var ctrlAttributes);
+                            var ctrlAttributes = model.FirstOrDefault(x => x.Key == attribute.Id)?.Value;
                             if (!string.IsNullOrEmpty(ctrlAttributes))
                             {
                                 customAttributes = _customerAttributeParser.AddCustomerAttribute(customAttributes,
@@ -129,10 +129,10 @@ namespace Grand.Web.Admin.Controllers
                         break;
                     case AttributeControlType.Checkboxes:
                         {
-                            form.TryGetValue(controlId, out var cblAttributes);
+                            var cblAttributes = model.FirstOrDefault(x => x.Key == attribute.Id)?.Value;
                             if (!string.IsNullOrEmpty(cblAttributes))
                             {
-                                foreach (var item in cblAttributes)
+                                foreach (var item in cblAttributes.Split(','))
                                 {
                                     if (!string.IsNullOrEmpty(item))
                                         customAttributes = _customerAttributeParser.AddCustomerAttribute(customAttributes,
@@ -158,10 +158,10 @@ namespace Grand.Web.Admin.Controllers
                     case AttributeControlType.TextBox:
                     case AttributeControlType.MultilineTextbox:
                         {
-                            form.TryGetValue(controlId, out var ctrlAttributes);
+                            var ctrlAttributes = model.FirstOrDefault(x => x.Key == attribute.Id)?.Value;
                             if (!string.IsNullOrEmpty(ctrlAttributes))
                             {
-                                string enteredText = ctrlAttributes.ToString().Trim();
+                                var enteredText = ctrlAttributes.ToString().Trim();
                                 customAttributes = _customerAttributeParser.AddCustomerAttribute(customAttributes,
                                     attribute, enteredText).ToList();
                             }
@@ -182,8 +182,8 @@ namespace Grand.Web.Admin.Controllers
 
         protected virtual async Task<bool> CheckSalesManager(Customer customer)
         {
-            return (await _groupService.IsSalesManager(_workContext.CurrentCustomer)
-                && (_workContext.CurrentCustomer.SeId != customer.SeId));
+            return await _groupService.IsSalesManager(_workContext.CurrentCustomer)
+                   && _workContext.CurrentCustomer.SeId != customer.SeId;
         }
 
         #region Customers
@@ -223,7 +223,7 @@ namespace Grand.Web.Admin.Controllers
 
         [PermissionAuthorizeAction(PermissionActionName.Edit)]
         [HttpPost, ArgumentNameFilter(KeyName = "save-continue", Argument = "continueEditing")]
-        public async Task<IActionResult> Create(CustomerModel model, bool continueEditing, IFormCollection form)
+        public async Task<IActionResult> Create(CustomerModel model, bool continueEditing)
         {
             if (!string.IsNullOrWhiteSpace(model.Email))
             {
@@ -264,7 +264,7 @@ namespace Grand.Web.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                model.Attributes = await ParseCustomCustomerAttributes(form);
+                model.Attributes = await ParseCustomCustomerAttributes(model.SelectedAttributes);
                 var customer = await _customerViewModelService.InsertCustomerModel(model);
 
                 //password
@@ -318,7 +318,7 @@ namespace Grand.Web.Admin.Controllers
 
         [PermissionAuthorizeAction(PermissionActionName.Edit)]
         [HttpPost, ArgumentNameFilter(KeyName = "save-continue", Argument = "continueEditing")]
-        public async Task<IActionResult> Edit(CustomerModel model, bool continueEditing, IFormCollection form)
+        public async Task<IActionResult> Edit(CustomerModel model, bool continueEditing)
         {
             var customer = await _customerService.GetCustomerById(model.Id);
             if (customer == null || customer.Deleted || await CheckSalesManager(customer))
@@ -344,7 +344,7 @@ namespace Grand.Web.Admin.Controllers
                 if (custowner == null)
                     ModelState.AddModelError("", "Owner email is not exists");
 
-                if (model.Owner.ToLower() == model.Email.ToLower())
+                if (string.Equals(model.Owner, model.Email, StringComparison.CurrentCultureIgnoreCase))
                     ModelState.AddModelError("", "You can't assign own email");
             }
 
@@ -358,7 +358,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 try
                 {
-                    model.Attributes = await ParseCustomCustomerAttributes(form);
+                    model.Attributes = await ParseCustomCustomerAttributes(model.SelectedAttributes);
                     customer = await _customerViewModelService.UpdateCustomerModel(customer, model);
                     //change password
                     if (!string.IsNullOrWhiteSpace(model.Password))
@@ -563,13 +563,13 @@ namespace Grand.Web.Admin.Controllers
 
             try
             {
-                if (String.IsNullOrWhiteSpace(customer.Email))
+                if (string.IsNullOrWhiteSpace(customer.Email))
                     throw new GrandException("Customer email is empty");
                 if (!CommonHelper.IsValidEmail(customer.Email))
                     throw new GrandException("Customer email is not valid");
-                if (String.IsNullOrWhiteSpace(model.SendEmail.Subject))
+                if (string.IsNullOrWhiteSpace(model.SendEmail.Subject))
                     throw new GrandException("Email subject is empty");
-                if (String.IsNullOrWhiteSpace(model.SendEmail.Body))
+                if (string.IsNullOrWhiteSpace(model.SendEmail.Body))
                     throw new GrandException("Email body is empty");
 
                 await _customerViewModelService.SendEmail(customer, model.SendEmail);
@@ -676,7 +676,7 @@ namespace Grand.Web.Admin.Controllers
 
         [PermissionAuthorizeAction(PermissionActionName.Edit)]
         [HttpPost]
-        public async Task<IActionResult> AddressCreate(CustomerAddressModel model, IFormCollection form)
+        public async Task<IActionResult> AddressCreate(CustomerAddressModel model)
         {
             var customer = await _customerService.GetCustomerById(model.CustomerId);
             if (customer == null || customer.Deleted || await CheckSalesManager(customer))
@@ -684,7 +684,7 @@ namespace Grand.Web.Admin.Controllers
                 return RedirectToAction("List");
 
             //custom address attributes
-            var customAttributes = await form.ParseCustomAddressAttributes(_addressAttributeParser, _addressAttributeService);
+            var customAttributes = await model.Address.ParseCustomAddressAttributes(_addressAttributeParser, _addressAttributeService);
             var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarnings(customAttributes);
             foreach (var error in customAttributeWarnings)
             {
@@ -711,7 +711,7 @@ namespace Grand.Web.Admin.Controllers
                 //No customer found with the specified id
                 return RedirectToAction("List");
 
-            var address = customer.Addresses.Where(x => x.Id == addressId).FirstOrDefault();
+            var address = customer.Addresses.FirstOrDefault(x => x.Id == addressId);
             if (address == null)
                 //No address found with the specified id
                 return RedirectToAction("Edit", new { id = customer.Id });
@@ -724,20 +724,20 @@ namespace Grand.Web.Admin.Controllers
         [PermissionAuthorizeAction(PermissionActionName.Edit)]
         [HttpPost]
 
-        public async Task<IActionResult> AddressEdit(CustomerAddressModel model, IFormCollection form)
+        public async Task<IActionResult> AddressEdit(CustomerAddressModel model)
         {
             var customer = await _customerService.GetCustomerById(model.CustomerId);
             if (customer == null || customer.Deleted || await CheckSalesManager(customer))
                 //No customer found with the specified id
                 return RedirectToAction("List");
 
-            var address = customer.Addresses.Where(x => x.Id == model.Address.Id).FirstOrDefault();
+            var address = customer.Addresses.FirstOrDefault(x => x.Id == model.Address.Id);
             if (address == null)
                 //No address found with the specified id
                 return RedirectToAction("Edit", new { id = customer.Id });
 
             //custom address attributes
-            var customAttributes = await form.ParseCustomAddressAttributes(_addressAttributeParser, _addressAttributeService);
+            var customAttributes = await model.Address.ParseCustomAddressAttributes(_addressAttributeParser, _addressAttributeService);
             var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarnings(customAttributes);
             foreach (var error in customAttributeWarnings)
             {
@@ -852,7 +852,7 @@ namespace Grand.Web.Admin.Controllers
             var gridModel = new DataSourceResult
             {
                 Data = items,
-                Total = productReviews.TotalCount,
+                Total = productReviews.TotalCount
             };
             return Json(gridModel);
         }
@@ -1026,7 +1026,7 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> ContactFormList(DataSourceRequest command, string customerId)
         {
-            string vendorId = "";
+            var vendorId = "";
             if (_workContext.CurrentVendor != null)
             {
                 vendorId = _workContext.CurrentVendor.Id;
@@ -1141,7 +1141,7 @@ namespace Grand.Web.Admin.Controllers
 
             try
             {
-                byte[] bytes = await _exportManager.Export(customers);
+                var bytes = await _exportManager.Export(customers);
                 return File(bytes, "text/xls", "customers.xlsx");
             }
             catch (Exception exc)
@@ -1165,7 +1165,7 @@ namespace Grand.Web.Admin.Controllers
                 customers.AddRange(await _customerService.GetCustomersByIds(ids));
             }
 
-            byte[] bytes = await _exportManager.Export(customers);
+            var bytes = await _exportManager.Export(customers);
             return File(bytes, "text/xls", "customers.xlsx");
         }
 
