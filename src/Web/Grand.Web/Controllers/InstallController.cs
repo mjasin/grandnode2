@@ -1,9 +1,7 @@
 ﻿using Grand.Business.Core.Commands.System.Security;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Data;
-using Grand.Domain.Logging;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Migrations;
@@ -16,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Grand.Web.Controllers
 {
@@ -141,11 +140,13 @@ namespace Grand.Web.Controllers
                     if (string.IsNullOrEmpty(model.MongoDBServerName))
                         ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "MongoDBServerNameRequired"));
 
-                    var userNameandPassword = "";
-                    if (!string.IsNullOrEmpty(model.MongoDBUsername))
-                        userNameandPassword = model.MongoDBUsername + ":" + model.MongoDBPassword + "@";
-
-                    connectionString = "mongodb://" + userNameandPassword + model.MongoDBServerName + "/" + model.MongoDBDatabaseName;
+                    var builder = new MongoDB.Driver.MongoUrlBuilder {
+                        Server = new MongoDB.Driver.MongoServerAddress(model.MongoDBServerName),
+                        Username = model.MongoDBUsername,
+                        Password = model.MongoDBPassword,
+                        DatabaseName = model.MongoDBDatabaseName
+                    };
+                    connectionString = builder.ToString();
                 }
                 else
                 {
@@ -163,13 +164,14 @@ namespace Grand.Web.Controllers
 
         protected async Task CheckConnectionString(IInstallationLocalizedService locService, string connectionString, InstallModel model)
         {
-            if (!_dbConfig.UseLiteDb && model.DataProvider == DbProvider.LiteDB)
+            switch (_dbConfig.UseLiteDb)
             {
-                ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "UseLiteDbEnable"));
-            }
-            if (_dbConfig.UseLiteDb && model.DataProvider != DbProvider.LiteDB)
-            {
-                ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "UseLiteDbDisable"));
+                case false when model.DataProvider == DbProvider.LiteDB:
+                    ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "UseLiteDbEnable"));
+                    break;
+                case true when model.DataProvider != DbProvider.LiteDB:
+                    ModelState.AddModelError("", locService.GetResource(model.SelectedLanguage, "UseLiteDbDisable"));
+                    break;
             }
 
             if (ModelState.IsValid && !string.IsNullOrEmpty(connectionString))
@@ -242,8 +244,8 @@ namespace Grand.Web.Controllers
                     }
                     catch (Exception ex)
                     {
-                        var _logger = _serviceProvider.GetRequiredService<ILogger>();
-                        await _logger.InsertLog(LogLevel.Error, "Error during installing plugin " + pluginInfo.SystemName,
+                        var logger = _serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("InstallController");
+                        logger.LogError(ex, "Error during installing plugin " + pluginInfo.SystemName,
                             ex.Message + " " + ex.InnerException?.Message);
                     }
                 }

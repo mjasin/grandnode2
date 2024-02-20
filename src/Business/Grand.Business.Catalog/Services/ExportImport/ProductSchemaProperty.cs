@@ -145,13 +145,11 @@ namespace Grand.Business.Catalog.Services.ExportImport
                     case 2:
                         picture3 = pictureLocalPath;
                         break;
-                    default:
-                        break;
                 }
                 i++;
             }
 
-            return new[] { picture1, picture2, picture3 };
+            return [picture1, picture2, picture3];
         }
     }
 }

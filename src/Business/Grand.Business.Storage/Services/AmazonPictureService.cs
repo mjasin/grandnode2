@@ -2,14 +2,13 @@
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Storage;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Media;
-using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Configuration;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System.Net;
 
 namespace Grand.Business.Storage.Services
@@ -32,9 +31,8 @@ namespace Grand.Business.Storage.Services
         #region Ctor
 
         public AmazonPictureService(IRepository<Picture> pictureRepository,
-            ILogger logger,
+            ILogger<AmazonPictureService> logger,
             IMediator mediator,
-            IWorkContext workContext,
             ICacheBase cacheBase,
             IMediaFileStore mediaFileStore,
             MediaSettings mediaSettings,
@@ -43,7 +41,6 @@ namespace Grand.Business.Storage.Services
             : base(pictureRepository,
                 logger,
                 mediator,
-                workContext,
                 cacheBase,
                 mediaFileStore,
                 mediaSettings,
@@ -90,7 +87,7 @@ namespace Grand.Business.Storage.Services
                     var s3Region = S3Region.FindValue(_config.AmazonRegion);
                     var putBucketRequest = new PutBucketRequest {
                         BucketName = _bucketName,
-                        BucketRegion = s3Region,
+                        BucketRegion = s3Region
                     };
 
                     try
@@ -129,7 +126,7 @@ namespace Grand.Business.Storage.Services
         {
             await CheckBucketExists();
 
-            var listObjectsRequest = new ListObjectsV2Request() {
+            var listObjectsRequest = new ListObjectsV2Request {
                 BucketName = _bucketName,
                 Prefix = picture.Id
             };
@@ -199,11 +196,11 @@ namespace Grand.Business.Storage.Services
 
             using (Stream stream = new MemoryStream(binary))
             {
-                var putObjectRequest = new PutObjectRequest() {
+                var putObjectRequest = new PutObjectRequest {
                     BucketName = _bucketName,
                     InputStream = stream,
                     Key = thumbFileName,
-                    StorageClass = S3StorageClass.Standard,
+                    StorageClass = S3StorageClass.Standard
                 };
                 _s3Client.PutObjectAsync(putObjectRequest).Wait();
             }
@@ -218,7 +215,7 @@ namespace Grand.Business.Storage.Services
         {
             await CheckBucketExists();
 
-            var listObjectsRequest = new ListObjectsV2Request() {
+            var listObjectsRequest = new ListObjectsV2Request {
                 BucketName = _bucketName
             };
             var listObjectsResponse = await _s3Client.ListObjectsV2Async(listObjectsRequest);

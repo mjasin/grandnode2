@@ -24,7 +24,6 @@ namespace Grand.Web.Admin.Controllers
     {
         #region Fields
 
-        private readonly IPaymentService _paymentService;
         private readonly IPaymentTransactionService _paymentTransactionService;
         private readonly IOrderService _orderService;
         private readonly ITranslationService _translationService;
@@ -33,12 +32,11 @@ namespace Grand.Web.Admin.Controllers
         private readonly IDateTimeService _dateTimeService;
         private readonly IMediator _mediator;
 
-        #endregion Fields
+        #endregion Fields
 
         #region Constructors
 
         public PaymentTransactionController(
-            IPaymentService paymentService,
             ITranslationService translationService,
             IPaymentTransactionService paymentTransactionService,
             IOrderService orderService,
@@ -48,7 +46,6 @@ namespace Grand.Web.Admin.Controllers
             IMediator mediator
             )
         {
-            _paymentService = paymentService;
             _translationService = translationService;
             _paymentTransactionService = paymentTransactionService;
             _orderService = orderService;
@@ -63,7 +60,10 @@ namespace Grand.Web.Admin.Controllers
         #region Methods
 
         //list
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
         public IActionResult List()
         {
@@ -527,10 +527,6 @@ namespace Grand.Web.Admin.Controllers
             {
                 return RedirectToAction("List", "MerchandiseReturn");
             }
-
-            if (_workContext.CurrentVendor != null)
-                return RedirectToAction("List", "PaymentTransaction");
-
             if (ModelState.IsValid)
             {
                 await _paymentTransactionService.DeletePaymentTransaction(paymentTransaction);

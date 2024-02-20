@@ -4,12 +4,15 @@ using Grand.Business.Core.Utilities.Common.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using MongoDB.AspNetCore.OData;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace Grand.Api.Controllers.OData
 {
-    public partial class BrandLayoutController : BaseODataController
+    [Route("odata/BrandLayout")]
+    [ApiExplorerSettings(IgnoreApi = false, GroupName = "v1")]
+    public class BrandLayoutController : BaseODataController
     {
         private readonly IMediator _mediator;
         private readonly IPermissionService _permissionService;
@@ -29,7 +32,7 @@ namespace Grand.Api.Controllers.OData
         {
             if (!await _permissionService.Authorize(PermissionSystemName.Maintenance)) return Forbid();
 
-            var layout = await _mediator.Send(new GetLayoutQuery() { Id = key, LayoutName = typeof(Domain.Catalog.BrandLayout).Name });
+            var layout = await _mediator.Send(new GetLayoutQuery { Id = key, LayoutName = typeof(Domain.Catalog.BrandLayout).Name });
             if (!layout.Any()) return NotFound();
 
             return Ok(layout.FirstOrDefault());
@@ -37,14 +40,14 @@ namespace Grand.Api.Controllers.OData
 
         [SwaggerOperation(summary: "Get entities from BrandLayout", OperationId = "GetBrandLayouts")]
         [HttpGet]
-        [EnableQuery(HandleNullPropagation = HandleNullPropagationOption.False)]
+        [MongoEnableQuery(HandleNullPropagation = HandleNullPropagationOption.False)]
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get()
         {
             if (!await _permissionService.Authorize(PermissionSystemName.Maintenance)) return Forbid();
 
-            return Ok(await _mediator.Send(new GetLayoutQuery() { LayoutName = typeof(Domain.Catalog.BrandLayout).Name }));
+            return Ok(await _mediator.Send(new GetLayoutQuery { LayoutName = typeof(Domain.Catalog.BrandLayout).Name }));
         }
     }
 }

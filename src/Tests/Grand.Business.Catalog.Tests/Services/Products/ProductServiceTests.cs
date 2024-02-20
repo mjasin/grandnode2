@@ -1,20 +1,22 @@
-﻿using Grand.Business.Common.Services.Security;
+﻿using Grand.Business.Catalog.Services.Products;
+using Grand.Business.Common.Services.Security;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Queries.Catalog;
 using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Orders;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using Grand.SharedKernel.Extensions;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class ProductServiceTests
@@ -33,35 +35,35 @@ namespace Grand.Business.Catalog.Services.Products.Tests
 
             _productRepository = new MongoDBRepositoryTest<Product>();
             _workContextMock = new Mock<IWorkContext>();
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "" });
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "" });
             _workContextMock.Setup(c => c.CurrentCustomer).Returns(() => new Customer());
             _mediatorMock = new Mock<IMediator>();
 
             _mediatorMock.Setup(x => x.Send(It.IsAny<GetProductArchByIdQuery>(), default))
                 .Returns(Task.FromResult(new Product()));
 
-            _aclServiceMock = new AclService();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _aclServiceMock = new AclService(new AccessControlConfig());
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _productService = new ProductService(_cacheBase, _productRepository, _workContextMock.Object, _mediatorMock.Object, _aclServiceMock);
         }
 
         private async Task insertSampleProducts()
         {
-            await _productRepository.InsertAsync(new Product() { Id = "1", Published = true, VisibleIndividually = true, ShowOnHomePage = true });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true, ShowOnHomePage = true });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true, BestSeller = true });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true, BestSeller = true });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true, });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true, });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true, });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true, Sku = "test123" });
-            await _productRepository.InsertAsync(new Product() { Published = true, VisibleIndividually = true, ParentGroupedProductId = "1" });
+            await _productRepository.InsertAsync(new Product { Id = "1", Published = true, VisibleIndividually = true, ShowOnHomePage = true });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true, ShowOnHomePage = true });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true, BestSeller = true });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true, BestSeller = true });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true, Sku = "test123" });
+            await _productRepository.InsertAsync(new Product { Published = true, VisibleIndividually = true, ParentGroupedProductId = "1" });
 
-            var product = new Product() { Published = true, VisibleIndividually = true };
+            var product = new Product { Published = true, VisibleIndividually = true };
             product.AppliedDiscounts.Add("1");
-            product.ProductCategories.Add(new ProductCategory() { CategoryId = "1" });
-            product.ProductAttributeMappings.Add(new ProductAttributeMapping() { ProductAttributeId = "1" });
+            product.ProductCategories.Add(new ProductCategory { CategoryId = "1" });
+            product.ProductAttributeMappings.Add(new ProductAttributeMapping { ProductAttributeId = "1" });
             await _productRepository.InsertAsync(product);
 
         }
@@ -131,7 +133,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         {
             await insertSampleProducts();
             //Act
-            var result = await _productService.GetProductsByIds(new[] { "1" });
+            var result = await _productService.GetProductsByIds(["1"]);
 
             //Assert
             Assert.IsTrue(result.Count > 0);
@@ -154,7 +156,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task InsertProductTest()
         {
             //Arrange 
-            var product = new Product() { Id = "1" };
+            var product = new Product { Id = "1" };
             await _productService.InsertProduct(product);
 
             //Act
@@ -168,7 +170,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UpdateProductTest()
         {
             //Arrange 
-            var product = new Product() { Id = "103", Name = "test" };
+            var product = new Product { Id = "103", Name = "test" };
             await _productService.InsertProduct(product);
 
             //Act
@@ -185,7 +187,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task DeleteProductTest()
         {
             //Arrange 
-            var product = new Product() { Id = "1" };
+            var product = new Product { Id = "1" };
             await _productService.InsertProduct(product);
 
             //Act
@@ -200,7 +202,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UnPublishProductTest()
         {
             //Arrange 
-            var product = new Product() { Id = "100", Published = true };
+            var product = new Product { Id = "100", Published = true };
             await _productService.InsertProduct(product);
 
             //Act
@@ -321,7 +323,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             var product = new Product();
             await _productService.InsertProduct(product);
             //Act
-            await _productService.InsertRelatedProduct(new RelatedProduct() { ProductId2 = "2" }, product.Id);
+            await _productService.InsertRelatedProduct(new RelatedProduct { ProductId2 = "2" }, product.Id);
 
             var result = await _productService.GetProductById(product.Id);
 
@@ -336,7 +338,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var relatedproducts = new RelatedProduct() { ProductId2 = "2" };
+            var relatedproducts = new RelatedProduct { ProductId2 = "2" };
             await _productService.InsertRelatedProduct(relatedproducts, product.Id);
 
             //Act
@@ -354,7 +356,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var relatedproducts = new RelatedProduct() { ProductId2 = "2" };
+            var relatedproducts = new RelatedProduct { ProductId2 = "2" };
             await _productService.InsertRelatedProduct(relatedproducts, product.Id);
 
             //Act
@@ -393,7 +395,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var similarProduct = new SimilarProduct() { ProductId1 = product.Id, ProductId2 = "2" };
+            var similarProduct = new SimilarProduct { ProductId1 = product.Id, ProductId2 = "2" };
             await _productService.InsertSimilarProduct(similarProduct);
 
             //Act
@@ -413,7 +415,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var similarProduct = new SimilarProduct() { ProductId1 = product.Id, ProductId2 = "2" };
+            var similarProduct = new SimilarProduct { ProductId1 = product.Id, ProductId2 = "2" };
             await _productService.InsertSimilarProduct(similarProduct);
 
             //Act
@@ -433,7 +435,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             await _productService.InsertProduct(product);
             //Act
             await _productService.InsertBundleProduct(new BundleProduct {
-                ProductId = "2",
+                ProductId = "2"
             }, product.Id);
 
             var result = await _productService.GetProductById(product.Id);
@@ -449,7 +451,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var bundleProduct = new BundleProduct() { ProductId = "2" };
+            var bundleProduct = new BundleProduct { ProductId = "2" };
             await _productService.InsertBundleProduct(bundleProduct, product.Id);
 
             //Act
@@ -469,7 +471,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var bundleProduct = new BundleProduct() { ProductId = "2" };
+            var bundleProduct = new BundleProduct { ProductId = "2" };
             await _productService.InsertBundleProduct(bundleProduct, product.Id);
 
             //Act
@@ -491,7 +493,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Act
             await _productService.InsertCrossSellProduct(new CrossSellProduct {
                 ProductId1 = product.Id,
-                ProductId2 = "2",
+                ProductId2 = "2"
             });
 
             var result = await _productService.GetProductById(product.Id);
@@ -509,7 +511,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             await _productService.InsertProduct(product);
             var crossSellProduct = new CrossSellProduct {
                 ProductId1 = product.Id,
-                ProductId2 = "2",
+                ProductId2 = "2"
             };
             await _productService.InsertCrossSellProduct(crossSellProduct);
 
@@ -527,24 +529,24 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetCrossSellProductsByShoppingCartTest()
         {
             //Arrange 
-            var product = new Product() { Published = true, VisibleIndividually = true };
+            var product = new Product { Published = true, VisibleIndividually = true };
             await _productService.InsertProduct(product);
-            var product2 = new Product() { Published = true, VisibleIndividually = true };
+            var product2 = new Product { Published = true, VisibleIndividually = true };
             await _productService.InsertProduct(product2);
-            var product3 = new Product() { Published = true, VisibleIndividually = true };
+            var product3 = new Product { Published = true, VisibleIndividually = true };
             await _productService.InsertProduct(product3);
             //Act
             await _productService.InsertCrossSellProduct(new CrossSellProduct {
                 ProductId1 = product.Id,
-                ProductId2 = product2.Id,
+                ProductId2 = product2.Id
             });
             //Act
             await _productService.InsertCrossSellProduct(new CrossSellProduct {
                 ProductId1 = product.Id,
-                ProductId2 = product3.Id,
+                ProductId2 = product3.Id
             });
 
-            var result = await _productService.GetCrossSellProductsByShoppingCart(new List<ShoppingCartItem> { new ShoppingCartItem() { ProductId = product.Id } }, 2);
+            var result = await _productService.GetCrossSellProductsByShoppingCart(new List<ShoppingCartItem> { new ShoppingCartItem { ProductId = product.Id } }, 2);
 
             //Assert
             Assert.IsNotNull(result);
@@ -593,7 +595,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             await _productService.InsertProduct(product);
 
             //Act
-            await _productService.InsertTierPrice(new TierPrice() { Price = 10, Quantity = 1 }, product.Id);
+            await _productService.InsertTierPrice(new TierPrice { Price = 10, Quantity = 1 }, product.Id);
 
             var result = await _productService.GetProductById(product.Id);
 
@@ -608,7 +610,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var tierprice = new TierPrice() { Price = 10, Quantity = 1 };
+            var tierprice = new TierPrice { Price = 10, Quantity = 1 };
             await _productService.InsertTierPrice(tierprice, product.Id);
 
             //Act
@@ -628,7 +630,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var tierprice = new TierPrice() { Price = 10, Quantity = 1 };
+            var tierprice = new TierPrice { Price = 10, Quantity = 1 };
             await _productService.InsertTierPrice(tierprice, product.Id);
 
             //Act
@@ -646,7 +648,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productPrice = new ProductPrice() { Price = 10, CurrencyCode = "USD", ProductId = product.Id };
+            var productPrice = new ProductPrice { Price = 10, CurrencyCode = "USD", ProductId = product.Id };
 
             //Act
             await _productService.InsertProductPrice(productPrice);
@@ -664,7 +666,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productPrice = new ProductPrice() { Price = 10, CurrencyCode = "USD", ProductId = product.Id };
+            var productPrice = new ProductPrice { Price = 10, CurrencyCode = "USD", ProductId = product.Id };
             await _productService.InsertProductPrice(productPrice);
 
             //Act
@@ -685,7 +687,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productPrice = new ProductPrice() { Price = 10, CurrencyCode = "USD", ProductId = product.Id };
+            var productPrice = new ProductPrice { Price = 10, CurrencyCode = "USD", ProductId = product.Id };
             await _productService.InsertProductPrice(productPrice);
 
             //Act
@@ -704,7 +706,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productPicture = new ProductPicture() { PictureId = "1" };
+            var productPicture = new ProductPicture { PictureId = "1" };
 
             //Act
             await _productService.InsertProductPicture(productPicture, product.Id);
@@ -722,7 +724,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productPicture = new ProductPicture() { PictureId = "1" };
+            var productPicture = new ProductPicture { PictureId = "1" };
             await _productService.InsertProductPicture(productPicture, product.Id);
 
             //Act
@@ -743,7 +745,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productPicture = new ProductPicture() { PictureId = "1" };
+            var productPicture = new ProductPicture { PictureId = "1" };
             await _productService.InsertProductPicture(productPicture, product.Id);
 
             //Act
@@ -762,7 +764,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productWarehouseInventory = new ProductWarehouseInventory() { WarehouseId = "1" };
+            var productWarehouseInventory = new ProductWarehouseInventory { WarehouseId = "1" };
 
             //Act
             await _productService.InsertProductWarehouseInventory(productWarehouseInventory, product.Id);
@@ -780,7 +782,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productWarehouseInventory = new ProductWarehouseInventory() { WarehouseId = "1" };
+            var productWarehouseInventory = new ProductWarehouseInventory { WarehouseId = "1" };
             await _productService.InsertProductWarehouseInventory(productWarehouseInventory, product.Id);
 
             //Act
@@ -801,7 +803,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             //Arrange 
             var product = new Product();
             await _productService.InsertProduct(product);
-            var productWarehouseInventory = new ProductWarehouseInventory() { WarehouseId = "1" };
+            var productWarehouseInventory = new ProductWarehouseInventory { WarehouseId = "1" };
             await _productService.InsertProductWarehouseInventory(productWarehouseInventory, product.Id);
 
             //Act

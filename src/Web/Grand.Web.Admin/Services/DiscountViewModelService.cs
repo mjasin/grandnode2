@@ -8,20 +8,17 @@ using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Interfaces.Customers;
 using Grand.Domain.Catalog;
 using Grand.Domain.Discounts;
 using Grand.Domain.Vendors;
 using Grand.Infrastructure;
-using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Catalog;
 using Grand.Web.Admin.Models.Discounts;
 using Grand.Web.Common.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Grand.Web.Admin.Services
@@ -32,7 +29,6 @@ namespace Grand.Web.Admin.Services
 
         private readonly IDiscountService _discountService;
         private readonly ITranslationService _translationService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly ICurrencyService _currencyService;
         private readonly ICategoryService _categoryService;
         private readonly IProductService _productService;
@@ -44,7 +40,6 @@ namespace Grand.Web.Admin.Services
         private readonly IOrderService _orderService;
         private readonly IPriceFormatter _priceFormatter;
         private readonly IDateTimeService _dateTimeService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         #endregion
 
@@ -55,7 +50,6 @@ namespace Grand.Web.Admin.Services
             ICurrencyService currencyService,
             ICategoryService categoryService,
             IProductService productService,
-            ICustomerActivityService customerActivityService,
             IWorkContext workContext,
             ICollectionService collectionService,
             IBrandService brandService,
@@ -63,15 +57,13 @@ namespace Grand.Web.Admin.Services
             IVendorService vendorService,
             IOrderService orderService,
             IPriceFormatter priceFormatter,
-            IDateTimeService dateTimeService,
-            IHttpContextAccessor httpContextAccessor)
+            IDateTimeService dateTimeService)
         {
             _discountService = discountService;
             _translationService = translationService;
             _currencyService = currencyService;
             _categoryService = categoryService;
             _productService = productService;
-            _customerActivityService = customerActivityService;
             _workContext = workContext;
             _collectionService = collectionService;
             _brandService = brandService;
@@ -80,7 +72,6 @@ namespace Grand.Web.Admin.Services
             _orderService = orderService;
             _priceFormatter = priceFormatter;
             _dateTimeService = dateTimeService;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         #endregion
@@ -123,8 +114,7 @@ namespace Grand.Web.Admin.Services
 
         public virtual async Task PrepareDiscountModel(DiscountModel model, Discount discount)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
 
             model.AvailableDiscountRequirementRules.Add(new SelectListItem {
                 Text = _translationService.GetResource(
@@ -175,10 +165,6 @@ namespace Grand.Web.Admin.Services
             var discount = model.ToEntity(_dateTimeService);
             await _discountService.InsertDiscount(discount);
 
-            //activity log
-            _ = _customerActivityService.InsertActivity("AddNewDiscount", discount.Id,
-                _workContext.CurrentCustomer, _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.AddNewDiscount"), discount.Name);
             return discount;
         }
 
@@ -188,62 +174,60 @@ namespace Grand.Web.Admin.Services
             discount = model.ToEntity(discount, _dateTimeService);
             await _discountService.UpdateDiscount(discount);
 
-            //clean up old references (if changed) and update "HasDiscountsApplied" properties
-            if (prevDiscountType == DiscountType.AssignedToCategories
-                && discount.DiscountTypeId != DiscountType.AssignedToCategories)
+            switch (prevDiscountType)
             {
-                //applied to categories
-                //_categoryService.
-                var categories = await _categoryService.GetAllCategoriesByDiscount(discount.Id);
-
-                //update "HasDiscountsApplied" property
-                foreach (var category in categories)
+                //clean up old references (if changed) and update "HasDiscountsApplied" properties
+                case DiscountType.AssignedToCategories 
+                when discount.DiscountTypeId != DiscountType.AssignedToCategories:
                 {
-                    var item = category.AppliedDiscounts.FirstOrDefault(x => x == discount.Id);
-                    category.AppliedDiscounts.Remove(item);
+                    //applied to categories
+                    //_categoryService.
+                    var categories = await _categoryService.GetAllCategoriesByDiscount(discount.Id);
+
+                    //update "HasDiscountsApplied" property
+                    foreach (var category in categories)
+                    {
+                        var item = category.AppliedDiscounts.FirstOrDefault(x => x == discount.Id);
+                        category.AppliedDiscounts.Remove(item);
+                    }
+
+                    break;
+                }
+                case DiscountType.AssignedToCollections 
+                when discount.DiscountTypeId != DiscountType.AssignedToCollections:
+                {
+                    //applied to collections
+                    var collections = await _collectionService.GetAllCollectionsByDiscount(discount.Id);
+                    foreach (var collection in collections)
+                    {
+                        var item = collection.AppliedDiscounts.FirstOrDefault(x => x == discount.Id);
+                        collection.AppliedDiscounts.Remove(item);
+                    }
+
+                    break;
+                }
+                case DiscountType.AssignedToSkus 
+                when discount.DiscountTypeId != DiscountType.AssignedToSkus:
+                {
+                    //applied to products
+                    var products = await _productService.GetProductsByDiscount(discount.Id);
+
+                    foreach (var p in products)
+                    {
+                        var item = p.AppliedDiscounts.FirstOrDefault(x => x == discount.Id);
+                        p.AppliedDiscounts.Remove(item);
+                        await _productService.DeleteDiscount(item, p.Id);
+                    }
+
+                    break;
                 }
             }
-
-            if (prevDiscountType == DiscountType.AssignedToCollections
-                && discount.DiscountTypeId != DiscountType.AssignedToCollections)
-            {
-                //applied to collections
-                var collections = await _collectionService.GetAllCollectionsByDiscount(discount.Id);
-                foreach (var collection in collections)
-                {
-                    var item = collection.AppliedDiscounts.FirstOrDefault(x => x == discount.Id);
-                    collection.AppliedDiscounts.Remove(item);
-                }
-            }
-
-            if (prevDiscountType == DiscountType.AssignedToSkus
-                && discount.DiscountTypeId != DiscountType.AssignedToSkus)
-            {
-                //applied to products
-                var products = await _productService.GetProductsByDiscount(discount.Id);
-
-                foreach (var p in products)
-                {
-                    var item = p.AppliedDiscounts.FirstOrDefault(x => x == discount.Id);
-                    p.AppliedDiscounts.Remove(item);
-                    await _productService.DeleteDiscount(item, p.Id);
-                }
-            }
-
-            //activity log
-            _ = _customerActivityService.InsertActivity("EditDiscount", discount.Id,
-                _workContext.CurrentCustomer, _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.EditDiscount"), discount.Name);
             return discount;
         }
 
         public virtual async Task DeleteDiscount(Discount discount)
         {
             await _discountService.DeleteDiscount(discount);
-            //activity log
-            _ = _customerActivityService.InsertActivity("DeleteDiscount", discount.Id,
-                _workContext.CurrentCustomer, _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.DeleteDiscount"), discount.Name);
         }
 
         public virtual async Task InsertCouponCode(string discountId, string couponCode)
@@ -258,11 +242,8 @@ namespace Grand.Web.Admin.Services
         public virtual string GetRequirementUrlInternal(IDiscountRule discountRequirementRule, Discount discount,
             string discountRequirementId)
         {
-            if (discountRequirementRule == null)
-                throw new ArgumentNullException(nameof(discountRequirementRule));
-
-            if (discount == null)
-                throw new ArgumentNullException(nameof(discount));
+            ArgumentNullException.ThrowIfNull(discountRequirementRule);
+            ArgumentNullException.ThrowIfNull(discount);
 
             var storeLocation = _workContext.CurrentHost.Url.TrimEnd('/');
 
@@ -447,7 +428,7 @@ namespace Grand.Web.Admin.Services
                     OrderId = x.OrderId,
                     OrderNumber = order?.OrderNumber ?? 0,
                     OrderCode = order != null ? order.Code : "",
-                    OrderTotal = order != null ? _priceFormatter.FormatPrice(order.OrderTotal, false) : "",
+                    OrderTotal = order != null ? _priceFormatter.FormatPrice(order.OrderTotal, await _currencyService.GetPrimaryStoreCurrency()) : "",
                     CreatedOn = _dateTimeService.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc)
                 };
                 items.Add(duhModel);

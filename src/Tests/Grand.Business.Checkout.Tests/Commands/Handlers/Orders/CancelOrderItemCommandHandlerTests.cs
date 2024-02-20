@@ -1,4 +1,5 @@
-﻿using Grand.Business.Core.Commands.Checkout.Orders;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
+using Grand.Business.Core.Commands.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Shipping;
@@ -10,7 +11,7 @@ using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class CancelOrderItemCommandHandlerTests
@@ -38,14 +39,15 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         [TestMethod()]
         public async Task HandleTest()
         {
-            var command = new CancelOrderItemCommand();
-            command.Order = new Order() {
-                Id = "id"
+            var command = new CancelOrderItemCommand {
+                Order = new Order {
+                    Id = "id"
+                },
+                OrderItem = new OrderItem { OpenQty = 1, Status = OrderItemStatus.Open }
             };
-            command.OrderItem = new OrderItem() { OpenQty = 1, Status = OrderItemStatus.Open };
 
             _shipmentServiceMock.Setup(c => c.GetShipmentsByOrder(It.IsAny<string>())).ReturnsAsync(new List<Shipment>());
-            _productServiceMock.Setup(a => a.GetProductById(It.IsAny<string>(), false)).Returns(() => Task.FromResult(new Product() { Id = "2", Published = true, Price = 10 }));
+            _productServiceMock.Setup(a => a.GetProductById(It.IsAny<string>(), false)).Returns(() => Task.FromResult(new Product { Id = "2", Published = true, Price = 10 }));
             await _handler.Handle(command, default);
 
             _inventoryMock.Verify(c => c.AdjustReserved(It.IsAny<Product>(), It.IsAny<int>(), It.IsAny<IList<CustomAttribute>>(), It.IsAny<string>()), Times.Once);

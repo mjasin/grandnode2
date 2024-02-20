@@ -1,11 +1,10 @@
-﻿using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Directory;
+﻿using Grand.Domain.Directory;
 
 namespace Grand.Business.System.Services.Installation
 {
     public partial class InstallationService
     {
-        protected virtual async Task InstallMeasures()
+        protected virtual Task InstallMeasures()
         {
             var measureDimensions = new List<MeasureDimension>
             {
@@ -14,25 +13,25 @@ namespace Grand.Business.System.Services.Installation
                     Name = "centimetre(s)",
                     SystemKeyword = "centimetres",
                     Ratio = 1,
-                    DisplayOrder = 1,
+                    DisplayOrder = 1
                 },
                 new MeasureDimension
                 {
                     Name = "inch(es)",
                     SystemKeyword = "inches",
                     Ratio = 0.393701,
-                    DisplayOrder = 2,
+                    DisplayOrder = 2
                 },
                 new MeasureDimension
                 {
                     Name = "feet",
                     SystemKeyword = "feet",
                     Ratio = 0.0328084,
-                    DisplayOrder = 3,
+                    DisplayOrder = 3
                 }
             };
 
-            await _measureDimensionRepository.InsertAsync(measureDimensions);
+            measureDimensions.ForEach(x=>_measureDimensionRepository.Insert(x));
 
             var measureWeights = new List<MeasureWeight>
             {
@@ -41,54 +40,53 @@ namespace Grand.Business.System.Services.Installation
                     Name = "ounce(s)",
                     SystemKeyword = "ounce",
                     Ratio = 16,
-                    DisplayOrder = 1,
+                    DisplayOrder = 1
                 },
                 new MeasureWeight
                 {
                     Name = "lb(s)",
                     SystemKeyword = "lb",
                     Ratio = 1,
-                    DisplayOrder = 2,
+                    DisplayOrder = 2
                 },
                 new MeasureWeight
                 {
                     Name = "kg(s)",
                     SystemKeyword = "kg",
                     Ratio = 0.45359237,
-                    DisplayOrder = 3,
+                    DisplayOrder = 3
                 },
                 new MeasureWeight
                 {
                     Name = "gram(s)",
                     SystemKeyword = "grams",
                     Ratio = 453.59237,
-                    DisplayOrder = 4,
+                    DisplayOrder = 4
                 }
             };
 
-            await _measureWeightRepository.InsertAsync(measureWeights);
+            measureWeights.ForEach(x=>_measureWeightRepository.Insert(x));
 
             var measureUnits = new List<MeasureUnit>
             {
                 new MeasureUnit
                 {
                     Name = "pcs.",
-                    DisplayOrder = 1,
+                    DisplayOrder = 1
                 },
                 new MeasureUnit
                 {
                     Name = "pair",
-                    DisplayOrder = 2,
+                    DisplayOrder = 2
                 },
                 new MeasureUnit
                 {
                     Name = "set",
-                    DisplayOrder = 3,
+                    DisplayOrder = 3
                 }
             };
-
-            await _measureUnitRepository.InsertAsync(measureUnits);
-
+            measureUnits.ForEach(x=>_measureUnitRepository.Insert(x));
+            return Task.CompletedTask;
         }
     }
 }

@@ -2,7 +2,6 @@ using Grand.Domain;
 using Grand.Domain.Common;
 using Grand.Domain.Customers;
 using Grand.Domain.Orders;
-using Grand.Domain.Stores;
 using System.Linq.Expressions;
 
 namespace Grand.Business.Core.Interfaces.Customers
@@ -116,7 +115,7 @@ namespace Grand.Business.Core.Interfaces.Customers
         /// Insert a guest customer
         /// </summary>
         /// <returns>Customer</returns>
-        Task<Customer> InsertGuestCustomer(Store store);
+        Task<Customer> InsertGuestCustomer(Customer customer = null);
 
         /// <summary>
         /// Insert a customer

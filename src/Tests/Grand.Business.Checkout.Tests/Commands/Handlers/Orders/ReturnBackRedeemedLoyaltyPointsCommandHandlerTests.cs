@@ -1,15 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Grand.Business.Checkout.Commands.Handlers.Orders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Grand.Business.Core.Interfaces.Common.Localization;
-using Moq;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
+using Grand.Business.Core.Interfaces.Common.Localization;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class ReturnBackRedeemedLoyaltyPointsCommandHandlerTests
@@ -29,8 +24,9 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         public async Task HandleTest()
         {
             //Arrange
-            var command = new Core.Commands.Checkout.Orders.ReturnBackRedeemedLoyaltyPointsCommand();
-            command.Order = new Domain.Orders.Order() { RedeemedLoyaltyPoints = 10 };
+            var command = new Core.Commands.Checkout.Orders.ReturnBackRedeemedLoyaltyPointsCommand {
+                Order = new Domain.Orders.Order { RedeemedLoyaltyPoints = 10 }
+            };
             _translationServiceMock.Setup(x => x.GetResource(It.IsAny<string>())).Returns("Name");
             //Act
             await _handler.Handle(command, CancellationToken.None);

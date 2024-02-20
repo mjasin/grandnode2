@@ -1,21 +1,20 @@
-﻿using Grand.Api.DTOs.Catalog;
+﻿using Grand.Api.Commands.Models.Catalog;
+using Grand.Api.DTOs.Catalog;
 using Grand.Api.Extensions;
-using Grand.Domain.Seo;
-using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
-using Grand.Business.Core.Interfaces.Common.Seo;
-using MediatR;
-using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Extensions;
+using Grand.Business.Core.Interfaces.Catalog.Products;
+using Grand.Business.Core.Interfaces.Common.Localization;
+using Grand.Business.Core.Interfaces.Common.Seo;
+using Grand.Domain.Seo;
 using Grand.Infrastructure;
+using MediatR;
 
-namespace Grand.Api.Commands.Models.Catalog
+namespace Grand.Api.Commands.Handlers.Catalog
 {
     public class AddProductCommandHandler : IRequestHandler<AddProductCommand, ProductDto>
     {
         private readonly IProductService _productService;
         private readonly ISlugService _slugService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly ITranslationService _translationService;
         private readonly ILanguageService _languageService;
         private readonly IWorkContext _workContext;
@@ -25,7 +24,6 @@ namespace Grand.Api.Commands.Models.Catalog
         public AddProductCommandHandler(
             IProductService productService,
             ISlugService slugService,
-            ICustomerActivityService customerActivityService,
             ITranslationService translationService,
             ILanguageService languageService,
             IWorkContext workContext,
@@ -33,7 +31,6 @@ namespace Grand.Api.Commands.Models.Catalog
         {
             _productService = productService;
             _slugService = slugService;
-            _customerActivityService = customerActivityService;
             _translationService = translationService;
             _languageService = languageService;
             _workContext = workContext;
@@ -43,8 +40,6 @@ namespace Grand.Api.Commands.Models.Catalog
         public async Task<ProductDto> Handle(AddProductCommand request, CancellationToken cancellationToken)
         {
             var product = request.Model.ToEntity();
-            product.CreatedOnUtc = DateTime.UtcNow;
-            product.UpdatedOnUtc = DateTime.UtcNow;
             await _productService.InsertProduct(product);
 
             request.Model.SeName = await product.ValidateSeName(request.Model.SeName, product.Name, true, _seoSettings, _slugService, _languageService);
@@ -52,9 +47,6 @@ namespace Grand.Api.Commands.Models.Catalog
             //search engine name
             await _slugService.SaveSlug(product, request.Model.SeName, "");
             await _productService.UpdateProduct(product);
-
-            //activity log
-            _ = _customerActivityService.InsertActivity("AddNewProduct", product.Id, _workContext.CurrentCustomer, "", _translationService.GetResource("ActivityLog.AddNewProduct"), product.Name);
 
             return product.ToModel();
         }

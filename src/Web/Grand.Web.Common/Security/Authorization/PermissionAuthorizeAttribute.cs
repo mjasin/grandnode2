@@ -21,8 +21,7 @@ namespace Grand.Web.Common.Security.Authorization
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             //ignore filter (the action available even when navigation is not allowed)
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             if (string.IsNullOrEmpty(Permission))
                 return;
@@ -33,7 +32,7 @@ namespace Grand.Web.Common.Security.Authorization
                 return;
 
             //authorize permission of access to the admin area
-            if (!await permissionService.Authorize(StandardPermission.AccessAdminPanel))
+            if (!await permissionService.Authorize(StandardPermission.ManageAccessAdminPanel))
                 context.Result = new RedirectToRouteResult("AdminLogin", new RouteValueDictionary());
             else
                 context.Result = new RedirectToActionResult("AccessDenied", "Home", new { pageUrl = context.HttpContext.Request.Path });

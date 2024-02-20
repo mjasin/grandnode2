@@ -1,4 +1,4 @@
-﻿using Grand.Business.Catalog.Services.ExportImport.Dto;
+﻿using Grand.Business.Core.Dto;
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Catalog.Brands;
 using Grand.Business.Core.Interfaces.Common.Directory;
@@ -82,7 +82,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region List
 
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
         public async Task<IActionResult> List()
         {
@@ -146,7 +149,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 var collection = await _brandViewModelService.InsertBrandModel(model);
@@ -176,7 +179,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!brand.LimitedToStores || (brand.LimitedToStores && brand.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && brand.Stores.Count > 1))
-                    Warning(_translationService.GetResource("Admin.Catalog.Brands.Permisions"));
+                    Warning(_translationService.GetResource("Admin.Catalog.Brands.Permissions"));
                 else
                 {
                     if (!brand.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))
@@ -224,7 +227,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
                 brand = await _brandViewModelService.UpdateBrandModel(brand, model);
                 Success(_translationService.GetResource("Admin.Catalog.Brands.Updated"));
@@ -351,10 +354,6 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> ImportFromXlsx(IFormFile importexcelfile, [FromServices] IWorkContext workContext, [FromServices] IImportManager<BrandDto> importManager)
         {
-            //a vendor and staff cannot import collections
-            if (workContext.CurrentVendor != null || await _groupService.IsStaff(_workContext.CurrentCustomer))
-                return AccessDeniedView();
-
             try
             {
                 if (importexcelfile is { Length: > 0 })
@@ -377,25 +376,6 @@ namespace Grand.Web.Admin.Controllers
         }
         #endregion
 
-        #region Activity log
-
-        [PermissionAuthorizeAction(PermissionActionName.Preview)]
-        [HttpPost]
-        public async Task<IActionResult> ListActivityLog(DataSourceRequest command, string brandId)
-        {
-            var brand = await _brandService.GetBrandById(brandId);
-            var permission = await CheckAccessToBrand(brand);
-            if (!permission.allow)
-                return ErrorForKendoGridJson(permission.message);
-
-            var (activityLogModels, totalCount) = await _brandViewModelService.PrepareActivityLogModel(brandId, command.Page, command.PageSize);
-            var gridModel = new DataSourceResult {
-                Data = activityLogModels.ToList(),
-                Total = totalCount
-            };
-            return Json(gridModel);
-        }
-        #endregion
     }
 
 }

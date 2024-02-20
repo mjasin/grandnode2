@@ -1,6 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Grand.Domain.Stores;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Domain.Stores.Tests
+namespace Grand.Domain.Tests.Stores
 {
     [TestClass()]
     public class StoreExtensionsTests
@@ -11,8 +12,8 @@ namespace Grand.Domain.Stores.Tests
         public void Setup()
         {
             store = new();
-            store.Domains.Add(new DomainHost() { HostName = "google.com", Url = "https:\\google.com" });
-            store.Domains.Add(new DomainHost() { HostName = "yahoo.com", Url = "https:\\yahoo.com" });
+            store.Domains.Add(new DomainHost { HostName = "google.com", Url = "https:\\google.com" });
+            store.Domains.Add(new DomainHost { HostName = "yahoo.com", Url = "https:\\yahoo.com" });
         }
 
         [TestMethod()]

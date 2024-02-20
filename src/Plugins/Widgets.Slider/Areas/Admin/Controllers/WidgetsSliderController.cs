@@ -10,13 +10,12 @@ using Grand.Web.Common.Security.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Widgets.Slider.Models;
 using Widgets.Slider.Services;
+using Grand.Business.Core.Interfaces.Common.Directory;
 
 namespace Widgets.Slider.Areas.Admin.Controllers
 {
-    [AuthorizeAdmin]
-    [Area("Admin")]
     [PermissionAuthorize(PermissionSystemName.Widgets)]
-    public class WidgetsSliderController : BasePluginController
+    public class WidgetsSliderController : BaseAdminPluginController
     {
         private readonly IPictureService _pictureService;
         private readonly ITranslationService _translationService;
@@ -24,6 +23,7 @@ namespace Widgets.Slider.Areas.Admin.Controllers
         private readonly ILanguageService _languageService;
         private readonly SliderWidgetSettings _sliderWidgetSettings;
         private readonly ISettingService _settingService;
+        private readonly IDateTimeService _dateTimeService;
 
         public WidgetsSliderController(
             IPictureService pictureService,
@@ -31,7 +31,8 @@ namespace Widgets.Slider.Areas.Admin.Controllers
             ISliderService sliderService,
             ILanguageService languageService,
             ISettingService settingService,
-            SliderWidgetSettings sliderWidgetSettings)
+            SliderWidgetSettings sliderWidgetSettings,
+            IDateTimeService dateTimeService)
         {
             _pictureService = pictureService;
             _translationService = translationService;
@@ -39,6 +40,7 @@ namespace Widgets.Slider.Areas.Admin.Controllers
             _languageService = languageService;
             _settingService = settingService;
             _sliderWidgetSettings = sliderWidgetSettings;
+            _dateTimeService = dateTimeService;
         }
         public IActionResult Configure()
         {
@@ -96,7 +98,7 @@ namespace Widgets.Slider.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var pictureSlider = model.ToEntity();
+                var pictureSlider = model.ToEntity(_dateTimeService);
                 pictureSlider.Locales = model.Locales.ToLocalizedProperty();
 
                 await _sliderService.InsertPictureSlider(pictureSlider);
@@ -113,7 +115,7 @@ namespace Widgets.Slider.Areas.Admin.Controllers
             if (slide == null)
                 return RedirectToAction("Configure");
 
-            var model = slide.ToModel();
+            var model = slide.ToModel(_dateTimeService);
 
             //locales
             await AddLocales(_languageService, model.Locales, (locale, languageId) =>
@@ -134,7 +136,7 @@ namespace Widgets.Slider.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                pictureSlider = model.ToEntity();
+                pictureSlider = model.ToEntity(pictureSlider, _dateTimeService);
                 pictureSlider.Locales = model.Locales.ToLocalizedProperty();
                 await _sliderService.UpdatePictureSlider(pictureSlider);
                 Success(_translationService.GetResource("Widgets.Slider.Edited"));

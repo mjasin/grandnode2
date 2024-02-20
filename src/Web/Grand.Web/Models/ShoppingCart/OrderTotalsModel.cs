@@ -4,15 +4,10 @@ namespace Grand.Web.Models.ShoppingCart
 {
     public class OrderTotalsModel : BaseModel
     {
-        public OrderTotalsModel()
-        {
-            TaxRates = new List<TaxRate>();
-            GiftVouchers = new List<GiftVoucher>();
-            Discounts = new HashSet<string>();
-        }
         public bool IsEditable { get; set; }
 
         public string SubTotal { get; set; }
+        public bool SubTotalIncludingTax { get; set; }
         public double SubTotalValue { get; set; }
 
         public string SubTotalDiscount { get; set; }
@@ -26,12 +21,12 @@ namespace Grand.Web.Models.ShoppingCart
         public double PaymentMethodAdditionalFeeValue { get; set; }
 
         public string Tax { get; set; }
-        public IList<TaxRate> TaxRates { get; set; }
+        public IList<TaxRate> TaxRates { get; set; } = new List<TaxRate>();
         public bool DisplayTax { get; set; }
         public bool DisplayTaxRates { get; set; }
 
 
-        public IList<GiftVoucher> GiftVouchers { get; set; }
+        public IList<GiftVoucher> GiftVouchers { get; set; } = new List<GiftVoucher>();
 
         public string OrderTotalDiscount { get; set; }
         public double OrderTotalDiscountValue { get; set; }
@@ -44,7 +39,7 @@ namespace Grand.Web.Models.ShoppingCart
         public string OrderTotal { get; set; }
         public double OrderTotalValue { get; set; }
 
-        public HashSet<string> Discounts { get; set; }
+        public HashSet<string> Discounts { get; set; } = new();
 
         #region Nested classes
 

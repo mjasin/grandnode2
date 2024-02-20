@@ -1,13 +1,15 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Brands;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Brands.Tests
+namespace Grand.Business.Catalog.Tests.Services.Brands
 {
     [TestClass()]
     public class BrandLayoutServiceTests
@@ -23,7 +25,7 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
             _repository = new MongoDBRepositoryTest<BrandLayout>();
             _mediatorMock = new Mock<IMediator>();
 
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _brandLayoutService = new BrandLayoutService(_repository, _cacheBase, _mediatorMock.Object);
         }
 
@@ -47,7 +49,7 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
         public async Task GetBrandLayoutByIdTest()
         {
             //Arrange
-            var brandLayout = new BrandLayout() {
+            var brandLayout = new BrandLayout {
                 Name = "test"
             };
             await _brandLayoutService.InsertBrandLayout(brandLayout);
@@ -73,7 +75,7 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
         public async Task UpdateBrandLayoutTest()
         {
             //Arrange
-            var categoryLayout = new BrandLayout() {
+            var categoryLayout = new BrandLayout {
                 Name = "test"
             };
             await _brandLayoutService.InsertBrandLayout(categoryLayout);
@@ -91,11 +93,11 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
         {
 
             //Arrange
-            var brandLayout1 = new BrandLayout() {
+            var brandLayout1 = new BrandLayout {
                 Name = "test1"
             };
             await _brandLayoutService.InsertBrandLayout(brandLayout1);
-            var brandLayout2 = new BrandLayout() {
+            var brandLayout2 = new BrandLayout {
                 Name = "test2"
             };
             await _brandLayoutService.InsertBrandLayout(brandLayout2);

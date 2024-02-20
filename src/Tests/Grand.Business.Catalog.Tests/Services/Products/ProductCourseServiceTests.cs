@@ -1,10 +1,11 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Products;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
 using Grand.Domain.Courses;
-using Grand.Domain.Data;
+using Grand.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class ProductCourseServiceTests
@@ -26,7 +27,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetCourseByProductIdTest()
         {
             //Arrange
-            var course1 = new Course() { ProductId = "1" };
+            var course1 = new Course { ProductId = "1" };
             await _courseRepository.InsertAsync(course1);
             //Act
             var result = await _courseService.GetCourseByProductId("1");
@@ -39,7 +40,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetProductByCourseIdTest()
         {
             //Arrange
-            var product = new Product() { CourseId = "1", Id = "1"};
+            var product = new Product { CourseId = "1", Id = "1"};
             await _repository.InsertAsync(product);
             //Act
             var result = await _courseService.GetProductByCourseId("1");
@@ -54,7 +55,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UpdateCourseOnProductTest()
         {
             //Arrange
-            var product = new Product() { CourseId = "1", Id = "1" };
+            var product = new Product { CourseId = "1", Id = "1" };
             await _repository.InsertAsync(product);
 
             //Act

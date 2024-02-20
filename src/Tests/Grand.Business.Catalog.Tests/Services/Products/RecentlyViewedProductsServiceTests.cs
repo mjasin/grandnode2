@@ -1,14 +1,16 @@
-﻿using Grand.Business.Core.Interfaces.Catalog.Products;
+﻿using Grand.Business.Catalog.Services.Products;
+using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class RecentlyViewedProductsServiceTests
@@ -25,9 +27,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             _repository = new MongoDBRepositoryTest<RecentlyViewedProduct>();
             _mediatorMock = new Mock<IMediator>();
             _productServiceMock = new Mock<IProductService>();
-            _productServiceMock.Setup(a => a.GetProductsByIds(It.IsAny<string[]>(), false)).Returns(() => Task.FromResult((IList<Product>)new List<Product>() { new Product() { Id = "1", Published = true }, new Product() { Id = "2", Published = true }, new Product() { Id = "3", Published = true } }));
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
-            _service = new RecentlyViewedProductsService(_productServiceMock.Object, _cacheBase, new CatalogSettings() { RecentlyViewedProductsEnabled = true, RecentlyViewedProductsNumber = 10 }, _repository);
+            _productServiceMock.Setup(a => a.GetProductsByIds(It.IsAny<string[]>(), false)).Returns(() => Task.FromResult((IList<Product>)new List<Product> { new Product { Id = "1", Published = true }, new Product { Id = "2", Published = true }, new Product { Id = "3", Published = true } }));
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
+            _service = new RecentlyViewedProductsService(_productServiceMock.Object, _cacheBase, new CatalogSettings { RecentlyViewedProductsEnabled = true, RecentlyViewedProductsNumber = 10 }, _repository);
         }
 
 

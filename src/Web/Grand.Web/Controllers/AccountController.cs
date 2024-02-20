@@ -707,7 +707,6 @@ namespace Grand.Web.Controllers
             {
                 var address = model.Address.ToEntity(_workContext.CurrentCustomer, addressSettings);
                 address.Attributes = await _mediator.Send(new GetParseCustomAddressAttributes { SelectedAttributes = model.Address.SelectedAttributes });
-                address.CreatedOnUtc = DateTime.UtcNow;
                 customer.Addresses.Add(address);
 
                 await _customerService.InsertAddress(address, customer.Id);
@@ -751,7 +750,7 @@ namespace Grand.Web.Controllers
                 Address = address,
                 ExcludeProperties = false,
                 Customer = _workContext.CurrentCustomer,
-                LoadCountries = () => countries,
+                LoadCountries = () => countries
             });
 
             return View(model);
@@ -1207,9 +1206,7 @@ namespace Grand.Web.Controllers
                     success = true
                 });
             }
-
             //errors
-            ModelState.AddModelError("", result.error);
             return Json(new
             {
                 redirect = Url.RouteUrl("CustomerSubAccounts"),

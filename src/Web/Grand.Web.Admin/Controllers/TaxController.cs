@@ -1,12 +1,10 @@
 ﻿using Grand.Business.Core.Interfaces.Catalog.Tax;
 using Grand.Business.Core.Interfaces.Common.Configuration;
-using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Extensions;
 using Grand.Web.Common.Security.Authorization;
 using Grand.Domain.Tax;
-using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Plugins;
 using Grand.Web.Admin.Models.Tax;
@@ -16,7 +14,6 @@ using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Web.Admin.Models.Common;
 using Grand.Domain.Directory;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Extensions.Mapping.Settings;
 
@@ -28,8 +25,6 @@ namespace Grand.Web.Admin.Controllers
         #region Fields
 
         private readonly ITaxService _taxService;
-        private readonly IStoreService _storeService;
-        private readonly IWorkContext _workContext;
         private readonly ITaxCategoryService _taxCategoryService;
         private readonly ISettingService _settingService;
         private readonly IServiceProvider _serviceProvider;
@@ -42,8 +37,6 @@ namespace Grand.Web.Admin.Controllers
         #region Constructors
 
         public TaxController(ITaxService taxService,
-            IStoreService storeService,
-            IWorkContext workContext,
             ITaxCategoryService taxCategoryService,
             ISettingService settingService, 
             IServiceProvider serviceProvider,
@@ -52,8 +45,6 @@ namespace Grand.Web.Admin.Controllers
             ICountryService countryService)
         {
             _taxService = taxService;
-            _storeService = storeService;
-            _workContext = workContext;
             _taxCategoryService = taxCategoryService;
             _settingService = settingService;
             _serviceProvider = serviceProvider;
@@ -70,7 +61,10 @@ namespace Grand.Web.Admin.Controllers
             await _cacheBase.Clear();
         }
 
-        public IActionResult Providers() => View();
+        public IActionResult Providers()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Providers(DataSourceRequest command)
@@ -163,7 +157,7 @@ namespace Grand.Web.Admin.Controllers
                 model.DefaultTaxAddress.AvailableCountries.Add(new SelectListItem { Text = c.Name, Value = c.Id, Selected = defaultAddress != null && c.Id == defaultAddress.CountryId });
 
             var states = defaultAddress != null && !string.IsNullOrEmpty(defaultAddress.CountryId) ? (await _countryService.GetCountryById(defaultAddress.CountryId))?.StateProvinces : new List<StateProvince>();
-            if (states.Count > 0)
+            if (states?.Count > 0)
             {
                 foreach (var s in states)
                     model.DefaultTaxAddress.AvailableStates.Add(new SelectListItem { Text = s.Name, Value = s.Id, Selected = s.Id == defaultAddress.StateProvinceId });
@@ -177,8 +171,7 @@ namespace Grand.Web.Admin.Controllers
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> Settings(TaxSettingsModel model, 
-            [FromServices] ICustomerActivityService customerActivityService)
+        public async Task<IActionResult> Settings(TaxSettingsModel model)
         {
             //load settings for a chosen store scope
             var storeScope = await GetActiveStore();
@@ -189,12 +182,7 @@ namespace Grand.Web.Admin.Controllers
 
             //now clear cache
             await ClearCache();
-
-            //activity log
-            _ = customerActivityService.InsertActivity("EditSettings", "",
-                _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.EditSettings"));
-
+            
             Success(_translationService.GetResource("Admin.Configuration.Updated"));
             return RedirectToAction("Settings");
         }
@@ -203,7 +191,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Tax Categories
 
-        public IActionResult Categories() => View();
+        public IActionResult Categories()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Categories(DataSourceRequest command)

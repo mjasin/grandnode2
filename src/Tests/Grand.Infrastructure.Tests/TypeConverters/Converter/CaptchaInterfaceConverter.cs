@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text.Json;
 
-namespace Grand.Infrastructure.TypeConverters.Converter.Tests;
+namespace Grand.Infrastructure.Tests.TypeConverters.Converter;
 
 [TestClass()]
 public class CaptchaInterfaceConverter
@@ -11,12 +11,13 @@ public class CaptchaInterfaceConverter
     public void ConvertFrom_CaptchaObject_To_Json()
     {
         //Arrange
-        var sample = new SampleClass();
-        sample.CaptchaValidModel = new CaptchaModel() {
-            ReCaptchaResponse = "xxx",
-            ReCaptchaResponseField = "yyy",
-            ReCaptchaChallengeField = "zzz",
-            ReCaptchaResponseValue = "uuu"
+        var sample = new SampleClass {
+            CaptchaValidModel = new CaptchaModel {
+                ReCaptchaResponse = "xxx",
+                ReCaptchaResponseField = "yyy",
+                ReCaptchaChallengeField = "zzz",
+                ReCaptchaResponseValue = "uuu"
+            }
         };
         //Act
         var jsonString = JsonSerializer.Serialize(sample);
@@ -71,11 +72,6 @@ public class CaptchaInterfaceConverter
    
     public class SampleClass
     {
-        public SampleClass()
-        {
-            CaptchaValidModel = new CaptchaModel();
-        }
-        
-        public ICaptchaValidModel CaptchaValidModel { get; set; }
+        public ICaptchaValidModel CaptchaValidModel { get; set; } = new CaptchaModel();
     }
 }

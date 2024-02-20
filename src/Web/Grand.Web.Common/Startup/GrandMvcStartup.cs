@@ -22,14 +22,8 @@ namespace Grand.Web.Common.Startup
             //add healthChecks
             services.AddGrandHealthChecks();
 
-            //add miniprofiler
-            services.AddGrandMiniProfiler();
-
-            //add WebMarkupMin
-            services.AddHtmlMinification(configuration);
-
             //add ApplicationInsights
-            services.AddApplicationInsights(configuration);
+            services.AddGrandApplicationInsights(configuration);
 
             //add and configure MVC feature
             services.AddGrandMvc(configuration);
@@ -43,14 +37,8 @@ namespace Grand.Web.Common.Startup
         /// <param name="webHostEnvironment">WebHostEnvironment</param>
         public void Configure(IApplicationBuilder application, IWebHostEnvironment webHostEnvironment)
         {
-            //add MiniProfiler
-            application.UseProfiler();
-
             //endpoint routing
             application.UseGrandEndpoints();
-
-            //save log application started
-            application.LogApplicationStarted();
         }
 
         /// <summary>

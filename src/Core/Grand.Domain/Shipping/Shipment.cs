@@ -3,7 +3,7 @@ namespace Grand.Domain.Shipping
     /// <summary>
     /// Represents a shipment
     /// </summary>
-    public partial class Shipment : BaseEntity
+    public class Shipment : BaseEntity
     {
         private ICollection<ShipmentItem> _shipmentItems;
 
@@ -53,11 +53,6 @@ namespace Grand.Domain.Shipping
         public string AdminComment { get; set; }
 
         /// <summary>
-        /// Gets or sets the entity creation date
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
-
-        /// <summary>
         /// Gets the shipment number
         /// </summary>
         public virtual int ShipmentNumber { get; set; }
@@ -67,8 +62,8 @@ namespace Grand.Domain.Shipping
         /// </summary>
         public virtual ICollection<ShipmentItem> ShipmentItems
         {
-            get { return _shipmentItems ??= new List<ShipmentItem>(); }
-            protected set { _shipmentItems = value; }
+            get => _shipmentItems ??= new List<ShipmentItem>();
+            protected set => _shipmentItems = value;
         }
     }
 }

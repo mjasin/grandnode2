@@ -41,19 +41,16 @@ namespace Grand.Business.Checkout.Validators
                             }
                         }
                         break;
-                    default:
-                        break;
                 }
 
-                if (value.ShoppingCartType == ShoppingCartType.ShoppingCart && !await permissionService.Authorize(StandardPermission.EnableShoppingCart, value.Customer))
+                switch (value.ShoppingCartType)
                 {
-                    context.AddFailure("Shopping cart is disabled");
-                    return;
-                }
-                if (value.ShoppingCartType == ShoppingCartType.Wishlist && !await permissionService.Authorize(StandardPermission.EnableWishlist, value.Customer))
-                {
-                    context.AddFailure("Wishlist is disabled");
-                    return;
+                    case ShoppingCartType.ShoppingCart when !await permissionService.Authorize(StandardPermission.EnableShoppingCart, value.Customer):
+                        context.AddFailure("Shopping cart is disabled");
+                        return;
+                    case ShoppingCartType.Wishlist when !await permissionService.Authorize(StandardPermission.EnableWishlist, value.Customer):
+                        context.AddFailure("Wishlist is disabled");
+                        return;
                 }
 
                 if (value.Quantity <= 0)

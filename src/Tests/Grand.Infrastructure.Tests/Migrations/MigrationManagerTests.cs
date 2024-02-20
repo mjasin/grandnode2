@@ -1,16 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Grand.Infrastructure.Migrations;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Infrastructure.Migrations.Tests
+namespace Grand.Infrastructure.Tests.Migrations
 {
     [TestClass()]
     public class MigrationManagerTests
     {
-        MigrationManager migrationManager;
-
-        public MigrationManagerTests()
-        {
-            migrationManager = new MigrationManager();
-        }
+        MigrationManager migrationManager = new();
 
         [TestMethod()]
         public void GetAllMigrationsTest()

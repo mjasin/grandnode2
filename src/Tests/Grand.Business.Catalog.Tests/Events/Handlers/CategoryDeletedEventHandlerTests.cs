@@ -1,14 +1,16 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Events.Handlers;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Seo;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Events.Handlers.Tests
+namespace Grand.Business.Catalog.Tests.Events.Handlers
 {
     [TestClass()]
     public class CategoryDeletedEventHandlerTests
@@ -26,7 +28,7 @@ namespace Grand.Business.Catalog.Events.Handlers.Tests
             _mediatorMock = new Mock<IMediator>();
             _repository = new MongoDBRepositoryTest<Product>();
             _entityUrlRepository = new MongoDBRepositoryTest<EntityUrl>();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
 
             _handler = new CategoryDeletedEventHandler(_entityUrlRepository, _repository, _cacheBase);
         }
@@ -38,13 +40,13 @@ namespace Grand.Business.Catalog.Events.Handlers.Tests
             //Arrange
             var category = new Category();
             var product = new Product();
-            product.ProductCategories.Add(new ProductCategory() { CategoryId = category.Id });
+            product.ProductCategories.Add(new ProductCategory { CategoryId = category.Id });
             await _repository.InsertAsync(product);
             var product2 = new Product();
-            product2.ProductCategories.Add(new ProductCategory() { CategoryId = category.Id });
+            product2.ProductCategories.Add(new ProductCategory { CategoryId = category.Id });
             await _repository.InsertAsync(product2);
             var product3 = new Product();
-            product3.ProductCategories.Add(new ProductCategory() { CategoryId = "1" });
+            product3.ProductCategories.Add(new ProductCategory { CategoryId = "1" });
             await _repository.InsertAsync(product3);
 
             //Act

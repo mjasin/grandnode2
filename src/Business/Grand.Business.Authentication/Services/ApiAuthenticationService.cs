@@ -12,20 +12,19 @@ namespace Grand.Business.Authentication.Services
 {
     public class ApiAuthenticationService : IApiAuthenticationService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICustomerService _customerService;
         private readonly IGroupService _groupService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private Customer _cachedCustomer;
 
 
         public ApiAuthenticationService(
-            IHttpContextAccessor httpContextAccessor,
             ICustomerService customerService,
-            IGroupService groupService)
+            IGroupService groupService, IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
             _customerService = customerService;
             _groupService = groupService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public virtual async Task<Customer> GetAuthenticatedCustomer()
@@ -37,9 +36,8 @@ namespace Grand.Business.Authentication.Services
             Customer customer = null;
             if (_httpContextAccessor.HttpContext == null) return null;
             
-            //try to get authenticated user identity
             string authHeader = _httpContextAccessor.HttpContext.Request.Headers[HeaderNames.Authorization];
-            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith(JwtBearerDefaults.AuthenticationScheme))
+            if (string.IsNullOrEmpty(authHeader))
                 return null;
 
             if (_httpContextAccessor.HttpContext.Request.Path.Value != null 
@@ -74,8 +72,7 @@ namespace Grand.Business.Authentication.Services
         private async Task<Customer> ApiCustomer()
         {
             Customer customer = null;
-            if (_httpContextAccessor.HttpContext == null) return null;
-            var authResult = await _httpContextAccessor.HttpContext.AuthenticateAsync(FrontendAPIConfig.AuthenticationScheme);
+            var authResult = await _httpContextAccessor.HttpContext!.AuthenticateAsync(FrontendAPIConfig.AuthenticationScheme);
             if (!authResult.Succeeded)
             {
                 _httpContextAccessor.HttpContext.Response.StatusCode = 400;

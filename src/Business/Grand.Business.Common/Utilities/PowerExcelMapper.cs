@@ -77,7 +77,7 @@ namespace Grand.Business.Common.Utilities
             return cell.CellType switch {
                 CellType.String => string.IsNullOrWhiteSpace(cell.StringCellValue),
                 CellType.Blank => true,
-                _ => false,
+                _ => false
             };
         }
 
@@ -233,7 +233,10 @@ namespace Grand.Business.Common.Utilities
             return o;
         }
 
-        static object GetDefault(Type t) => t.GetTypeInfo().IsValueType ? Activator.CreateInstance(t) : null;
+        static object GetDefault(Type t)
+        {
+            return t.GetTypeInfo().IsValueType ? Activator.CreateInstance(t) : null;
+        }
 
         readonly Dictionary<Type, Func<object>> ObjectFactories = new();
 
@@ -276,12 +279,12 @@ namespace Grand.Business.Common.Utilities
                     {
                         return DataFormatter.FormatCellValue(cell);
                     }
-                    else if (cell.NumericCellValue < maxDate && DateUtil.IsCellDateFormatted(cell))
+
+                    if (cell.NumericCellValue < maxDate && DateUtil.IsCellDateFormatted(cell))
                     {
                         return cell.DateCellValue;
                     }
-                    else
-                        return cell.NumericCellValue;
+                    return cell.NumericCellValue;
                 case CellType.Formula:
                     return cell.CellFormula;
                 case CellType.Boolean:
@@ -294,8 +297,7 @@ namespace Grand.Business.Common.Utilities
                 default:
                     if (targetColumn.Json)
                         return JsonSerializer.Deserialize(cell.StringCellValue, targetColumn.PropertyType);
-                    else
-                        return cell.StringCellValue;
+                    return cell.StringCellValue;
             }
         }
 
@@ -308,7 +310,7 @@ namespace Grand.Business.Common.Utilities
                 CellType.Error => cell.ErrorCellValue,
                 CellType.String => cell.StringCellValue,
                 CellType.Blank => string.Empty,
-                _ => "<unknown>",
+                _ => "<unknown>"
             };
         }
     }

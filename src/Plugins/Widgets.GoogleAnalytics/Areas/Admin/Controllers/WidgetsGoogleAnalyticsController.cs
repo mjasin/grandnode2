@@ -1,23 +1,19 @@
 ﻿using Grand.Business.Core.Interfaces.Common.Configuration;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Utilities.Common.Security;
-using Grand.Web.Common.Controllers;
-using Grand.Web.Common.Filters;
-using Grand.Web.Common.Security.Authorization;
 using Grand.Domain.Common;
 using Grand.Domain.Customers;
 using Grand.Infrastructure;
+using Grand.Web.Common.Controllers;
+using Grand.Web.Common.Security.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Widgets.GoogleAnalytics.Models;
 
-namespace Widgets.GoogleAnalytics.Controllers
+namespace Widgets.GoogleAnalytics.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    [AuthorizeAdmin]
     [PermissionAuthorize(PermissionSystemName.Widgets)]
-    public class WidgetsGoogleAnalyticsController : BasePluginController
+    public class WidgetsGoogleAnalyticsController : BaseAdminPluginController
     {
         private readonly IWorkContext _workContext;
         private readonly IStoreService _storeService;

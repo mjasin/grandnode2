@@ -1,16 +1,17 @@
-﻿using Grand.Business.Core.Interfaces.Catalog.Collections;
-using Grand.Business.Catalog.Services.Collections;
+﻿using Grand.Business.Catalog.Services.Collections;
+using Grand.Business.Core.Interfaces.Catalog.Collections;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Events;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Tests.Service.Collections
+namespace Grand.Business.Catalog.Tests.Services.Collections
 {
     [TestClass()]
     public class CollectionServiceTests
@@ -33,7 +34,7 @@ namespace Grand.Business.Catalog.Tests.Service.Collections
             _aclMock = new Mock<IAclService>();
             _settings = new CatalogSettings();
             _collectionService = new CollectionService(_cacheMock.Object, _repositoryMock.Object, _workContextMock.Object
-                , _mediatorMock.Object, _aclMock.Object);
+                , _mediatorMock.Object, _aclMock.Object, new AccessControlConfig());
         }
 
 

@@ -141,7 +141,7 @@ namespace Grand.Business.Checkout.Services.Orders
                         allowedDiscounts.Add(new ApplyDiscount {
                             DiscountId = discount.Id,
                             IsCumulative = discount.IsCumulative,
-                            CouponCode = validDiscount.CouponCode,
+                            CouponCode = validDiscount.CouponCode
                         });
                     }
                 }
@@ -182,7 +182,7 @@ namespace Grand.Business.Checkout.Services.Orders
                         allowedDiscounts.Add(new ApplyDiscount {
                             DiscountId = discount.Id,
                             IsCumulative = discount.IsCumulative,
-                            CouponCode = validDiscount.CouponCode,
+                            CouponCode = validDiscount.CouponCode
                         });
                     }
                 }
@@ -541,7 +541,6 @@ namespace Grand.Business.Checkout.Services.Orders
         public virtual async Task<(double? shoppingCartShippingTotal, double taxRate, List<ApplyDiscount> appliedDiscounts)> GetShoppingCartShippingTotal(IList<ShoppingCartItem> cart, bool includingTax)
         {
             double? shippingTotal = null;
-            double? shippingTotalTaxed = null;
             var appliedDiscounts = new List<ApplyDiscount>();
             double taxRate = 0;
 
@@ -602,16 +601,21 @@ namespace Grand.Business.Checkout.Services.Orders
                 }
             }
 
-            if (!shippingTotal.HasValue) return (null, taxRate, appliedDiscounts);
-            if (shippingTotal.Value < 0)
-                shippingTotal = 0;
+            switch (shippingTotal)
+            {
+                case null:
+                    return (null, taxRate, appliedDiscounts);
+                case < 0:
+                    shippingTotal = 0;
+                    break;
+            }
 
             //round
             if (_shoppingCartSettings.RoundPrices)
                 shippingTotal = RoundingHelper.RoundPrice(shippingTotal.Value, currency);
 
             var shippingPrice = await _taxService.GetShippingPrice(shippingTotal.Value, includingTax, customer);
-            shippingTotalTaxed = shippingPrice.shippingPrice;
+            double? shippingTotalTaxed = shippingPrice.shippingPrice;
             taxRate = shippingPrice.taxRate;
 
             //round
@@ -629,8 +633,7 @@ namespace Grand.Business.Checkout.Services.Orders
         /// <returns>Tax total</returns>
         public virtual async Task<(double taxtotal, SortedDictionary<double, double> taxRates)> GetTaxTotal(IList<ShoppingCartItem> cart, bool usePaymentMethodAdditionalFee = true)
         {
-            if (cart == null)
-                throw new ArgumentNullException(nameof(cart));
+            ArgumentNullException.ThrowIfNull(cart);
 
             var taxRates = new SortedDictionary<double, double>();
 

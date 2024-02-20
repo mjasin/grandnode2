@@ -1,5 +1,4 @@
-﻿using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Pages;
+﻿using Grand.Domain.Pages;
 using Grand.Domain.Seo;
 
 namespace Grand.Business.System.Services.Installation
@@ -162,8 +161,19 @@ namespace Grand.Business.System.Services.Installation
                                            PageLayoutId = defaultPageLayout.Id,
                                            Published = true
                                        },
+                                   new Page
+                                   {
+                                       SystemName = "VendorPortalInfo",
+                                       IncludeInSitemap = false,
+                                       IsPasswordProtected = false,
+                                       DisplayOrder = 1,
+                                       Title = "Welcome to our Vendor Management Hub!",
+                                       Body = "<p>Manage your product catalog, oversee customer orders, and streamline your shipping processes. Your vendor dashboard is the command center for your success. Stay organized, serve your customers efficiently, and watch your business thrive.</p>",
+                                       PageLayoutId = defaultPageLayout.Id,
+                                       Published = true
+                                   }
                                };
-            await _pageRepository.InsertAsync(pages);
+            pages.ForEach(x=>_pageRepository.Insert(x));
 
             var lpages = from p in _pageRepository.Table
                          select p;

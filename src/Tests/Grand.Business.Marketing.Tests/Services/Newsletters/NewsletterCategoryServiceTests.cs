@@ -1,6 +1,5 @@
 ﻿using Grand.Business.Marketing.Services.Newsletters;
-using Grand.Business.Marketing.Services.Newsteletters;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Messages;
 using Grand.Infrastructure.Events;
 using MediatR;

@@ -1,19 +1,16 @@
-﻿using DiscountRules.CustomerGroups.Models;
+﻿using DiscountRules.Standard.Models;
 using Grand.Business.Core.Interfaces.Catalog.Discounts;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Domain.Discounts;
 using Grand.Web.Common.Controllers;
-using Grand.Web.Common.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DiscountRules.CustomerGroups.Controllers
+namespace DiscountRules.Standard.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    [AuthorizeAdmin]
-    public class CustomerGroupsController : BasePluginController
+    public class CustomerGroupsController : BaseAdminPluginController
     {
         private readonly IDiscountService _discountService;
         private readonly IGroupService _groupService;
@@ -46,7 +43,7 @@ namespace DiscountRules.CustomerGroups.Controllers
                     return Content("Failed to load requirement.");
             }
 
-            var model = new RequirementModel {
+            var model = new RequirementCustomerGroupsModel {
                 RequirementId = !string.IsNullOrEmpty(discountRequirementId) ? discountRequirementId : "",
                 DiscountId = discountId,
                 CustomerGroupId = discountRequirement?.Metadata

@@ -1,7 +1,7 @@
 ﻿using Grand.Business.Core.Interfaces.Cms;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Utilities.Common.Security;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Stores;
 using Grand.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +24,7 @@ namespace Grand.Web.Common.Filters
         public ClosedStoreAttribute(bool ignore = false) : base(typeof(CheckAccessClosedStoreFilter))
         {
             _ignoreFilter = ignore;
-            Arguments = new object[] { ignore };
+            Arguments = [ignore];
         }
 
         public bool IgnoreFilter => _ignoreFilter;
@@ -72,12 +72,6 @@ namespace Grand.Web.Common.Filters
             /// <param name="next">Action execution delegate</param>
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
-
-                if (context?.HttpContext?.Request == null)
-                {
-                    await next();
-                    return;
-                }
                 //check whether this filter has been overridden for the Action
                 var actionFilter = context.ActionDescriptor.FilterDescriptors
                     .Where(f => f.Scope == FilterScope.Action)

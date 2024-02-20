@@ -7,14 +7,6 @@ namespace Grand.Domain.Knowledgebase
 {
     public class KnowledgebaseArticle : BaseEntity, ITreeNode, ITranslationEntity, ISlugEntity, IGroupLinkEntity, IStoreLinkEntity
     {
-        public KnowledgebaseArticle()
-        {
-            CustomerGroups = new List<string>();
-            Locales = new List<TranslationEntity>();
-            RelatedArticles = new List<string>();
-            Stores = new List<string>();
-        }
-
         /// <summary>
         /// Gets or sets title of the article
         /// </summary>
@@ -41,25 +33,15 @@ namespace Grand.Domain.Knowledgebase
         public bool Published { get; set; }
 
         /// <summary>
-        /// Gets or sets the date and time of instance creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time of instance update
-        /// </summary>
-        public DateTime UpdatedOnUtc { get; set; }
-
-        /// <summary>
         /// Gets or sets the collection of locales
         /// </summary>
-        public IList<TranslationEntity> Locales { get; set; }
+        public IList<TranslationEntity> Locales { get; set; } = new List<TranslationEntity>();
 
         /// <summary>
         /// Gets or sets a value indicating whether the entity is subject to ACL
         /// </summary>
         public bool LimitedToGroups { get; set; }
-        public IList<string> CustomerGroups { get; set; }
+        public IList<string> CustomerGroups { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the name
@@ -89,7 +71,7 @@ namespace Grand.Domain.Knowledgebase
         /// <summary>
         /// Gets or sets list of related articles ids
         /// </summary>
-        public IList<string> RelatedArticles { get; set; }
+        public IList<string> RelatedArticles { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets a value indicating whether the comments are allowed 
@@ -100,6 +82,6 @@ namespace Grand.Domain.Knowledgebase
         /// Gets or sets a value indicating whether the entity is limited/restricted to certain stores
         /// </summary>
         public bool LimitedToStores { get; set; }
-        public IList<string> Stores { get; set; }
+        public IList<string> Stores { get; set; } = new List<string>();
     }
 }

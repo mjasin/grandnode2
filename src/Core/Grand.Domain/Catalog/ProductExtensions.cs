@@ -9,13 +9,13 @@ namespace Grand.Domain.Catalog
     /// </summary>
     public static class ProductExtensions
     {
-
         /// <summary>
         /// Used to get an appropriate tier price
         /// </summary>
         /// <param name="product">Product</param>
         /// <param name="customer">Customer</param>
         /// <param name="storeId">Store id</param>
+        /// <param name="currencyCode"></param>
         /// <param name="quantity">Quantity</param>
         /// <returns>Price</returns>
         public static TierPrice GetPreferredTierPrice(this Product product, Customer customer, string storeId, string currencyCode, int quantity)
@@ -39,15 +39,14 @@ namespace Grand.Domain.Catalog
         /// Check if product tag exists
         /// </summary>
         /// <param name="product">Product</param>
-        /// <param name="productTagId">Product tag id</param>
+        /// <param name="productTagName"></param>
         /// <returns>Result</returns>
         public static bool ProductTagExists(this Product product,
             string productTagName)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
-            bool result = product.ProductTags.FirstOrDefault(pt => pt == productTagName) != null;
+            var result = product.ProductTags.FirstOrDefault(pt => pt == productTagName) != null;
             return result;
         }
 
@@ -58,8 +57,7 @@ namespace Grand.Domain.Catalog
         /// <returns>Result</returns>
         public static int[] ParseAllowedQuantities(this Product product)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             var result = new List<int>();
             if (!String.IsNullOrWhiteSpace(product.AllowedQuantities))
@@ -85,36 +83,33 @@ namespace Grand.Domain.Catalog
         /// </summary>
         /// <param name="product">Product</param>
         /// <param name="attributes">Attributes</param>
-        /// <param name="productAttributeParser">Product attribute service</param>
         /// <param name="sku">SKU</param>
-        /// <param name="Mpn">MPN</param>
+        /// <param name="mpn">MPN</param>
         /// <param name="gtin">GTIN</param>
         private static void GetSkuMpnGtin(this Product product, IList<CustomAttribute> attributes,
-            out string sku, out string Mpn, out string gtin)
+            out string sku, out string mpn, out string gtin)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             sku = null;
-            Mpn = null;
+            mpn = null;
             gtin = null;
 
-            if (attributes != null &&
-                product.ManageInventoryMethodId == ManageInventoryMethod.ManageStockByAttributes)
+            if (attributes != null && attributes.Any())
             {
                 var combination = FindProductAttributeCombination(product, attributes);
                 if (combination != null)
                 {
                     sku = combination.Sku;
-                    Mpn = combination.Mpn;
+                    mpn = combination.Mpn;
                     gtin = combination.Gtin;
                 }
             }
 
             if (string.IsNullOrEmpty(sku))
                 sku = product.Sku;
-            if (string.IsNullOrEmpty(Mpn))
-                Mpn = product.Mpn;
+            if (string.IsNullOrEmpty(mpn))
+                mpn = product.Mpn;
             if (string.IsNullOrEmpty(gtin))
                 gtin = product.Gtin;
         }
@@ -129,8 +124,7 @@ namespace Grand.Domain.Catalog
         public static ProductAttributeCombination FindProductAttributeCombination(this Product product,
             IList<CustomAttribute> customAttributes, bool ignoreNonCombinableAttributes = true)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             var combinations = product.ProductAttributeCombinations;
             return combinations.FirstOrDefault(x =>
@@ -141,6 +135,7 @@ namespace Grand.Domain.Catalog
         /// <summary>
         /// Gets selected product attribute mappings
         /// </summary>
+        /// <param name="product"></param>
         /// <param name="customAttributes">Attributes</param>
         /// <returns>Selected product attribute mappings</returns>
         public static IList<ProductAttributeMapping> ParseProductAttributeMappings(this Product product, IList<CustomAttribute> customAttributes)
@@ -151,7 +146,7 @@ namespace Grand.Domain.Catalog
 
             foreach (var customAttribute in customAttributes.GroupBy(x => x.Key))
             {
-                var attribute = product.ProductAttributeMappings.Where(x => x.Id == customAttribute.Key).FirstOrDefault();
+                var attribute = product.ProductAttributeMappings.FirstOrDefault(x => x.Id == customAttribute.Key);
                 if (attribute != null)
                 {
                     result.Add(attribute);
@@ -163,6 +158,7 @@ namespace Grand.Domain.Catalog
         /// <summary>
         /// Get product attribute values
         /// </summary>
+        /// <param name="product"></param>
         /// <param name="customAttributes">Attributes</param>
         /// <returns>Product attribute values</returns>
         public static IList<ProductAttributeValue> ParseProductAttributeValues(this Product product, IList<CustomAttribute> customAttributes)
@@ -182,9 +178,9 @@ namespace Grand.Domain.Catalog
                 {
                     if (!string.IsNullOrEmpty(valueStr))
                     {
-                        if (attribute.ProductAttributeValues.Where(x => x.Id == valueStr).Count() > 0)
+                        if (attribute.ProductAttributeValues.Any(x => x.Id == valueStr))
                         {
-                            var value = attribute.ProductAttributeValues.Where(x => x.Id == valueStr).FirstOrDefault();
+                            var value = attribute.ProductAttributeValues.FirstOrDefault(x => x.Id == valueStr);
                             if (value != null)
                             {
                                 values.Add(value);
@@ -215,32 +211,33 @@ namespace Grand.Domain.Catalog
         /// <summary>
         /// Adds an attribute
         /// </summary>
-        /// <param name="attributes">Attributes</param>
+        /// <param name="customAttributes"></param>
         /// <param name="productAttributeMapping">Product attribute mapping</param>
         /// <param name="value">Value</param>
         /// <returns>Attributes</returns>
         public static IList<CustomAttribute> AddProductAttribute(IList<CustomAttribute> customAttributes, ProductAttributeMapping productAttributeMapping, string value)
         {
-            if (customAttributes == null)
-                customAttributes = new List<CustomAttribute>();
-
-            customAttributes.Add(new CustomAttribute() { Key = productAttributeMapping.Id, Value = value });
+            customAttributes ??= new List<CustomAttribute>();
+            customAttributes.Add(new CustomAttribute { Key = productAttributeMapping.Id, Value = value });
 
             return customAttributes;
         }
+
         /// <summary>
         /// Remove an attribute
         /// </summary>
-        /// <param name="attributes">Attributes</param>
+        /// <param name="customAttributes"></param>
         /// <param name="productAttributeMapping">Product attribute mapping</param>
         /// <returns>Updated result (XML format)</returns>
         public static IList<CustomAttribute> RemoveProductAttribute(IList<CustomAttribute> customAttributes, ProductAttributeMapping productAttributeMapping)
         {
             return customAttributes.Where(x => x.Key != productAttributeMapping.Id).ToList();
         }
+
         /// <summary>
         /// Are attributes equal
         /// </summary>
+        /// <param name="product"></param>
         /// <param name="customAttributes1">The attributes of the first product</param>
         /// <param name="customAttributes2">The attributes of the second product</param>
         /// <param name="ignoreNonCombinableAttributes">A value indicating whether we should ignore non-combinable attributes</param>
@@ -262,10 +259,10 @@ namespace Grand.Domain.Catalog
             if (attributes1.Count != attributes2.Count)
                 return false;
 
-            bool attributesEqual = true;
+            var attributesEqual = true;
             foreach (var a1 in attributes1)
             {
-                bool hasAttribute = false;
+                var hasAttribute = false;
                 foreach (var a2 in attributes2)
                 {
                     if (a1.Id == a2.Id)
@@ -275,10 +272,10 @@ namespace Grand.Domain.Catalog
                         var values2Str = ParseValues(customAttributes2, a2.Id);
                         if (values1Str.Count == values2Str.Count)
                         {
-                            foreach (string str1 in values1Str)
+                            foreach (var str1 in values1Str)
                             {
-                                bool hasValue = false;
-                                foreach (string str2 in values2Str)
+                                var hasValue = false;
+                                foreach (var str2 in values2Str)
                                 {
                                     //case insensitive? 
                                     if (str1.Trim() == str2.Trim())
@@ -316,16 +313,15 @@ namespace Grand.Domain.Catalog
         /// <summary>
         /// Check whether condition of some attribute is met (if specified). Return "null" if not condition is specified
         /// </summary>
+        /// <param name="product"></param>
         /// <param name="pam">Product attribute</param>
         /// <param name="selectedAttributes">Selected attributes</param>
         /// <returns>Result</returns>
         public static bool? IsConditionMet(this Product product, ProductAttributeMapping pam, IList<CustomAttribute> selectedAttributes)
         {
-            if (pam == null)
-                throw new ArgumentNullException(nameof(pam));
+            ArgumentNullException.ThrowIfNull(pam);
 
-            if (selectedAttributes == null)
-                selectedAttributes = new List<CustomAttribute>();
+            selectedAttributes ??= new List<CustomAttribute>();
 
             var conditionAttribute = pam.ConditionAttribute;
             if (!conditionAttribute.Any())
@@ -348,7 +344,7 @@ namespace Grand.Domain.Catalog
             var allFound = true;
             foreach (var t1 in valuesThatShouldBeSelected)
             {
-                bool found = false;
+                var found = false;
                 foreach (var t2 in selectedValues)
                     if (t1 == t2)
                         found = true;
@@ -363,12 +359,10 @@ namespace Grand.Domain.Catalog
         /// Generate all combinations
         /// </summary>
         /// <param name="product">Product</param>
-        /// <param name="ignoreNonCombinableAttributes">A value indicating whether we should ignore non-combinable attributes</param>
         /// <returns>Attribute combinations</returns>
         public static IList<IEnumerable<CustomAttribute>> GenerateAllCombinations(this Product product)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             var allProductAttributMappings = product.ProductAttributeMappings.Where(x => !x.IsNonCombinable()).ToList();
 
@@ -395,8 +389,7 @@ namespace Grand.Domain.Catalog
         /// <returns>SKU</returns>
         public static string FormatSku(this Product product, IList<CustomAttribute> attributes = null)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             product.GetSkuMpnGtin(attributes, out var sku, out _, out _);
 
@@ -411,8 +404,7 @@ namespace Grand.Domain.Catalog
         /// <returns>Collection part number</returns>
         public static string FormatMpn(this Product product, IList<CustomAttribute> attributes = null)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             product.GetSkuMpnGtin(attributes, out _, out var Mpn, out _);
 
@@ -424,12 +416,10 @@ namespace Grand.Domain.Catalog
         /// </summary>
         /// <param name="product">Product</param>
         /// <param name="attributes">Attributes</param>
-        /// <param name="productAttributeParser">Product attribute service</param>
         /// <returns>GTIN</returns>
         public static string FormatGtin(this Product product, IList<CustomAttribute> attributes = null)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             product.GetSkuMpnGtin(attributes, out _, out _, out var gtin);
 
@@ -443,11 +433,10 @@ namespace Grand.Domain.Catalog
         /// <returns>A list of required product IDs</returns>
         public static string[] ParseRequiredProductIds(this Product product)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
-            if (String.IsNullOrEmpty(product.RequiredProductIds))
-                return new string[0];
+            if (string.IsNullOrEmpty(product.RequiredProductIds))
+                return Array.Empty<string>();
 
             var ids = new List<string>();
 
@@ -479,8 +468,7 @@ namespace Grand.Domain.Catalog
         /// <returns>Result</returns>
         public static bool IsAvailable(this Product product, DateTime dateTime)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             if (product.AvailableStartDateTimeUtc.HasValue && product.AvailableStartDateTimeUtc.Value > dateTime)
             {

@@ -2,6 +2,7 @@
 using Grand.Domain.Catalog;
 using Grand.Infrastructure.Mapper;
 using Grand.Web.Admin.Models.Catalog;
+using Grand.Web.Common.Extensions;
 
 namespace Grand.Web.Admin.Extensions.Mapping
 {
@@ -18,7 +19,12 @@ namespace Grand.Web.Admin.Extensions.Mapping
             return product;
 
         }
+        public static ProductModel ToModel(this Product entity)
+        {
+            var product = entity.MapTo<Product, ProductModel>();
+            return product;
 
+        }
         public static Product ToEntity(this ProductModel model, IDateTimeService dateTimeService)
         {
             var product = model.MapTo<ProductModel, Product>();

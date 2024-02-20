@@ -1,7 +1,7 @@
 ﻿using Grand.Business.Core.Interfaces.System.Reports;
 using Grand.Business.Core.Utilities.System;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 
 namespace Grand.Business.System.Services.Reports
 {
@@ -31,7 +31,7 @@ namespace Grand.Business.System.Services.Reports
         /// <param name="vendorId">Vendor identifier</param>
         /// <param name="storeId">Store identifier</param>
         /// <returns>Result</returns>
-        public virtual async Task<(IList<Product> products, IList<ProductsAttributeCombination> combinations)> LowStockProducts(string vendorId, string storeId)
+        public virtual async Task<(IList<Product> products, IList<ProductsAttributeCombination> combinations)> LowStockProducts(string vendorId = "", string storeId = "")
         {
             //Track inventory for product
             //simple products
@@ -56,8 +56,7 @@ namespace Grand.Business.System.Services.Reports
                            (vendorId == "" || p.VendorId == vendorId) &&
                            (storeId == "" || p.Stores.Contains(storeId))
                            from c in p.ProductAttributeCombinations
-                           select new ProductsAttributeCombination()
-                           {
+                           select new ProductsAttributeCombination {
                                ProductId = p.Id,
                                StockQuantity = c.StockQuantity,
                                Attributes = c.Attributes,

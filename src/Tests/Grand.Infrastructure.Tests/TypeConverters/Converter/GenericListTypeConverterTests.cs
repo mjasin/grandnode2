@@ -1,20 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Grand.Infrastructure.TypeConverters.Converter;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Infrastructure.TypeConverters.Converter.Tests
+namespace Grand.Infrastructure.Tests.TypeConverters.Converter
 {
     [TestClass()]
     public class GenericListTypeConverterTests
     {
-        GenericListTypeConverter<int> _intconverter;
-        GenericListTypeConverter<double> _doubleconverter;
-        GenericListTypeConverter<string> _stringconverter;
-
-        public GenericListTypeConverterTests()
-        {
-            _intconverter = new GenericListTypeConverter<int>();
-            _doubleconverter = new GenericListTypeConverter<double>();
-            _stringconverter = new GenericListTypeConverter<string>();
-        }
+        GenericListTypeConverter<int> _intconverter = new();
+        GenericListTypeConverter<double> _doubleconverter = new();
+        GenericListTypeConverter<string> _stringconverter = new();
 
         [TestMethod()]
         public void CanConvertFromTest_string_true()

@@ -1,12 +1,13 @@
-﻿using Grand.Business.Core.Interfaces.Catalog.Products;
+﻿using Grand.Business.Catalog.Queries.Handlers;
+using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Queries.Handlers.Tests
+namespace Grand.Business.Catalog.Tests.Queries.Handlers
 {
     [TestClass()]
     public class GetSuggestedProductsQueryHandlerTests
@@ -30,9 +31,10 @@ namespace Grand.Business.Catalog.Queries.Handlers.Tests
         [TestMethod()]
         public async Task HandleTest()
         {
-            var suggestedProductsQuery = new Core.Queries.Catalog.GetSuggestedProductsQuery();
-            suggestedProductsQuery.CustomerTagIds = new[] { "1" };
-            suggestedProductsQuery.ProductsNumber = 10;
+            var suggestedProductsQuery = new Core.Queries.Catalog.GetSuggestedProductsQuery {
+                CustomerTagIds = ["1"],
+                ProductsNumber = 10
+            };
             await handler.Handle(suggestedProductsQuery, CancellationToken.None);
             _casheManagerMock.Verify(c => c.GetAsync(It.IsAny<string>(), It.IsAny<Func<Task<List<Product>>>>()), Times.Once);
         }

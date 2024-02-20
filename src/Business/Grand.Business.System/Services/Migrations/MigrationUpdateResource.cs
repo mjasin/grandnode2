@@ -1,9 +1,9 @@
 ﻿using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Localization;
 using Grand.SharedKernel.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Grand.Business.System.Services.Migrations
 {
@@ -13,15 +13,12 @@ namespace Grand.Business.System.Services.Migrations
             string filename)
         {
             var langRepository = serviceProvider.GetRequiredService<IRepository<Language>>();
-            var logService = serviceProvider.GetRequiredService<ILogger>();
+            var logService = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("ImportLanguageResourcesFromXml");
             var translationService = serviceProvider.GetRequiredService<ITranslationService>();
 
             try
             {
-                var language = langRepository.Table.FirstOrDefault(l => l.Name == "English");
-
-                if (language == null)
-                    language = langRepository.Table.FirstOrDefault();
+                var language = langRepository.Table.FirstOrDefault(l => l.Name == "English") ?? langRepository.Table.FirstOrDefault();
 
                 var filePath = CommonPath.MapPath(filename);
                 var localesXml = File.ReadAllText(filePath);
@@ -29,7 +26,7 @@ namespace Grand.Business.System.Services.Migrations
             }
             catch (Exception ex)
             {
-                logService.InsertLog(Domain.Logging.LogLevel.Error, "UpgradeProcess - MigrationUpdateResourceString", ex.Message).GetAwaiter().GetResult();
+                logService.LogError(ex, "UpgradeProcess - ImportLanguageResourcesFromXml {Filename}", filename);
             }
             return true;
         }

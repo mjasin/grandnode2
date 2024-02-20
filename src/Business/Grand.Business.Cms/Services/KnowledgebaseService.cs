@@ -1,13 +1,13 @@
 ﻿using Grand.Business.Core.Interfaces.Cms;
 using Grand.Domain;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Knowledgebase;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Cms.Services
@@ -20,7 +20,8 @@ namespace Grand.Business.Cms.Services
         private readonly IMediator _mediator;
         private readonly IWorkContext _workContext;
         private readonly ICacheBase _cacheBase;
-
+        private readonly AccessControlConfig _accessControlConfig;
+        
         /// <summary>
         /// Ctor
         /// </summary>
@@ -30,8 +31,7 @@ namespace Grand.Business.Cms.Services
             IRepository<KnowledgebaseArticleComment> articleCommentRepository,
             IMediator mediator,
             IWorkContext workContext,
-            ICacheBase cacheBase
-            )
+            ICacheBase cacheBase, AccessControlConfig accessControlConfig)
         {
             _knowledgebaseCategoryRepository = knowledgebaseCategoryRepository;
             _knowledgebaseArticleRepository = knowledgebaseArticleRepository;
@@ -39,6 +39,7 @@ namespace Grand.Business.Cms.Services
             _mediator = mediator;
             _workContext = workContext;
             _cacheBase = cacheBase;
+            _accessControlConfig = accessControlConfig;
         }
 
         /// <summary>
@@ -67,7 +68,6 @@ namespace Grand.Business.Cms.Services
         /// <param name="kc"></param>
         public virtual async Task UpdateKnowledgebaseCategory(KnowledgebaseCategory kc)
         {
-            kc.UpdatedOnUtc = DateTime.UtcNow;
             await _knowledgebaseCategoryRepository.UpdateAsync(kc);
             await _cacheBase.RemoveByPrefix(CacheKey.ARTICLES_PATTERN_KEY);
             await _cacheBase.RemoveByPrefix(CacheKey.KNOWLEDGEBASE_CATEGORIES_PATTERN_KEY);
@@ -81,7 +81,7 @@ namespace Grand.Business.Cms.Services
         /// <returns>knowledge base category</returns>
         public virtual async Task<KnowledgebaseCategory> GetKnowledgebaseCategory(string id)
         {
-            return await Task.FromResult(_knowledgebaseCategoryRepository.Table.FirstOrDefault(x => x.Id == id));
+            return await _knowledgebaseCategoryRepository.GetOneAsync(x => x.Id == id);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Grand.Business.Cms.Services
                 query = query.Where(x => x.Published);
                 query = query.Where(x => x.Id == id);
 
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     //Limited to customer groups rules
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
@@ -110,7 +110,7 @@ namespace Grand.Business.Cms.Services
                             select p;
                 }
 
-                if (!CommonHelper.IgnoreStoreLimitations)
+                if (!_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -129,9 +129,6 @@ namespace Grand.Business.Cms.Services
         /// <param name="kc"></param>
         public virtual async Task InsertKnowledgebaseCategory(KnowledgebaseCategory kc)
         {
-            kc.CreatedOnUtc = DateTime.UtcNow;
-            kc.UpdatedOnUtc = DateTime.UtcNow;
-
             await _knowledgebaseCategoryRepository.InsertAsync(kc);
 
             await _cacheBase.RemoveByPrefix(CacheKey.ARTICLES_PATTERN_KEY);
@@ -169,7 +166,7 @@ namespace Grand.Business.Cms.Services
         {
             var query = from p in _knowledgebaseArticleRepository.Table
                         select p;
-            if (!CommonHelper.IgnoreAcl)
+            if (!_accessControlConfig.IgnoreAcl)
             {
                 var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                 query = from p in query
@@ -177,7 +174,7 @@ namespace Grand.Business.Cms.Services
                         select p;
             }
 
-            if (!CommonHelper.IgnoreStoreLimitations && !string.IsNullOrEmpty(storeId))
+            if (!_accessControlConfig.IgnoreStoreLimitations && !string.IsNullOrEmpty(storeId))
             {
                 //Limited to stores rules
                 query = from p in query
@@ -194,8 +191,6 @@ namespace Grand.Business.Cms.Services
         /// <param name="ka"></param>
         public virtual async Task InsertKnowledgebaseArticle(KnowledgebaseArticle ka)
         {
-            ka.CreatedOnUtc = DateTime.UtcNow;
-            ka.UpdatedOnUtc = DateTime.UtcNow;
             await _knowledgebaseArticleRepository.InsertAsync(ka);
             await _cacheBase.RemoveByPrefix(CacheKey.ARTICLES_PATTERN_KEY);
             await _cacheBase.RemoveByPrefix(CacheKey.KNOWLEDGEBASE_CATEGORIES_PATTERN_KEY);
@@ -208,7 +203,6 @@ namespace Grand.Business.Cms.Services
         /// <param name="ka"></param>
         public virtual async Task UpdateKnowledgebaseArticle(KnowledgebaseArticle ka)
         {
-            ka.UpdatedOnUtc = DateTime.UtcNow;
             await _knowledgebaseArticleRepository.UpdateAsync(ka);
             await _cacheBase.RemoveByPrefix(CacheKey.ARTICLES_PATTERN_KEY);
             await _cacheBase.RemoveByPrefix(CacheKey.KNOWLEDGEBASE_CATEGORIES_PATTERN_KEY);
@@ -254,7 +248,7 @@ namespace Grand.Business.Cms.Services
 
                 query = query.Where(x => x.Published);
 
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                     query = from p in query
@@ -262,7 +256,7 @@ namespace Grand.Business.Cms.Services
                             select p;
                 }
 
-                if (!CommonHelper.IgnoreStoreLimitations)
+                if (!_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -291,7 +285,7 @@ namespace Grand.Business.Cms.Services
 
                 query = query.Where(x => x.Published);
 
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                     query = from p in query
@@ -299,7 +293,7 @@ namespace Grand.Business.Cms.Services
                             select p;
                 }
 
-                if (!CommonHelper.IgnoreStoreLimitations)
+                if (!_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -328,7 +322,7 @@ namespace Grand.Business.Cms.Services
                 query = query.Where(x => x.Published);
                 query = query.Where(x => x.Id == id);
 
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                     query = from p in query
@@ -336,7 +330,7 @@ namespace Grand.Business.Cms.Services
                             select p;
                 }
 
-                if (!CommonHelper.IgnoreStoreLimitations)
+                if (!_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -364,7 +358,7 @@ namespace Grand.Business.Cms.Services
                 query = query.Where(x => x.Published);
                 query = query.Where(x => x.ParentCategoryId == categoryId);
 
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                     query = from p in query
@@ -372,7 +366,7 @@ namespace Grand.Business.Cms.Services
                             select p;
                 }
 
-                if (!CommonHelper.IgnoreStoreLimitations)
+                if (!_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -403,7 +397,7 @@ namespace Grand.Business.Cms.Services
                 query = query.Where(p => p.Locales.Any(x => x.LocaleValue != null && x.LocaleValue.ToLower().Contains(keyword.ToLower()))
                     || p.Name.ToLower().Contains(keyword.ToLower()) || p.Content.ToLower().Contains(keyword.ToLower()));
 
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                     query = from p in query
@@ -411,7 +405,7 @@ namespace Grand.Business.Cms.Services
                             select p;
                 }
 
-                if (!CommonHelper.IgnoreStoreLimitations)
+                if (!_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -441,7 +435,7 @@ namespace Grand.Business.Cms.Services
                 query = query.Where(p => p.Locales.Any(x => x.LocaleValue != null && x.LocaleValue.ToLower().Contains(keyword.ToLower()))
                     || p.Name.ToLower().Contains(keyword.ToLower()) || p.Description.ToLower().Contains(keyword.ToLower()));
 
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                     query = from p in query
@@ -449,7 +443,7 @@ namespace Grand.Business.Cms.Services
                             select p;
                 }
 
-                if (!CommonHelper.IgnoreStoreLimitations)
+                if (!_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -478,7 +472,7 @@ namespace Grand.Business.Cms.Services
                 query = query.Where(x => x.Published);
                 query = query.Where(x => x.ShowOnHomepage);
 
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                     query = from p in query
@@ -486,7 +480,7 @@ namespace Grand.Business.Cms.Services
                             select p;
                 }
 
-                if (!CommonHelper.IgnoreStoreLimitations)
+                if (!_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -551,8 +545,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="articleComment">Article comment</param>
         public virtual async Task InsertArticleComment(KnowledgebaseArticleComment articleComment)
         {
-            if (articleComment == null)
-                throw new ArgumentNullException(nameof(articleComment));
+            ArgumentNullException.ThrowIfNull(articleComment);
 
             await _articleCommentRepository.InsertAsync(articleComment);
 
@@ -619,8 +612,7 @@ namespace Grand.Business.Cms.Services
 
         public virtual async Task DeleteArticleComment(KnowledgebaseArticleComment articleComment)
         {
-            if (articleComment == null)
-                throw new ArgumentNullException(nameof(articleComment));
+            ArgumentNullException.ThrowIfNull(articleComment);
 
             await _articleCommentRepository.DeleteAsync(articleComment);
         }

@@ -1,15 +1,16 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Products;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using Grand.SharedKernel.Extensions;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class ProductAttributeServiceTests
@@ -28,7 +29,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             _repository = new MongoDBRepositoryTest<Product>();
             _repositoryproductAttribute = new MongoDBRepositoryTest<ProductAttribute>();
             _mediatorMock = new Mock<IMediator>();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
 
             _productAttributeService = new ProductAttributeService(_cacheBase, _repositoryproductAttribute, _repository, _mediatorMock.Object);
         }
@@ -40,7 +41,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             var pa1 = new ProductAttribute();
             var pa2 = new ProductAttribute();
             var pa3 = new ProductAttribute();
-            await _repositoryproductAttribute.InsertManyAsync(new[] { pa1, pa2, pa3 });
+            await _repositoryproductAttribute.InsertAsync(pa1);
+            await _repositoryproductAttribute.InsertAsync(pa2);
+            await _repositoryproductAttribute.InsertAsync(pa3);
 
             //Act
             var result = await _productAttributeService.GetAllProductAttributes();
@@ -56,7 +59,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             var pa1 = new ProductAttribute();
             var pa2 = new ProductAttribute();
             var pa3 = new ProductAttribute();
-            await _repositoryproductAttribute.InsertManyAsync(new[] { pa1, pa2, pa3 });
+            await _repositoryproductAttribute.InsertAsync(pa1);
+            await _repositoryproductAttribute.InsertAsync(pa2);
+            await _repositoryproductAttribute.InsertAsync(pa3);
 
             //Act
             var result = await _productAttributeService.GetProductAttributeById(pa1.Id);

@@ -1,16 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Grand.Business.Checkout.Commands.Handlers.Orders;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
 using Grand.Business.Core.Commands.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
+using Grand.Business.Core.Interfaces.Checkout.Payments;
+using Grand.Business.Core.Queries.Checkout.Orders;
 using Grand.Domain.Orders;
 using Grand.Domain.Payments;
 using MediatR;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Grand.Business.Core.Interfaces.Checkout.Payments;
-using Grand.Business.Core.Interfaces.Common.Logging;
-using Grand.Business.Core.Queries.Checkout.Orders;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class PartiallyPaidOfflineCommandHandlerTests
@@ -35,7 +34,7 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         public async Task HandleTest()
         {
             //Arrange
-            var command = new PartiallyPaidOfflineCommand() { PaymentTransaction = new PaymentTransaction() };
+            var command = new PartiallyPaidOfflineCommand { PaymentTransaction = new PaymentTransaction() };
             _mediatorMock.Setup(x => x.Send(It.IsAny<CanPartiallyPaidOfflineQuery>(), default))
                 .Returns(Task.FromResult(true));
             _orderServiceMock.Setup(x => x.GetOrderByGuid(It.IsAny<Guid>())).Returns(Task.FromResult(new Order()));

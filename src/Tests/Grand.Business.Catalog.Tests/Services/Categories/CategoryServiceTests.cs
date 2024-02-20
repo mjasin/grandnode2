@@ -2,10 +2,11 @@
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
-using Grand.Domain.Data.Mongo;
+using Grand.Data;
+using Grand.Data.Mongo;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Events;
 using Grand.SharedKernel.Extensions;
 using MediatR;
@@ -35,14 +36,14 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
 
             _casheManagerMock = new Mock<ICacheBase>();
             _categoryRepositoryMock = new Mock<IRepository<Category>>();
-            _productRepositoryMock = new Mock<MongoRepository<Product>>();
+            _productRepositoryMock = new Mock<MongoRepository<Product>>(Mock.Of<IAuditInfoProvider>());
             _workContextMock = new Mock<IWorkContext>();
             _mediatorMock = new Mock<IMediator>();
             _aclServiceMock = new Mock<IAclService>();
             _settings = new CatalogSettings();
             _categoryService = new CategoryService(_casheManagerMock.Object, _categoryRepositoryMock.Object, _workContextMock.Object,
-                 _mediatorMock.Object, _aclServiceMock.Object);
-            _productCategoryService = new ProductCategoryService(_productRepositoryMock.Object, _casheManagerMock.Object, _workContextMock.Object, _mediatorMock.Object);
+                 _mediatorMock.Object, _aclServiceMock.Object, new AccessControlConfig());
+            _productCategoryService = new ProductCategoryService(_productRepositoryMock.Object, _casheManagerMock.Object, _workContextMock.Object, _mediatorMock.Object, new AccessControlConfig());
         }
 
         [TestMethod()]
@@ -80,7 +81,7 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
         public void GetCategoryBreadCrumb_ShouldReturnEmptyList()
         {
             var allCategory = GetMockCategoryList();
-            var category = new Category() { ParentCategoryId = "3" };
+            var category = new Category { ParentCategoryId = "3" };
             _aclServiceMock.Setup(a => a.Authorize(It.IsAny<Category>(), It.IsAny<Customer>())).Returns(() => true);
             _aclServiceMock.Setup(a => a.Authorize(It.IsAny<Category>(), It.IsAny<string>())).Returns(() => true);
             var result = _categoryService.GetCategoryBreadCrumb(category, allCategory);
@@ -91,8 +92,8 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
         public void GetCategoryBreadCrumb_ShouldReturnTwoElement()
         {
             var allCategory = GetMockCategoryList();
-            var category = new Category() { Id = "6", ParentCategoryId = "3", Published = true };
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "" });
+            var category = new Category { Id = "6", ParentCategoryId = "3", Published = true };
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "" });
             _aclServiceMock.Setup(a => a.Authorize(It.IsAny<Category>(), It.IsAny<Customer>())).Returns(() => true);
             _aclServiceMock.Setup(a => a.Authorize(It.IsAny<Category>(), It.IsAny<string>())).Returns(() => true);
             var result = _categoryService.GetCategoryBreadCrumb(category, allCategory);
@@ -105,8 +106,8 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
         public void GetCategoryBreadCrumb_ShouldReturnThreeElement()
         {
             var allCategory = GetMockCategoryList();
-            var category = new Category() { Id = "6", ParentCategoryId = "1", Published = true };
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "" });
+            var category = new Category { Id = "6", ParentCategoryId = "1", Published = true };
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "" });
             _aclServiceMock.Setup(a => a.Authorize(It.IsAny<Category>(), It.IsAny<Customer>())).Returns(() => true);
             _aclServiceMock.Setup(a => a.Authorize(It.IsAny<Category>(), It.IsAny<string>())).Returns(() => true);
             var result = _categoryService.GetCategoryBreadCrumb(category, allCategory);
@@ -121,7 +122,7 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
         {
             var exprectedString = "cat5 >> cat1 >> cat6";
             var allCategory = GetMockCategoryList();
-            var category = new Category() { Id = "6", Name = "cat6", ParentCategoryId = "1", Published = true };
+            var category = new Category { Id = "6", Name = "cat6", ParentCategoryId = "1", Published = true };
             _aclServiceMock.Setup(a => a.Authorize(It.IsAny<Category>(), It.IsAny<Customer>())).Returns(() => true);
             _aclServiceMock.Setup(a => a.Authorize(It.IsAny<Category>(), It.IsAny<string>())).Returns(() => true);
             var result = _categoryService.GetFormattedBreadCrumb(category, allCategory);
@@ -177,13 +178,12 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
 
         private IList<Category> GetMockCategoryList()
         {
-            return new List<Category>()
-            {
-                new Category(){ Id="1" ,Name="cat1",Published=true,ParentCategoryId="5"},
-                new Category(){ Id="2" ,Name="cat2",Published=true},
-                new Category(){ Id="3" ,Name="cat3",Published=true},
-                new Category(){ Id="4" ,Name="cat4",Published=true},
-                new Category(){ Id="5" ,Name="cat5",Published=true},
+            return new List<Category> {
+                new Category { Id="1" ,Name="cat1",Published=true,ParentCategoryId="5"},
+                new Category { Id="2" ,Name="cat2",Published=true},
+                new Category { Id="3" ,Name="cat3",Published=true},
+                new Category { Id="4" ,Name="cat4",Published=true},
+                new Category { Id="5" ,Name="cat5",Published=true}
             };
         }
 

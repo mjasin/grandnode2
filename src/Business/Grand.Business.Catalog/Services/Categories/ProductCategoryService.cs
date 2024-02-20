@@ -3,12 +3,12 @@ using Grand.Business.Core.Utilities.Catalog;
 using Grand.Domain;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Catalog.Services.Categories
@@ -19,17 +19,19 @@ namespace Grand.Business.Catalog.Services.Categories
         private readonly ICacheBase _cacheBase;
         private readonly IWorkContext _workContext;
         private readonly IMediator _mediator;
-
+        private readonly AccessControlConfig _accessControlConfig;
+        
         public ProductCategoryService(
             IRepository<Product> productRepository,
             ICacheBase cacheBase,
             IWorkContext workContext,
-            IMediator mediator)
+            IMediator mediator, AccessControlConfig accessControlConfig)
         {
             _productRepository = productRepository;
             _cacheBase = cacheBase;
             _workContext = workContext;
             _mediator = mediator;
+            _accessControlConfig = accessControlConfig;
         }
 
         /// <summary>
@@ -51,9 +53,9 @@ namespace Grand.Business.Catalog.Services.Categories
             {
                 var query = _productRepository.Table.Where(x => x.ProductCategories.Any(y => y.CategoryId == categoryId));
 
-                if (!showHidden && (!CommonHelper.IgnoreAcl || !CommonHelper.IgnoreStoreLimitations))
+                if (!showHidden && (!_accessControlConfig.IgnoreAcl || !_accessControlConfig.IgnoreStoreLimitations))
                 {
-                    if (!CommonHelper.IgnoreAcl)
+                    if (!_accessControlConfig.IgnoreAcl)
                     {
                         //Limited to customer groups
                         var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
@@ -61,7 +63,7 @@ namespace Grand.Business.Catalog.Services.Categories
                                 where !p.LimitedToGroups || allowedCustomerGroupsIds.Any(x => p.CustomerGroups.Contains(x))
                                 select p;
                     }
-                    if (!CommonHelper.IgnoreStoreLimitations)
+                    if (!_accessControlConfig.IgnoreStoreLimitations)
                     {
                         //Limited to stores
                         var currentStoreId = _workContext.CurrentStore.Id;
@@ -101,8 +103,7 @@ namespace Grand.Business.Catalog.Services.Categories
         /// <param name="productId">Product ident</param>
         public virtual async Task InsertProductCategory(ProductCategory productCategory, string productId)
         {
-            if (productCategory == null)
-                throw new ArgumentNullException(nameof(productCategory));
+            ArgumentNullException.ThrowIfNull(productCategory);
 
             await _productRepository.AddToSet(productId, x => x.ProductCategories, productCategory);
 
@@ -121,8 +122,7 @@ namespace Grand.Business.Catalog.Services.Categories
         /// <param name="productId">Product ident</param>
         public virtual async Task UpdateProductCategory(ProductCategory productCategory, string productId)
         {
-            if (productCategory == null)
-                throw new ArgumentNullException(nameof(productCategory));
+            ArgumentNullException.ThrowIfNull(productCategory);
 
             await _productRepository.UpdateToSet(productId, x => x.ProductCategories, z => z.Id, productCategory.Id, productCategory);
 
@@ -140,8 +140,7 @@ namespace Grand.Business.Catalog.Services.Categories
         /// <param name="productId">Product ident</param>
         public virtual async Task DeleteProductCategory(ProductCategory productCategory, string productId)
         {
-            if (productCategory == null)
-                throw new ArgumentNullException(nameof(productCategory));
+            ArgumentNullException.ThrowIfNull(productCategory);
 
             await _productRepository.PullFilter(productId, x => x.ProductCategories, z => z.Id, productCategory.Id);
 

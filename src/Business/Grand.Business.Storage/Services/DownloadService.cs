@@ -1,5 +1,5 @@
 using Grand.Business.Core.Interfaces.Storage;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Media;
 using Grand.Infrastructure.Extensions;
 using MediatR;
@@ -89,8 +89,7 @@ namespace Grand.Business.Storage.Services
         /// <param name="download">Download</param>
         public virtual async Task InsertDownload(Download download)
         {
-            if (download == null)
-                throw new ArgumentNullException(nameof(download));
+            ArgumentNullException.ThrowIfNull(download);
             if (!download.UseDownloadUrl)
             {
                 download.DownloadObjectId = await _storeFilesContext.BucketUploadFromBytes(download.Filename, download.DownloadBinary);
@@ -108,8 +107,7 @@ namespace Grand.Business.Storage.Services
         /// <param name="download">Download</param>
         public virtual async Task UpdateDownload(Download download)
         {
-            if (download == null)
-                throw new ArgumentNullException(nameof(download));
+            ArgumentNullException.ThrowIfNull(download);
 
             await _downloadRepository.UpdateAsync(download);
 
@@ -122,8 +120,7 @@ namespace Grand.Business.Storage.Services
         /// <param name="download">Download</param>
         public virtual async Task DeleteDownload(Download download)
         {
-            if (download == null)
-                throw new ArgumentNullException(nameof(download));
+            ArgumentNullException.ThrowIfNull(download);
 
             await _downloadRepository.DeleteAsync(download);
 

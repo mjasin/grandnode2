@@ -1,19 +1,16 @@
 ﻿using Azure.Identity;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Grand.Business.Core.Interfaces.Authentication;
 using Grand.Business.Core.Interfaces.Common.Configuration;
-using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Utilities.Authentication;
-using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Domain.Configuration;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Plugins;
 using Grand.Infrastructure.TypeSearch;
 using Grand.SharedKernel.Extensions;
-using Grand.Web.Common.Themes;
+using Grand.Web.Common.View;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -21,18 +18,11 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.WebEncoders;
-using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
-using System.IO.Compression;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
-using WebMarkupMin.AspNet.Common.Compressors;
-using WebMarkupMin.AspNet.Common.UrlMatchers;
-using WebMarkupMin.AspNetCore6;
-using WebMarkupMin.NUglify;
-using IWmmLogger = WebMarkupMin.Core.Loggers.ILogger;
-using WmmThrowExceptionLogger = WebMarkupMin.Core.Loggers.ThrowExceptionLogger;
 
 namespace Grand.Web.Common.Infrastructure
 {
@@ -99,7 +89,7 @@ namespace Grand.Web.Common.Infrastructure
             //themes support
             services.Configure<RazorViewEngineOptions>(options =>
             {
-                options.ViewLocationExpanders.Add(new ThemeViewLocationExpander());
+                options.ViewLocationExpanders.Add(new ViewLocationExpander());
             });
         }
 
@@ -216,7 +206,11 @@ namespace Grand.Web.Common.Infrastructure
         public static IMvcBuilder AddGrandMvc(this IServiceCollection services, IConfiguration configuration)
         {
             //add basic MVC feature
-            var mvcBuilder = services.AddControllersWithViews();
+            var mvcBuilder = services.AddControllersWithViews().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null; 
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
 
             //add view localization
             mvcBuilder.AddViewLocalization();
@@ -254,45 +248,14 @@ namespace Grand.Web.Common.Infrastructure
             }
 
             //Add fluentValidation
-            services.AddFluentValidationClientsideAdapters();
             var typeSearcher = new TypeSearcher();
             var assemblies = typeSearcher.GetAssemblies();
             services.AddValidatorsFromAssemblies(assemblies);
-
-            //MVC now serializes JSON with camel case names by default, use this code to avoid it
-            mvcBuilder.AddNewtonsoftJson(options =>
-                options.SerializerSettings.ContractResolver = new DefaultContractResolver());
-
+            
             //register controllers as services, it'll allow to override them
             mvcBuilder.AddControllersAsServices();
-
+            
             return mvcBuilder;
-        }
-
-        /// <summary>
-        /// Add mini profiler service for the application
-        /// </summary>
-        /// <param name="services">Collection of service descriptors</param>
-        public static void AddGrandMiniProfiler(this IServiceCollection services)
-        {
-            //whether database is already installed
-            if (!DataSettingsManager.DatabaseIsInstalled())
-                return;
-
-            //add MiniProfiler services
-            services.AddMiniProfiler(options =>
-            {
-                options.IgnoredPaths.Add("/api");
-                options.IgnoredPaths.Add("/odata");
-                options.IgnoredPaths.Add("/health/live");
-                options.IgnoredPaths.Add("/.well-known/pki-validation");
-                //determine who can access the MiniProfiler results
-                options.ResultsAuthorize = request =>
-                    !request.HttpContext.RequestServices.GetRequiredService<PerformanceConfig>()
-                        .DisplayMiniProfilerInPublicStore ||
-                    request.HttpContext.RequestServices.GetRequiredService<IPermissionService>()
-                        .Authorize(StandardPermission.AccessAdminPanel).Result;
-            });
         }
 
         public static void AddSettings(this IServiceCollection services)
@@ -326,68 +289,28 @@ namespace Grand.Web.Common.Infrastructure
                 tags: new[] { "mongodb" });
         }
 
-        public static void AddHtmlMinification(this IServiceCollection services, IConfiguration configuration)
-        {
-            var performanceConfig = new PerformanceConfig();
-            configuration.GetSection("Performance").Bind(performanceConfig);
-            if (performanceConfig.UseHtmlMinification)
-            {
-                // Add WebMarkupMin services
-                services.AddWebMarkupMin(options =>
-                    {
-                        options.AllowMinificationInDevelopmentEnvironment = true;
-                        options.AllowCompressionInDevelopmentEnvironment = true;
-                    })
-                    .AddHtmlMinification(options =>
-                    {
-                        options.MinificationSettings.RemoveOptionalEndTags = false;
-
-                        options.ExcludedPages = new List<IUrlMatcher> {
-                            new WildcardUrlMatcher("/swagger/*"),
-                            new WildcardUrlMatcher("/admin/*"),
-                            new ExactUrlMatcher("/admin")
-                        };
-                        options.CssMinifierFactory = new NUglifyCssMinifierFactory();
-                        options.JsMinifierFactory = new NUglifyJsMinifierFactory();
-                    })
-                    .AddXmlMinification(options =>
-                    {
-                        options.ExcludedPages = new List<IUrlMatcher> {
-                            new WildcardUrlMatcher("/swagger/*"),
-                            new WildcardUrlMatcher("/admin/*"),
-                            new ExactUrlMatcher("/admin")
-                        };
-                    })
-                    .AddHttpCompression(options =>
-                    {
-                        options.ExcludedPages = new List<IUrlMatcher> {
-                            new WildcardUrlMatcher("/swagger/*")
-                        };
-                        options.CompressorFactories = new List<ICompressorFactory> {
-                            new BuiltInBrotliCompressorFactory(new BuiltInBrotliCompressionSettings {
-                                Level = CompressionLevel.Fastest
-                            }),
-                            new DeflateCompressorFactory(new DeflateCompressionSettings {
-                                Level = CompressionLevel.Fastest
-                            }),
-                            new GZipCompressorFactory(new GZipCompressionSettings {
-                                Level = CompressionLevel.Fastest
-                            })
-                        };
-                    });
-            }
-
-            if (performanceConfig.HtmlMinificationErrors)
-                services.AddSingleton<IWmmLogger, WmmThrowExceptionLogger>();
-        }
-
-        public static void AddApplicationInsights(this IServiceCollection services, IConfiguration configuration)
+        public static void AddGrandApplicationInsights(this IServiceCollection services, IConfiguration configuration)
         {
             var applicationInsights = new ApplicationInsightsConfig();
             configuration.GetSection("ApplicationInsights").Bind(applicationInsights);
-            if (applicationInsights.Enabled)
+            if (!string.IsNullOrEmpty(applicationInsights.ConnectionString))
             {
                 services.AddApplicationInsightsTelemetry();
+                services.AddServiceProfiler();
+                services.AddLogging(builder =>
+                {
+                    builder.AddApplicationInsights(
+                        configureTelemetryConfiguration: (config) =>
+                        {
+                            config.ConnectionString = applicationInsights.ConnectionString;
+                        },
+                        configureApplicationInsightsLoggerOptions: (options) =>
+                        {
+                            options.IncludeScopes = false;
+                            options.TrackExceptionsAsExceptionTelemetry = false;
+                        }
+                    );
+                });
             }
         }
 

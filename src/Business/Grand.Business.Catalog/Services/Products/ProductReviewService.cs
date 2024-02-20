@@ -2,7 +2,7 @@
 using Grand.Infrastructure.Extensions;
 using Grand.Domain;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using MediatR;
 
 namespace Grand.Business.Catalog.Services.Products
@@ -76,8 +76,7 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="productReview">Product review</param>
         public virtual async Task InsertProductReview(ProductReview productReview)
         {
-            if (productReview == null)
-                throw new ArgumentNullException(nameof(productReview));
+            ArgumentNullException.ThrowIfNull(productReview);
 
             await _productReviewRepository.InsertAsync(productReview);
 
@@ -86,15 +85,13 @@ namespace Grand.Business.Catalog.Services.Products
         }
         public virtual async Task UpdateProductReview(ProductReview productReview)
         {
-            if (productReview == null)
-                throw new ArgumentNullException(nameof(productReview));
+            ArgumentNullException.ThrowIfNull(productReview);
 
             var update = UpdateBuilder<ProductReview>.Create()
                 .Set(x => x.Title, productReview.Title)
                 .Set(x => x.ReviewText, productReview.ReviewText)
                 .Set(x => x.ReplyText, productReview.ReplyText)
                 .Set(x => x.Signature, productReview.Signature)
-                .Set(x => x.UpdatedOnUtc, DateTime.UtcNow)
                 .Set(x => x.IsApproved, productReview.IsApproved)
                 .Set(x => x.HelpfulNoTotal, productReview.HelpfulNoTotal)
                 .Set(x => x.HelpfulYesTotal, productReview.HelpfulYesTotal)
@@ -112,8 +109,7 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="productReview">Product review</param>
         public virtual async Task DeleteProductReview(ProductReview productReview)
         {
-            if (productReview == null)
-                throw new ArgumentNullException(nameof(productReview));
+            ArgumentNullException.ThrowIfNull(productReview);
 
             await _productReviewRepository.DeleteAsync(productReview);
 

@@ -1,12 +1,12 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Marketing.Services.Courses;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Courses;
-using Grand.Domain.Data;
+using Grand.Data;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-
-namespace Grand.Business.Marketing.Services.Courses.Tests
+namespace Grand.Business.Marketing.Tests.Services.Courses
 {
     [TestClass()]
     public class CourseLessonServiceTests
@@ -27,7 +27,7 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
         public async Task DeleteTest()
         {
             //Arrange
-            var courseLesson = new CourseLesson() {
+            var courseLesson = new CourseLesson {
                 Name = "test"
             };
             await _courseLessonService.Insert(courseLesson);
@@ -44,7 +44,7 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
         public async Task GetByCourseIdTest()
         {
             //Arrange
-            var courseLesson = new CourseLesson() {
+            var courseLesson = new CourseLesson {
                 Name = "test",
                 CourseId = "1"
             };
@@ -55,15 +55,15 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(1, result.Count);
         }
 
         [TestMethod()]
         public async Task GetByIdTest()
         {
             //Arrange
-            var courseLesson = new CourseLesson() {
-                Name = "test",
+            var courseLesson = new CourseLesson {
+                Name = "test"
             };
             await _courseLessonService.Insert(courseLesson);
 
@@ -79,8 +79,8 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
         public async Task InsertTest()
         {
             //Act
-            var courseLesson = new CourseLesson() {
-                Name = "test",
+            var courseLesson = new CourseLesson {
+                Name = "test"
             };
             await _courseLessonService.Insert(courseLesson);
 
@@ -92,8 +92,8 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
         public async Task UpdateTest()
         {
             //Arrange
-            var courseLesson = new CourseLesson() {
-                Name = "test",
+            var courseLesson = new CourseLesson {
+                Name = "test"
             };
             await _courseLessonService.Insert(courseLesson);
             courseLesson.Name = "test2";

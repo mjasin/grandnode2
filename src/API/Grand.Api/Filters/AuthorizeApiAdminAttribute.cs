@@ -1,6 +1,6 @@
 ﻿using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Utilities.Common.Security;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +22,7 @@ namespace Grand.Api.Filters
         public AuthorizeApiAdminAttribute(bool ignore = false) : base(typeof(AuthorizeApiAdminFilter))
         {
             _ignoreFilter = ignore;
-            Arguments = new object[] { ignore };
+            Arguments = [ignore];
         }
 
         public bool IgnoreFilter => _ignoreFilter;
@@ -61,9 +61,7 @@ namespace Grand.Api.Filters
             /// <param name="filterContext">Authorization filter context</param>
             public async Task OnAuthorizationAsync(AuthorizationFilterContext filterContext)
             {
-
-                if (filterContext == null)
-                    throw new ArgumentNullException(nameof(filterContext));
+                ArgumentNullException.ThrowIfNull(filterContext);
 
                 //check whether this filter has been overridden for the action
                 var actionFilter = filterContext.ActionDescriptor.FilterDescriptors
@@ -81,7 +79,7 @@ namespace Grand.Api.Filters
                 if (filterContext.Filters.Any(filter => filter is AuthorizeApiAdminFilter))
                 {
                     //authorize permission of access to the admin area
-                    if (!await _permissionService.Authorize(StandardPermission.AccessAdminPanel))
+                    if (!await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel))
                         filterContext.Result = new ForbidResult(JwtBearerDefaults.AuthenticationScheme);
 
                     //get allowed IP addresses

@@ -1,13 +1,13 @@
 ﻿using Grand.Business.Catalog.Services.Products;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Events;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Tests.Service.Products
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class CustomerGroupProductServiceTests

@@ -3,7 +3,7 @@ using Grand.Business.Core.Events.Catalog;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Domain.Catalog;
 using Grand.Domain.Common;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Shipping;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
@@ -119,7 +119,7 @@ namespace Grand.Business.Catalog.Services.Products
                 var p1 = await _productRepository.GetByIdAsync(item.ProductId);
                 if (p1 == null || p1.Id == product.Id ||
                     p1.ManageInventoryMethodId == ManageInventoryMethod.DontManageStock) continue;
-                var shipmentItem1 = new ShipmentItem() {
+                var shipmentItem1 = new ShipmentItem {
                     Id = shipmentItem.Id,
                     Attributes = shipmentItem.Attributes,
                     OrderItemId = shipmentItem.OrderItemId,
@@ -145,7 +145,7 @@ namespace Grand.Business.Catalog.Services.Products
                     || associatedProduct.Id == product.Id
                     || associatedProduct.ManageInventoryMethodId == ManageInventoryMethod.DontManageStock) continue;
                 if (await CheckExistsInventoryJournal(associatedProduct, shipmentItem)) continue;
-                var item = new ShipmentItem() {
+                var item = new ShipmentItem {
                     Id = shipmentItem.Id,
                     Attributes = shipmentItem.Attributes,
                     OrderItemId = shipmentItem.OrderItemId,
@@ -167,10 +167,10 @@ namespace Grand.Business.Catalog.Services.Products
         }
         private async Task ReverseBookedInventory(Product product, InventoryJournal inventoryJournal)
         {
-            //standard manage stock
-            if (product.ManageInventoryMethodId == ManageInventoryMethod.ManageStock)
+            switch (product.ManageInventoryMethodId)
             {
-                if (product.UseMultipleWarehouses)
+                //standard manage stock
+                case ManageInventoryMethod.ManageStock when product.UseMultipleWarehouses:
                 {
                     var pwi = product.ProductWarehouseInventory.FirstOrDefault(x => x.WarehouseId == inventoryJournal.WarehouseId);
                     if (pwi == null)
@@ -183,61 +183,61 @@ namespace Grand.Business.Catalog.Services.Products
 
                     await _productRepository.UpdateToSet(product.Id, x => x.ProductWarehouseInventory, z => z.Id, pwi.Id, pwi);
                     await _productRepository.UpdateField(product.Id, x => x.UpdatedOnUtc, DateTime.UtcNow);
-
+                    break;
                 }
-                else
-                {
+                case ManageInventoryMethod.ManageStock:
                     product.StockQuantity += inventoryJournal.OutQty;
                     product.ReservedQuantity += inventoryJournal.OutQty;
                     await UpdateStockProduct(product);
-                }
-            }
-
-            //manage stock by attributes
-            if (product.ManageInventoryMethodId == ManageInventoryMethod.ManageStockByAttributes)
-            {
-                var combination = product.FindProductAttributeCombination(inventoryJournal.Attributes);
-                if (combination == null)
-                    return;
-
-                if (!product.UseMultipleWarehouses)
+                    break;
+                //manage stock by attributes
+                case ManageInventoryMethod.ManageStockByAttributes:
                 {
-                    combination.StockQuantity += inventoryJournal.OutQty;
-                    combination.ReservedQuantity += inventoryJournal.OutQty;
-                    if (combination.ReservedQuantity < 0)
-                        combination.ReservedQuantity = 0;
-
-                    product.StockQuantity = product.ProductAttributeCombinations.Sum(x => x.StockQuantity);
-                    product.ReservedQuantity = product.ProductAttributeCombinations.Sum(x => x.ReservedQuantity);
-
-                    await _productRepository.UpdateToSet(product.Id, x => x.ProductAttributeCombinations, z => z.Id, combination.Id, combination);
-                    await _productRepository.UpdateField(product.Id, x => x.UpdatedOnUtc, DateTime.UtcNow);
-
-                    await UpdateStockProduct(product);
-
-
-                }
-                else
-                {
-                    var pwi = combination.WarehouseInventory.FirstOrDefault(x => x.WarehouseId == inventoryJournal.WarehouseId);
-                    if (pwi == null)
+                    var combination = product.FindProductAttributeCombination(inventoryJournal.Attributes);
+                    if (combination == null)
                         return;
 
-                    pwi.StockQuantity += inventoryJournal.OutQty;
-                    pwi.ReservedQuantity += inventoryJournal.OutQty;
+                    if (!product.UseMultipleWarehouses)
+                    {
+                        combination.StockQuantity += inventoryJournal.OutQty;
+                        combination.ReservedQuantity += inventoryJournal.OutQty;
+                        if (combination.ReservedQuantity < 0)
+                            combination.ReservedQuantity = 0;
 
-                    if (pwi.ReservedQuantity < 0)
-                        pwi.ReservedQuantity = 0;
+                        product.StockQuantity = product.ProductAttributeCombinations.Sum(x => x.StockQuantity);
+                        product.ReservedQuantity = product.ProductAttributeCombinations.Sum(x => x.ReservedQuantity);
 
-                    combination.StockQuantity = combination.WarehouseInventory.Sum(x => x.StockQuantity);
-                    combination.ReservedQuantity = combination.WarehouseInventory.Sum(x => x.ReservedQuantity);
-                    product.StockQuantity = product.ProductAttributeCombinations.Sum(x => x.StockQuantity);
-                    product.ReservedQuantity = product.ProductAttributeCombinations.Sum(x => x.ReservedQuantity);
+                        await _productRepository.UpdateToSet(product.Id, x => x.ProductAttributeCombinations, z => z.Id, combination.Id, combination);
+                        await _productRepository.UpdateField(product.Id, x => x.UpdatedOnUtc, DateTime.UtcNow);
 
-                    await _productRepository.UpdateToSet(product.Id, x => x.ProductAttributeCombinations, z => z.Id, combination.Id, combination);
-                    await _productRepository.UpdateField(product.Id, x => x.UpdatedOnUtc, DateTime.UtcNow);
-                    await UpdateStockProduct(product);
+                        await UpdateStockProduct(product);
 
+
+                    }
+                    else
+                    {
+                        var pwi = combination.WarehouseInventory.FirstOrDefault(x => x.WarehouseId == inventoryJournal.WarehouseId);
+                        if (pwi == null)
+                            return;
+
+                        pwi.StockQuantity += inventoryJournal.OutQty;
+                        pwi.ReservedQuantity += inventoryJournal.OutQty;
+
+                        if (pwi.ReservedQuantity < 0)
+                            pwi.ReservedQuantity = 0;
+
+                        combination.StockQuantity = combination.WarehouseInventory.Sum(x => x.StockQuantity);
+                        combination.ReservedQuantity = combination.WarehouseInventory.Sum(x => x.ReservedQuantity);
+                        product.StockQuantity = product.ProductAttributeCombinations.Sum(x => x.StockQuantity);
+                        product.ReservedQuantity = product.ProductAttributeCombinations.Sum(x => x.ReservedQuantity);
+
+                        await _productRepository.UpdateToSet(product.Id, x => x.ProductAttributeCombinations, z => z.Id, combination.Id, combination);
+                        await _productRepository.UpdateField(product.Id, x => x.UpdatedOnUtc, DateTime.UtcNow);
+                        await UpdateStockProduct(product);
+
+                    }
+
+                    break;
                 }
             }
 
@@ -274,8 +274,7 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="warehouseId">Warehouse ident</param>
         public virtual async Task AdjustReserved(Product product, int quantityToChange, IList<CustomAttribute> attributes = null, string warehouseId = "")
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             if (quantityToChange == 0)
                 return;
@@ -334,8 +333,6 @@ namespace Grand.Business.Catalog.Services.Products
                             await _mediator.EntityUpdated(product);
 
                             break;
-                        default:
-                            break;
                     }
                 }
                 //qty is increased. product is out of stock (minimum stock quantity is reached again)?
@@ -378,8 +375,6 @@ namespace Grand.Business.Catalog.Services.Products
                                 await _mediator.EntityUpdated(product);
 
                                 break;
-                            default:
-                                break;
                         }
                     }
                 }
@@ -387,7 +382,7 @@ namespace Grand.Business.Catalog.Services.Products
                 //send email notification
                 if (quantityToChange < 0 && _stockQuantityService.GetTotalStockQuantity(product, warehouseId: warehouseId) < product.NotifyAdminForQuantityBelow)
                 {
-                    await _mediator.Send(new SendQuantityBelowStoreOwnerCommand() {
+                    await _mediator.Send(new SendQuantityBelowStoreOwnerCommand {
                         Product = product
                     });
                 }
@@ -406,7 +401,7 @@ namespace Grand.Business.Catalog.Services.Products
                     //send email notification
                     if (quantityToChange < 0 && combination.StockQuantity < combination.NotifyAdminForQuantityBelow)
                     {
-                        await _mediator.Send(new SendQuantityBelowStoreOwnerCommand() {
+                        await _mediator.Send(new SendQuantityBelowStoreOwnerCommand {
                             Product = product,
                             ProductAttributeCombination = combination
                         });
@@ -451,8 +446,7 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="warehouseId"></param>
         protected virtual async Task ReserveInventory(Product product, int quantity, string warehouseId)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             if (quantity >= 0)
                 throw new ArgumentException("Value must be negative.", nameof(quantity));
@@ -495,11 +489,8 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="warehouseId">Warehouse ident</param>
         protected virtual async Task ReserveInventoryCombination(Product product, ProductAttributeCombination combination, int quantity, string warehouseId)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            if (combination == null)
-                throw new ArgumentNullException(nameof(combination));
+            ArgumentNullException.ThrowIfNull(product);
+            ArgumentNullException.ThrowIfNull(combination);
 
             if (quantity >= 0)
                 throw new ArgumentException("Value must be negative.", nameof(quantity));
@@ -553,8 +544,7 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="warehouseId">Warehouse ident</param>
         protected virtual async Task UnblockReservedInventory(Product product, int quantity, string warehouseId)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             if (quantity < 0)
                 throw new ArgumentException("Value must be positive.", nameof(quantity));
@@ -599,8 +589,7 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="warehouseId">Warehouse ident</param>
         protected virtual async Task UnblockReservedInventoryCombination(Product product, ProductAttributeCombination combination, int quantity, string warehouseId)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             if (quantity < 0)
                 throw new ArgumentException("Value must be positive.", nameof(quantity));
@@ -649,14 +638,9 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="shipmentItem">Shipment item</param>
         public virtual async Task BookReservedInventory(Product product, Shipment shipment, ShipmentItem shipmentItem)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-
-            if (shipment == null)
-                throw new ArgumentNullException(nameof(shipment));
-
-            if (shipmentItem == null)
-                throw new ArgumentNullException(nameof(shipmentItem));
+            ArgumentNullException.ThrowIfNull(product);
+            ArgumentNullException.ThrowIfNull(shipment);
+            ArgumentNullException.ThrowIfNull(shipmentItem);
 
             //standard manage stock 
             if (product.ManageInventoryMethodId == ManageInventoryMethod.ManageStock)
@@ -701,12 +685,8 @@ namespace Grand.Business.Catalog.Services.Products
         /// <returns>Quantity reversed</returns>
         public virtual async Task ReverseBookedInventory(Shipment shipment, ShipmentItem shipmentItem)
         {
-
-            if (shipment == null)
-                throw new ArgumentNullException(nameof(shipment));
-
-            if (shipmentItem == null)
-                throw new ArgumentNullException(nameof(shipmentItem));
+            ArgumentNullException.ThrowIfNull(shipment);
+            ArgumentNullException.ThrowIfNull(shipmentItem);
 
             var inventoryJournals = _inventoryJournalRepository.Table.Where(j => j.PositionId == shipmentItem.Id);
 
@@ -730,8 +710,8 @@ namespace Grand.Business.Catalog.Services.Products
 
         public virtual async Task UpdateStockProduct(Product product, bool mediator = true)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
+            
             if (product.ReservedQuantity < 0)
                 product.ReservedQuantity = 0;
 

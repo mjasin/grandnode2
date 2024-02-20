@@ -1,7 +1,7 @@
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Storage;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Plugins;
 using Grand.SharedKernel.Extensions;
 using Widgets.Slider.Domain;
@@ -45,8 +45,7 @@ namespace Widgets.Slider
             var byte1 = await File.ReadAllBytesAsync(sampleImagesPath + "banner1.png");
             var byte2 = await File.ReadAllBytesAsync(sampleImagesPath + "banner2.png");
 
-            var pictureSlider1 = new PictureSlider()
-            {
+            var pictureSlider1 = new PictureSlider {
                 DisplayOrder = 0,
                 Link = "",
                 Name = "Sample slider 1",
@@ -60,14 +59,13 @@ namespace Widgets.Slider
             await _pictureSliderRepository.InsertAsync(pictureSlider1);
 
 
-            var pictureSlider2 = new PictureSlider()
-            {
+            var pictureSlider2 = new PictureSlider {
                 DisplayOrder = 1,
                 Link = "https://grandnode.com",
                 Name = "Sample slider 2",
                 FullWidth = true,
                 Published = true,
-                Description = "<div class=\"row slideRow\"><div class=\"col-md-6 offset-md-6 col-12 offset-0 d-flex flex-column justify-content-center align-items-start px-0 pr-md-3\"><div class=\"slide-title text-dark animate__animated animate__fadeInRight animate__delay-05s\"><h2 class=\"mt-0\">Redmi Note 9</h2></div><div class=\"slide-content animate__animated animate__fadeInRight animate__delay-1s\"><p class=\"mb-0\"><span>Equipped with a high-performance octa-core processor <br/> with a maximum clock frequency of 2.0 GHz.</span></p></div><div class=\"slide-price animate__animated animate__fadeInRight animate__delay-15s d-inline-flex align-items-center justify-content-start w-100 mt-2\"><p class=\"actual\">$249.00</p><p class=\"old-price\">$399.00</p></div><div class=\"slide-button animate__animated animate__fadeInRight animate__delay-2s mt-3\"><a class=\"btn btn-outline-info\" href=\"/redmi-note-9\">BUY REDMI NOTE 9</a></div></div></div>",
+                Description = "<div class=\"row slideRow\"><div class=\"col-md-6 offset-md-6 col-12 offset-0 d-flex flex-column justify-content-center align-items-start px-0 pr-md-3\"><div class=\"slide-title text-dark animate__animated animate__fadeInRight animate__delay-05s\"><h2 class=\"mt-0\">Redmi Note 9</h2></div><div class=\"slide-content animate__animated animate__fadeInRight animate__delay-1s\"><p class=\"mb-0\"><span>Equipped with a high-performance octa-core processor <br/> with a maximum clock frequency of 2.0 GHz.</span></p></div><div class=\"slide-price animate__animated animate__fadeInRight animate__delay-15s d-inline-flex align-items-center justify-content-start w-100 mt-2\"><p class=\"actual\">$249.00</p><p class=\"old-price\">$399.00</p></div><div class=\"slide-button animate__animated animate__fadeInRight animate__delay-2s mt-3\"><a class=\"btn btn-outline-info\" href=\"/redmi-note-9\">BUY REDMI NOTE 9</a></div></div></div>"
             };
             var pic2 = await _pictureService.InsertPicture(byte2, "image/png", "banner_2", reference: Grand.Domain.Common.Reference.Widget, objectId: pictureSlider2.Id, validateBinary: false);
             pictureSlider2.PictureId = pic2.Id;
@@ -125,8 +123,9 @@ namespace Widgets.Slider
             await this.AddOrUpdatePluginTranslateResource(_translationService, _languageService, "Widgets.Slider.SliderType", "Slider type");
             await this.AddOrUpdatePluginTranslateResource(_translationService, _languageService, "Widgets.Slider.SliderType.Hint", "Choose the slider type. Home page, category or collection page.");
             await this.AddOrUpdatePluginTranslateResource(_translationService, _languageService, "Widgets.Slider.Stores", "Stores");
-
-
+            await this.AddOrUpdatePluginTranslateResource(_translationService, _languageService, "Widgets.Slider.StartDate", "Start Date");
+            await this.AddOrUpdatePluginTranslateResource(_translationService, _languageService, "Widgets.Slider.EndDate", "End Date");           
+            
             await base.Install();
         }
 
@@ -182,6 +181,8 @@ namespace Widgets.Slider
             await this.DeletePluginTranslationResource(_translationService, _languageService, "Widgets.Slider.SliderType");
             await this.DeletePluginTranslationResource(_translationService, _languageService, "Widgets.Slider.SliderType.Hint");
             await this.DeletePluginTranslationResource(_translationService, _languageService, "Widgets.Slider.Stores");
+            await this.DeletePluginTranslationResource(_translationService, _languageService, "Widgets.Slider.StartDate");
+            await this.DeletePluginTranslationResource(_translationService, _languageService, "Widgets.Slider.EndDate");
 
             await base.Uninstall();
         }

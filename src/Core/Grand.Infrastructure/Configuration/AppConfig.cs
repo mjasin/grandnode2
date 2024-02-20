@@ -44,9 +44,8 @@ namespace Grand.Infrastructure.Configuration
         public long? MaxRequestBodySize { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating - (Serilog) use middleware for smarter HTTP request logging
+        /// Gets or sets the value to enable a middleware for logging additional information about CurrentCustomer and store
         /// </summary>
-        public bool UseSerilogRequestLogging { get; set; }
-
+        public bool EnableContextLoggingMiddleware { get; set; }
     }
 }

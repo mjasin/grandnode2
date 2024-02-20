@@ -1,7 +1,7 @@
 ﻿using Grand.Business.Core.Interfaces.Marketing.Documents;
 using Grand.Infrastructure.Extensions;
 using Grand.Domain;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Documents;
 using MediatR;
 using Grand.Domain.Common;
@@ -21,8 +21,7 @@ namespace Grand.Business.Marketing.Services.Documents
 
         public virtual async Task Delete(Document document)
         {
-            if (document == null)
-                throw new ArgumentNullException(nameof(document));
+            ArgumentNullException.ThrowIfNull(document);
 
             await _documentRepository.DeleteAsync(document);
 
@@ -71,8 +70,7 @@ namespace Grand.Business.Marketing.Services.Documents
 
         public virtual async Task Insert(Document document)
         {
-            if (document == null)
-                throw new ArgumentNullException(nameof(document));
+            ArgumentNullException.ThrowIfNull(document);
 
             await _documentRepository.InsertAsync(document);
 
@@ -83,8 +81,7 @@ namespace Grand.Business.Marketing.Services.Documents
 
         public virtual async Task Update(Document document)
         {
-            if (document == null)
-                throw new ArgumentNullException(nameof(document));
+            ArgumentNullException.ThrowIfNull(document);
 
             await _documentRepository.UpdateAsync(document);
 

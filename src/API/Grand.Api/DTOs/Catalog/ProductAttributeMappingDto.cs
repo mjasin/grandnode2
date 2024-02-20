@@ -3,12 +3,8 @@ using Grand.Api.Models;
 
 namespace Grand.Api.DTOs.Catalog
 {
-    public partial class ProductAttributeMappingDto : BaseApiEntityModel
+    public class ProductAttributeMappingDto : BaseApiEntityModel
     {
-        public ProductAttributeMappingDto()
-        {
-            ProductAttributeValues = new List<ProductAttributeValueDto>();
-        }
         public string ProductAttributeId { get; set; }
         public string TextPrompt { get; set; }
         public bool IsRequired { get; set; }
@@ -21,11 +17,9 @@ namespace Grand.Api.DTOs.Catalog
         public string ConditionAttributeXml { get; set; }
         public AttributeControlType AttributeControlTypeId { get; set; }
 
-        public IList<ProductAttributeValueDto> ProductAttributeValues { get; set; }
-        
-
+        public IList<ProductAttributeValueDto> ProductAttributeValues { get; set; } = new List<ProductAttributeValueDto>();
     }
-    public partial class ProductAttributeValueDto: BaseApiEntityModel
+    public class ProductAttributeValueDto: BaseApiEntityModel
     {
         public string AssociatedProductId { get; set; }
         public string Name { get; set; }

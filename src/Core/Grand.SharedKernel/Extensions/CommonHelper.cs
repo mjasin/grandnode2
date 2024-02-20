@@ -11,33 +11,13 @@ namespace Grand.SharedKernel.Extensions
     public static class CommonHelper
     {
         /// <summary>
-        /// Gets or sets application default cache time minutes
-        /// </summary>
-        public static int CacheTimeMinutes { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating for cookie expires in hours
-        /// </summary>
-        public static int CookieAuthExpires { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to ignore ACL rules (side-wide). It can significantly improve performance when enabled.
-        /// </summary>
-        public static bool IgnoreAcl { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to ignore "limit per store" rules (side-wide). It can significantly improve performance when enabled.
-        /// </summary>
-        public static bool IgnoreStoreLimitations { get; set; }
-
-        /// <summary>
         /// Ensures the subscriber email or throw.
         /// </summary>
         /// <param name="email">The email.</param>
         /// <returns></returns>
         public static string EnsureSubscriberEmailOrThrow(string email)
         {
-            string output = EnsureNotNull(email);
+            var output = EnsureNotNull(email);
             output = output.Trim();
             output = EnsureMaximumLength(output, 255);
 
@@ -108,11 +88,11 @@ namespace Grand.SharedKernel.Extensions
 
             if (str.Length > maxLength)
             {
-                var pLen = postfix == null ? 0 : postfix.Length;
+                var pLen = postfix?.Length ?? 0;
 
                 var result = str[..(maxLength - pLen)];
                 if(string.IsNullOrEmpty(result))
-                    return str[..(maxLength)];
+                    return str[..maxLength];
 
                 if (!string.IsNullOrEmpty(postfix))
                 {
@@ -153,7 +133,7 @@ namespace Grand.SharedKernel.Extensions
                 return false;
 
             var comparer = EqualityComparer<T>.Default;
-            for (int i = 0; i < a1.Length; i++)
+            for (var i = 0; i < a1.Length; i++)
             {
                 if (!comparer.Equals(a1[i], a2[i])) return false;
             }
@@ -246,10 +226,10 @@ namespace Grand.SharedKernel.Extensions
         {
             var str = value.ToString();
             if (string.IsNullOrEmpty(str)) return string.Empty;
-            string result = string.Empty;
+            var result = string.Empty;
             foreach (var c in str)
                 if (c.ToString() != c.ToString().ToLower())
-                    result += " " + c.ToString();
+                    result += " " + c;
                 else
                     result += c.ToString();
             return result.TrimStart();
@@ -266,7 +246,7 @@ namespace Grand.SharedKernel.Extensions
         {
             //source: http://stackoverflow.com/questions/9/how-do-i-calculate-someones-age-in-c
             //this assumes you are looking for the western idea of age and not using East Asian reckoning.
-            int age = endDate.Year - startDate.Year;
+            var age = endDate.Year - startDate.Year;
             if (startDate > endDate.AddYears(-age))
                 age--;
             return age;

@@ -6,7 +6,6 @@ using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Extensions;
 using Grand.Web.Common.Security.Authorization;
 using Grand.Domain.Seo;
-using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Models.Catalog;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,9 +34,15 @@ namespace Grand.Web.Admin.Controllers
             _seoSettings = seoSettings;
         }
 
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
-        public IActionResult List() => View();
+        public IActionResult List()
+        {
+            return View();
+        }
 
         [PermissionAuthorizeAction(PermissionActionName.List)]
         [HttpPost]
@@ -50,7 +55,7 @@ namespace Grand.Web.Admin.Controllers
                 var ptag = new ProductTagModel {
                     Id = item.Id,
                     Name = item.Name,
-                    ProductCount = await _productTagService.GetProductCount(item.Id, "")
+                    ProductCount = await _productTagService.GetProductCount(item.Id)
                 };
                 productTags.Add(ptag);
             }
@@ -96,7 +101,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 Id = productTag.Id,
                 Name = productTag.Name,
-                ProductCount = await _productTagService.GetProductCount(productTag.Id, "")
+                ProductCount = await _productTagService.GetProductCount(productTag.Id)
             };
             //locales
             await AddLocales(_languageService, model.Locales, (locale, languageId) =>

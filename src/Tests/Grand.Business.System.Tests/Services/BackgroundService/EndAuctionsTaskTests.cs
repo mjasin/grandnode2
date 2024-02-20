@@ -1,6 +1,5 @@
 ﻿using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Customers;
 using Grand.Business.Core.Interfaces.Messages;
 using Grand.Business.System.Services.BackgroundServices.ScheduleTasks;
@@ -13,6 +12,7 @@ using Grand.Domain.Orders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Grand.Business.Core.Utilities.Checkout;
+using Microsoft.Extensions.Logging;
 
 namespace Grand.Business.System.Tests.Services.BackgroundService
 {
@@ -23,7 +23,7 @@ namespace Grand.Business.System.Tests.Services.BackgroundService
         private Mock<IMessageProviderService> _messageProviderMock;
         private Mock<IShoppingCartService> _shoppingCartMock;
         private Mock<ICustomerService> _customerServiceMock;
-        private Mock<ILogger> _loggerMock;
+        private Mock<ILogger<EndAuctionsTask>> _loggerMock;
         private LanguageSettings _settings;
         private EndAuctionsTask _task;
 
@@ -34,7 +34,7 @@ namespace Grand.Business.System.Tests.Services.BackgroundService
             _messageProviderMock = new Mock<IMessageProviderService>();
             _shoppingCartMock = new Mock<IShoppingCartService>();
             _customerServiceMock = new Mock<ICustomerService>();
-            _loggerMock = new Mock<ILogger>();
+            _loggerMock = new Mock<ILogger<EndAuctionsTask>>();
             _settings = new LanguageSettings();
             _task = new EndAuctionsTask(_auctionMock.Object, _messageProviderMock.Object, _settings, _shoppingCartMock.Object, _customerServiceMock.Object,
                 _loggerMock.Object);
@@ -43,7 +43,7 @@ namespace Grand.Business.System.Tests.Services.BackgroundService
         [TestMethod]
         public async Task Execute_NotBids_InvokeExpectedMethos()
         {
-            _auctionMock.Setup(c => c.GetAuctionsToEnd()).ReturnsAsync(new List<Product>() { new Product() { Id = "id" } });
+            _auctionMock.Setup(c => c.GetAuctionsToEnd()).ReturnsAsync(new List<Product> { new Product { Id = "id" } });
             _auctionMock.Setup(c => c.GetBidsByProductId(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(() => new PagedList<Bid>());
             await _task.Execute();
             _auctionMock.Verify(c => c.UpdateAuctionEnded(It.IsAny<Product>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
@@ -54,30 +54,40 @@ namespace Grand.Business.System.Tests.Services.BackgroundService
         [TestMethod]
         public async Task Execute_HasWarnings_InvokeExpectedMethos()
         {
-            _auctionMock.Setup(c => c.GetAuctionsToEnd()).ReturnsAsync(new List<Product>() { new Product() { Id = "id" } });
-            _auctionMock.Setup(c => c.GetBidsByProductId(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(() => new PagedList<Bid>() { new Bid() });
+            _auctionMock.Setup(c => c.GetAuctionsToEnd()).ReturnsAsync(new List<Product> { new Product { Id = "id" } });
+            _auctionMock.Setup(c => c.GetBidsByProductId(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(() => new PagedList<Bid> { new Bid() });
             _shoppingCartMock.Setup(c => c.AddToCart(It.IsAny<Customer>(), It.IsAny<string>(), It.IsAny<ShoppingCartType>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<IList<CustomAttribute>>(), It.IsAny<double?>(), It.IsAny<DateTime?>(),
                 It.IsAny<DateTime?>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(),
                 It.IsAny<ShoppingCartValidatorOptions>()))
-                .ReturnsAsync((new List<string>() { "warning" }, null));
+                .ReturnsAsync((new List<string> { "warning" }, null));
             await _task.Execute();
 
-            _loggerMock.Verify(c => c.InsertLog(Domain.Logging.LogLevel.Error, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Customer>(), null, null, null), Times.Once);
+            _loggerMock.Verify(c => c.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Once);
         }
 
         [TestMethod]
         public async Task Execute_Valid_InvokeExpectedMethos()
         {
-            _auctionMock.Setup(c => c.GetAuctionsToEnd()).ReturnsAsync(new List<Product>() { new Product() { Id = "id" } });
-            _auctionMock.Setup(c => c.GetBidsByProductId(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(() => new PagedList<Bid>() { new Bid() });
+            _auctionMock.Setup(c => c.GetAuctionsToEnd()).ReturnsAsync(new List<Product> { new Product { Id = "id" } });
+            _auctionMock.Setup(c => c.GetBidsByProductId(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(() => new PagedList<Bid> { new Bid() });
             _shoppingCartMock.Setup(c => c.AddToCart(It.IsAny<Customer>(), It.IsAny<string>(), It.IsAny<ShoppingCartType>(), It.IsAny<string>(),
                 It.IsAny<string>(), It.IsAny<IList<CustomAttribute>>(), It.IsAny<double?>(), It.IsAny<DateTime?>(),
                 It.IsAny<DateTime?>(), It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ShoppingCartValidatorOptions>()))
                 .ReturnsAsync((new List<string>(), null));
             await _task.Execute();
 
-            _loggerMock.Verify(c => c.InsertLog(Domain.Logging.LogLevel.Error, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Customer>(), null, null, null), Times.Never);
+            _loggerMock.Verify(c => c.Log(
+                It.IsAny<LogLevel>(),
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception>(),
+                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()), Times.Never);
             _auctionMock.Verify(c => c.UpdateBid(It.IsAny<Bid>()), Times.Once);
             _auctionMock.Verify(c => c.UpdateAuctionEnded(It.IsAny<Product>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
             _messageProviderMock.Verify(c => c.SendAuctionEndedStoreOwnerMessage(It.IsAny<Product>(), It.IsAny<string>(), It.IsAny<Bid>()), Times.Once);

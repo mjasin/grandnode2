@@ -1,16 +1,18 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Collections;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using Grand.SharedKernel.Extensions;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Collections.Tests
+namespace Grand.Business.Catalog.Tests.Services.Collections
 {
     [TestClass()]
     public class ProductCollectionServiceTests
@@ -28,11 +30,11 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
 
             _repository = new MongoDBRepositoryTest<Product>();
             _workContextMock = new Mock<IWorkContext>();
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "" });
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "" });
             _workContextMock.Setup(c => c.CurrentCustomer).Returns(() => new Customer());
             _mediatorMock = new Mock<IMediator>();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
-            _productCollectionService = new ProductCollectionService(_cacheBase, _repository, _workContextMock.Object, _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
+            _productCollectionService = new ProductCollectionService(_cacheBase, _repository, _workContextMock.Object, _mediatorMock.Object, new AccessControlConfig());
         }
 
 
@@ -41,12 +43,12 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
         {
             //Arrange
             var p1 = new Product();
-            p1.ProductCollections.Add(new ProductCollection() { CollectionId = "1" });
-            p1.ProductCollections.Add(new ProductCollection() { CollectionId = "2" });
+            p1.ProductCollections.Add(new ProductCollection { CollectionId = "1" });
+            p1.ProductCollections.Add(new ProductCollection { CollectionId = "2" });
             await _repository.InsertAsync(p1);
             var p2 = new Product();
-            p2.ProductCollections.Add(new ProductCollection() { CollectionId = "2" });
-            p2.ProductCollections.Add(new ProductCollection() { CollectionId = "3" });
+            p2.ProductCollections.Add(new ProductCollection { CollectionId = "2" });
+            p2.ProductCollections.Add(new ProductCollection { CollectionId = "3" });
             await _repository.InsertAsync(p2);
 
             //Act
@@ -68,8 +70,8 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
             await _repository.InsertAsync(p2);
 
             //Act
-            await _productCollectionService.InsertProductCollection(new ProductCollection() { CollectionId = "1", DisplayOrder = 10 }, p1.Id);
-            await _productCollectionService.InsertProductCollection(new ProductCollection() { CollectionId = "2" }, p1.Id);
+            await _productCollectionService.InsertProductCollection(new ProductCollection { CollectionId = "1", DisplayOrder = 10 }, p1.Id);
+            await _productCollectionService.InsertProductCollection(new ProductCollection { CollectionId = "2" }, p1.Id);
 
             var pc1 = await _productCollectionService.GetProductCollectionsByCollectionId("1", "");
 
@@ -88,9 +90,9 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
             await _repository.InsertAsync(p2);
 
             //Act
-            var pc = new ProductCollection() { CollectionId = "1", DisplayOrder = 10 };
+            var pc = new ProductCollection { CollectionId = "1", DisplayOrder = 10 };
             await _productCollectionService.InsertProductCollection(pc, p1.Id);
-            await _productCollectionService.InsertProductCollection(new ProductCollection() { CollectionId = "2" }, p1.Id);
+            await _productCollectionService.InsertProductCollection(new ProductCollection { CollectionId = "2" }, p1.Id);
 
             pc.CollectionId = "10";
             pc.DisplayOrder = 5;
@@ -113,9 +115,9 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
             await _repository.InsertAsync(p2);
 
             //Act
-            var pc = new ProductCollection() { CollectionId = "1", DisplayOrder = 10 };
+            var pc = new ProductCollection { CollectionId = "1", DisplayOrder = 10 };
             await _productCollectionService.InsertProductCollection(pc, p1.Id);
-            await _productCollectionService.InsertProductCollection(new ProductCollection() { CollectionId = "2" }, p1.Id);
+            await _productCollectionService.InsertProductCollection(new ProductCollection { CollectionId = "2" }, p1.Id);
 
             await _productCollectionService.DeleteProductCollection(pc, p1.Id);
 

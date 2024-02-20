@@ -5,6 +5,7 @@ using Grand.Web.Common.Link;
 using Grand.Web.Common.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using Grand.Web.Common.Validators;
 
 namespace Grand.Web.Admin.Models.Catalog
 {
@@ -24,9 +25,11 @@ namespace Grand.Web.Admin.Models.Catalog
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.Name")]
         public string Name { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.Description")]
         public string Description { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.BottomDescription")]
         public string BottomDescription { get; set; }
 
@@ -34,12 +37,15 @@ namespace Grand.Web.Admin.Models.Catalog
         public string CollectionLayoutId { get; set; }
         public IList<SelectListItem> AvailableCollectionLayouts { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.MetaKeywords")]
         public string MetaKeywords { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.MetaDescription")]
         public string MetaDescription { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.MetaTitle")]
         public string MetaTitle { get; set; }
 
@@ -119,14 +125,6 @@ namespace Grand.Web.Admin.Models.Catalog
 
         public class AddCollectionProductModel : BaseModel
         {
-            public AddCollectionProductModel()
-            {
-                AvailableCollections = new List<SelectListItem>();
-                AvailableStores = new List<SelectListItem>();
-                AvailableVendors = new List<SelectListItem>();
-                AvailableProductTypes = new List<SelectListItem>();
-            }
-
             [GrandResourceDisplayName("Admin.Catalog.Products.List.SearchProductName")]
             public string SearchProductName { get; set; }
             [UIHint("Category")]
@@ -145,31 +143,15 @@ namespace Grand.Web.Admin.Models.Catalog
             [GrandResourceDisplayName("Admin.Catalog.Products.List.SearchProductType")]
             public int SearchProductTypeId { get; set; }
 
-            public IList<SelectListItem> AvailableCollections { get; set; }
-            public IList<SelectListItem> AvailableStores { get; set; }
-            public IList<SelectListItem> AvailableVendors { get; set; }
-            public IList<SelectListItem> AvailableProductTypes { get; set; }
+            public IList<SelectListItem> AvailableCollections { get; set; } = new List<SelectListItem>();
+            public IList<SelectListItem> AvailableStores { get; set; } = new List<SelectListItem>();
+            public IList<SelectListItem> AvailableVendors { get; set; } = new List<SelectListItem>();
+            public IList<SelectListItem> AvailableProductTypes { get; set; } = new List<SelectListItem>();
 
             public string CollectionId { get; set; }
 
             public string[] SelectedProductIds { get; set; }
         }
-
-        public class ActivityLogModel : BaseEntityModel
-        {
-            [GrandResourceDisplayName("Admin.Catalog.Collections.ActivityLog.ActivityLogType")]
-            public string ActivityLogTypeName { get; set; }
-            [GrandResourceDisplayName("Admin.Catalog.Collections.ActivityLog.Comment")]
-            public string Comment { get; set; }
-            [GrandResourceDisplayName("Admin.Catalog.Collections.ActivityLog.CreatedOn")]
-            public DateTime CreatedOn { get; set; }
-            [GrandResourceDisplayName("Admin.Catalog.Collections.ActivityLog.Customer")]
-            public string CustomerId { get; set; }
-            public string CustomerEmail { get; set; }
-        }
-
-
-
         #endregion
     }
 
@@ -180,18 +162,23 @@ namespace Grand.Web.Admin.Models.Catalog
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.Name")]
         public string Name { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.Description")]
         public string Description { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.BottomDescription")]
         public string BottomDescription { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.MetaKeywords")]
         public string MetaKeywords { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.MetaDescription")]
         public string MetaDescription { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Collections.Fields.MetaTitle")]
         public string MetaTitle { get; set; }
 

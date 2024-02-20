@@ -3,7 +3,6 @@ using Grand.Business.Core.Interfaces.Checkout.GiftVouchers;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Messages;
 using Grand.Infrastructure;
 using Grand.Domain.Localization;
@@ -11,7 +10,6 @@ using Grand.Domain.Orders;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Orders;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Http;
 using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Web.Admin.Extensions.Mapping;
 
@@ -30,9 +28,6 @@ namespace Grand.Web.Admin.Services
         private readonly LanguageSettings _languageSettings;
         private readonly ITranslationService _translationService;
         private readonly ILanguageService _languageService;
-        private readonly ICustomerActivityService _customerActivityService;
-        private readonly IWorkContext _workContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IStoreService _storeService;
 
         #endregion
@@ -46,8 +41,7 @@ namespace Grand.Web.Admin.Services
             ICurrencyService currencyService,
             LanguageSettings languageSettings,
             ITranslationService translationService, ILanguageService languageService,
-            ICustomerActivityService customerActivityService, IWorkContext workContext,
-            IHttpContextAccessor httpContextAccessor,
+            IWorkContext workContext,
             IStoreService storeService)
         {
             _giftVoucherService = giftVoucherService;
@@ -59,9 +53,6 @@ namespace Grand.Web.Admin.Services
             _languageSettings = languageSettings;
             _translationService = translationService;
             _languageService = languageService;
-            _customerActivityService = customerActivityService;
-            _workContext = workContext;
-            _httpContextAccessor = httpContextAccessor;
             _storeService = storeService;
         }
 
@@ -105,10 +96,15 @@ namespace Grand.Web.Admin.Services
             PrepareGiftVoucherModel(GiftVoucherListModel model, int pageIndex, int pageSize)
         {
             bool? isGiftVoucherActivated = null;
-            if (model.ActivatedId == 1)
-                isGiftVoucherActivated = true;
-            else if (model.ActivatedId == 2)
-                isGiftVoucherActivated = false;
+            switch (model.ActivatedId)
+            {
+                case 1:
+                    isGiftVoucherActivated = true;
+                    break;
+                case 2:
+                    isGiftVoucherActivated = false;
+                    break;
+            }
             var giftVouchers = await _giftVoucherService.GetAllGiftVouchers(
                 isGiftVoucherActivated: isGiftVoucherActivated,
                 giftVoucherCouponCode: model.CouponCode,
@@ -122,10 +118,8 @@ namespace Grand.Web.Admin.Services
                 var currency = await _currencyService.GetCurrencyByCode(item.CurrencyCode) ??
                                await _currencyService.GetPrimaryStoreCurrency();
 
-                gift.RemainingAmountStr = _priceFormatter.FormatPrice(item.GetGiftVoucherRemainingAmount(), currency,
-                    _workContext.WorkingLanguage, true, false);
-                gift.AmountStr =
-                    _priceFormatter.FormatPrice(item.Amount, currency, _workContext.WorkingLanguage, true, false);
+                gift.RemainingAmountStr = _priceFormatter.FormatPrice(item.GetGiftVoucherRemainingAmount(), currency);
+                gift.AmountStr = _priceFormatter.FormatPrice(item.Amount, currency);
                 gift.CreatedOn = _dateTimeService.ConvertToUserTime(item.CreatedOnUtc, DateTimeKind.Utc);
 
                 giftvouchers.Add(gift);
@@ -137,13 +131,7 @@ namespace Grand.Web.Admin.Services
         public virtual async Task<GiftVoucher> InsertGiftVoucherModel(GiftVoucherModel model)
         {
             var giftVoucher = model.ToEntity(_dateTimeService);
-            giftVoucher.CreatedOnUtc = DateTime.UtcNow;
             await _giftVoucherService.InsertGiftVoucher(giftVoucher);
-
-            //activity log
-            _ = _customerActivityService.InsertActivity("AddNewGiftVoucher", giftVoucher.Id,
-                _workContext.CurrentCustomer, _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.AddNewGiftVoucher"), giftVoucher.Code);
             return giftVoucher;
         }
 
@@ -162,10 +150,8 @@ namespace Grand.Web.Admin.Services
                            await _currencyService.GetPrimaryStoreCurrency();
             
             model.PurchasedWithOrderId = giftVoucher.PurchasedWithOrderItem != null ? (await GetOrderFromGiftVoucher(giftVoucher))?.Id : null;
-            model.RemainingAmountStr = _priceFormatter.FormatPrice(giftVoucher.GetGiftVoucherRemainingAmount(),
-                currency, _workContext.WorkingLanguage, true, false);
-            model.AmountStr = _priceFormatter.FormatPrice(giftVoucher.Amount, currency, _workContext.WorkingLanguage,
-                true, false);
+            model.RemainingAmountStr = _priceFormatter.FormatPrice(giftVoucher.GetGiftVoucherRemainingAmount(), currency);
+            model.AmountStr = _priceFormatter.FormatPrice(giftVoucher.Amount, currency);
             model.CreatedOn = _dateTimeService.ConvertToUserTime(giftVoucher.CreatedOnUtc, DateTimeKind.Utc);
             model.CurrencyCode = giftVoucher.CurrencyCode;
             return model;
@@ -199,10 +185,6 @@ namespace Grand.Web.Admin.Services
         {
             giftVoucher = model.ToEntity(giftVoucher, _dateTimeService);
             await _giftVoucherService.UpdateGiftVoucher(giftVoucher);
-            //activity log
-            _ = _customerActivityService.InsertActivity("EditGiftVoucher", giftVoucher.Id,
-                _workContext.CurrentCustomer, _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.EditGiftVoucher"), giftVoucher.Code);
 
             return giftVoucher;
         }
@@ -210,10 +192,6 @@ namespace Grand.Web.Admin.Services
         public virtual async Task DeleteGiftVoucher(GiftVoucher giftVoucher)
         {
             await _giftVoucherService.DeleteGiftVoucher(giftVoucher);
-            //activity log
-            _ = _customerActivityService.InsertActivity("DeleteGiftVoucher", giftVoucher.Id,
-                _workContext.CurrentCustomer, _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.DeleteGiftVoucher"), giftVoucher.Code);
         }
 
         public virtual async Task<GiftVoucherModel> PrepareGiftVoucherModel(GiftVoucher giftVoucher)
@@ -229,10 +207,8 @@ namespace Grand.Web.Admin.Services
 
             model.PurchasedWithOrderId = giftVoucher.PurchasedWithOrderItem != null ? order?.Id : null;
             model.PurchasedWithOrderNumber = order?.OrderNumber ?? 0;
-            model.RemainingAmountStr = _priceFormatter.FormatPrice(giftVoucher.GetGiftVoucherRemainingAmount(),
-                currency, _workContext.WorkingLanguage, true, false);
-            model.AmountStr = _priceFormatter.FormatPrice(giftVoucher.Amount, currency, _workContext.WorkingLanguage,
-                true, false);
+            model.RemainingAmountStr = _priceFormatter.FormatPrice(giftVoucher.GetGiftVoucherRemainingAmount(), currency);
+            model.AmountStr = _priceFormatter.FormatPrice(giftVoucher.Amount, currency);
             model.CreatedOn = _dateTimeService.ConvertToUserTime(giftVoucher.CreatedOnUtc, DateTimeKind.Utc);
             model.CurrencyCode = giftVoucher.CurrencyCode;
             return model;
@@ -253,8 +229,7 @@ namespace Grand.Web.Admin.Services
                     Id = x.Id,
                     OrderId = x.UsedWithOrderId,
                     OrderNumber = order?.OrderNumber ?? 0,
-                    UsedValue = _priceFormatter.FormatPrice(x.UsedValue, currency, _workContext.WorkingLanguage, true,
-                        false),
+                    UsedValue = _priceFormatter.FormatPrice(x.UsedValue, currency),
                     CreatedOn = _dateTimeService.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc)
                 });
             }

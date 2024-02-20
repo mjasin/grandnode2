@@ -340,7 +340,7 @@
 		<Value>Username is too long</Value>
 	</Resource>
 	<Resource Name="Account.EnableTwoFactorAuth" Area="Front">
-		<value>Enable Two Factor Authentication</value>
+		<Value>Enable Two Factor Authentication</Value>
 	</Resource>
 	<Resource Name="Account.Fields.AcceptPrivacyPolicy" Area="Front">
 		<Value>I accept privacy policy</Value>
@@ -575,6 +575,9 @@
 	</Resource>
 	<Resource Name="Account.Navigation" Area="Front">
 		<Value>My account</Value>
+	</Resource>
+	<Resource Name="Account.NoExists" Area="Front">
+		<Value>Account not exists</Value>
 	</Resource>
 	<Resource Name="Account.Options" Area="Front">
 		<Value>Options</Value>
@@ -905,327 +908,6 @@
 	</Resource>
 	<Resource Name="Account.YourPersonalDetails" Area="Front">
 		<Value>Your Personal Details</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AbandonedCart" Area="Front">
-		<Value>Send email AbandonedCart - ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewBrand" Area="Front">
-		<Value>Added a new brand ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewCategory" Area="Front">
-		<Value>Added a new category ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewCheckoutAttribute" Area="Front">
-		<Value>Added a new checkout attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewCollection" Area="Front">
-		<Value>Added a new collection ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewContactAttribute" Area="Front">
-		<Value>Added a new contact attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewCourse" Area="Front">
-		<Value>Added a new course ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewCourseLesson" Area="Front">
-		<Value>Added a new lesson ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewCustomer" Area="Front">
-		<Value>Added a new customer (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewCustomerGroup" Area="Front">
-		<Value>Added a new customer group ('{0}')</Value>
-	</Resource>	
-	<Resource Name="ActivityLog.AddNewCustomerTag" Area="Front">
-		<Value>Added a new customer tag ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewDiscount" Area="Front">
-		<Value>Added a new discount ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewDocument" Area="Front">
-		<Value>Added a new document ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewDocumentType" Area="Front">
-		<Value>Added a new document type ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewGiftVoucher" Area="Front">
-		<Value>Added a new gift voucher ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewLoyaltyPoints" Area="Front">
-		<Value>Added a loyalty points {1} to customer {0}</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewPage" Area="Front">
-		<Value>Added a new page ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewProduct" Area="Front">
-		<Value>Added a new product ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewProductAttribute" Area="Front">
-		<Value>Added a new product attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewSalesEmployee" Area="Front">
-		<Value>Added a new sales employee ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewSetting" Area="Front">
-		<Value>Added a new setting ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewSpecAttribute" Area="Front">
-		<Value>Added a new specification attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.AddNewWidget" Area="Front">
-		<Value>Added a new widget (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.CreateKnowledgebaseArticle" Area="Front">
-		<Value>Created knowledgebase article ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.CreateKnowledgebaseCategory" Area="Front">
-		<Value>Created knowledgebase category ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteAccount" Area="Front">
-		<Value>Customer was deleted</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteBid" Area="Front">
-		<Value>Deleted a bid for product ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteBrand" Area="Front">
-		<Value>Deleted a brand ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteCategory" Area="Front">
-		<Value>Deleted a category ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteCheckoutAttribute" Area="Front">
-		<Value>Deleted a checkout attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteCollection" Area="Front">
-		<Value>Deleted a collection ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteContactAttribute" Area="Front">
-		<Value>Deleted a contact attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteCourse" Area="Front">
-		<Value>Deleted a course ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteCourseLesson" Area="Front">
-		<Value>Deleted a lesson ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteCustomer" Area="Front">
-		<Value>Deleted a customer (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteCustomerGroup" Area="Front">
-		<Value>Deleted a customer group ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteCustomerTag" Area="Front">
-		<Value>Deleted a customer group ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteDiscount" Area="Front">
-		<Value>Deleted a discount ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteDocument" Area="Front">
-		<Value>Deleted a document ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteDocumentType" Area="Front">
-		<Value>Deleted a document type ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteGiftVoucher" Area="Front">
-		<Value>Deleted a gift voucher ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteKnowledgebaseArticle" Area="Front">
-		<Value>Deleted knowledgebase article ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteKnowledgebaseCategory" Area="Front">
-		<Value>Deleted knowledgebase category ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteMerchandiseReturn" Area="Front">
-		<Value>Deleted a merchandise return (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteOrder" Area="Front">
-		<Value>Deleted an order (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeletePage" Area="Front">
-		<Value>Deleted a page ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteProduct" Area="Front">
-		<Value>Deleted a product ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteProductAttribute" Area="Front">
-		<Value>Deleted a product attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteSalesEmployee" Area="Front">
-		<Value>Deleted a sales employee ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteSetting" Area="Front">
-		<Value>Deleted a setting ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteSpecAttribute" Area="Front">
-		<Value>Deleted a specification attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.DeleteWidget" Area="Front">
-		<Value>Deleted a widget (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditBrand" Area="Front">
-		<Value>Edited a brand ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditCategory" Area="Front">
-		<Value>Edited a category ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditCheckoutAttribute" Area="Front">
-		<Value>Edited a checkout attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditCollection" Area="Front">
-		<Value>Edited a collection ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditContactAttribute" Area="Front">
-		<Value>Edited a contact attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditCourse" Area="Front">
-		<Value>Edited a course ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditCustomer" Area="Front">
-		<Value>Edited a customer (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditCustomerGroup" Area="Front">
-		<Value>Edited a customer group ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditCustomerTag" Area="Front">
-		<Value>Edited a customer group ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditDiscount" Area="Front">
-		<Value>Edited a discount ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditDocument" Area="Front">
-		<Value>Edited a document ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditDocumentType" Area="Front">
-		<Value>Edited a document type ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditGiftVoucher" Area="Front">
-		<Value>Edited a gift voucher ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditLessonCourse" Area="Front">
-		<Value>Edited a lesson ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditMerchandiseReturn" Area="Front">
-		<Value>Edited a merchandise return (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditOrder" Area="Front">
-		<Value>Edited an order (ID = {0}). See order notes for details</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditPage" Area="Front">
-		<Value>Edited a page ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditProduct" Area="Front">
-		<Value>Edited a product ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditProductAttribute" Area="Front">
-		<Value>Edited a product attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditSalesEmployee" Area="Front">
-		<Value>Edited a sales employee ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditSettings" Area="Front">
-		<Value>Edited settings</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditSpecAttribute" Area="Front">
-		<Value>Edited a specification attribute ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.EditWidget" Area="Front">
-		<Value>Edited a widget (ID = {0})</Value>
-	</Resource>
-	<Resource Name="Activitylog.lastactivity" Area="Front">
-		<Value>Public store. Last Activity </Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddArticleComment" Area="Front">
-		<Value>Added an article comment</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddArticleComment" Area="Front">
-		<Value>Added an article comment</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddBlogComment" Area="Front">
-		<Value>Added a blog comment</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddNewsComment" Area="Front">
-		<Value>Added a news comment</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddProductReview" Area="Front">
-		<Value>Added a product review ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddToBid" Area="Front">
-		<Value>A new bid has been added ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddToCompareList" Area="Front">
-		<Value>Added a product to compare list ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddToShoppingCart" Area="Front">
-		<Value>Added a product to shopping cart ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AddToWishlist" Area="Front">
-		<Value>Added a product to wishlist ('{0}')</Value>
-	</Resource>
-	<Resource Name="Activitylog.PublicStore.AddvendorReview" Area="Front">
-		<Value>Add vendor review</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.AskQuestion" Area="Front">
-		<Value>Ask a question about product</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.ContactUs" Area="Front">
-		<Value>Used contact us form</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.Login" Area="Front">
-		<Value>Login</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.Logout" Area="Front">
-		<Value>Logout</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.PlaceOrder" Area="Front">
-		<Value>Placed a new order (ID = {0})</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.SendPM" Area="Front">
-		<Value>Sent PM to customer ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.ViewBrand" Area="Front">
-		<Value>Public store. Viewed a brand details page ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.ViewCategory" Area="Front">
-		<Value>Public store. Viewed a category details page ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.ViewCourse" Area="Front">
-		<Value>Public store. Viewed a course details page ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.ViewLesson" Area="Front">
-		<Value>Public store. Viewed a lesson details page ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.PublicStore.ViewProduct" Area="Front">
-		<Value>Public store. Viewed a product details page ('{0}')</Value>
-	</Resource>
-	<Resource Name="Activitylog.Registeredcustomer" Area="Front">
-		<Value>Public store. Registered Customer </Value>
-	</Resource>
-	<Resource Name="ActivityLog.SendCampaign" Area="Front">
-		<Value>Email campaign {0}</Value>
-	</Resource>
-	<Resource Name="ActivityLog.SendEmailfromAdminPanel">
-		<Value>Email (from admin panel) {0}</Value>
-	</Resource>
-	<Resource Name="ActivityLog.SendPM" Area="Front">
-		<Value>PM (from admin panel) {0}</Value>
-	</Resource>
-	<Resource Name="ActivityLog.SendPmFromAdminPanel">
-		<Value>Send pm from admin panel</Value>
-	</Resource>
-	<Resource Name="ActivityLog.UpdateCartCustomer" Area="Front">
-		<Value>Edited price for customer {0} (ID: {1}) price: {2}</Value>
-	</Resource>
-	<Resource Name="ActivityLog.UpdateKnowledgebaseArticle" Area="Front">
-		<Value>Updated knowledgebase article ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.UpdateKnowledgebaseCategory" Area="Front">
-		<Value>Updated knowledgebase category ('{0}')</Value>
-	</Resource>
-	<Resource Name="ActivityLog.UploadNewPlugin" Area="Front">
-		<Value>UploadedNewPlugin</Value>
-	</Resource>
-	<Resource Name="ActivityLog.UploadNewTheme" Area="Front">
-		<Value>UploadedNewTheme</Value>
 	</Resource>
 	<Resource Name="Address" Area="Front">
 		<Value>Address</Value>
@@ -1659,18 +1341,6 @@
 	<Resource Name="Admin.Catalog" Area="Admin">
 		<Value>Catalog</Value>
 	</Resource>
-	<Resource Name="Admin.Catalog.Articles.ActivityLog.ActivityLogType" Area="Admin">
-		<Value>Activity log type</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Articles.ActivityLog.Comment" Area="Admin">
-		<Value>Comment</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Articles.ActivityLog.CreatedOn" Area="Admin">
-		<Value>Created on</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Articles.ActivityLog.Customer" Area="Admin">
-		<Value>Customer</Value>
-	</Resource>
 	<Resource Name="Admin.Catalog.Attributes" Area="Admin">
 		<Value>Attributes</Value>
 	</Resource>
@@ -1953,21 +1623,6 @@
 	<Resource Name="Admin.Catalog.Brands.Acl" Area="Admin">
 		<Value>Access control list</Value>
 	</Resource>
-	<Resource Name="Admin.Catalog.Brands.ActivityLog" Area="Admin">
-		<Value>Activity Log</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Brands.ActivityLog.ActivityLogType" Area="Admin">
-		<Value>Activity Log Type</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Brands.ActivityLog.Comment" Area="Admin">
-		<Value>Comment</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Brands.ActivityLog.CreatedOn" Area="Admin">
-		<Value>Created on</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Brands.ActivityLog.Customer" Area="Admin">
-		<Value>Customer</Value>
-	</Resource>
 	<Resource Name="Admin.Catalog.Brands.Added" Area="Admin">
 		<Value>The new brand has been added successfully.</Value>
 	</Resource>
@@ -2091,7 +1746,7 @@
 	<Resource Name="Admin.Catalog.Brands.List.SearchStore" Area="Admin">
 		<Value>Store</Value>
 	</Resource>
-	<Resource Name="Admin.Catalog.Brands.Permisions" Area="Admin">
+	<Resource Name="Admin.Catalog.Brands.Permissions" Area="Admin">
 		<Value>You can't edit this brand, because it can be used in many stores.</Value>
 	</Resource>
 	<Resource Name="Admin.Catalog.Brands.Updated" Area="Admin">
@@ -2138,21 +1793,6 @@
 	</Resource>
 	<Resource Name="Admin.Catalog.Categories.Acl" Area="Admin">
 		<Value>Access control list</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Categories.ActivityLog" Area="Admin">
-		<Value>Activity Log</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Categories.ActivityLog.ActivityLogType" Area="Admin">
-		<Value>Activity Log Type</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Categories.ActivityLog.Comment" Area="Admin">
-		<Value>Comment</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Categories.ActivityLog.CreatedOn" Area="Admin">
-		<Value>Created on</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Categories.ActivityLog.Customer" Area="Admin">
-		<Value>Customer</Value>
 	</Resource>
 	<Resource Name="Admin.Catalog.Categories.Added" Area="Admin">
 		<Value>The new category has been added successfully.</Value>
@@ -2313,7 +1953,7 @@
 	<Resource Name="Admin.Catalog.Categories.Manage" Area="Admin">
 		<Value>Manage Categories</Value>
 	</Resource>
-	<Resource Name="Admin.Catalog.Categories.Permisions" Area="Admin">
+	<Resource Name="Admin.Catalog.Categories.Permissions" Area="Admin">
 		<Value>You can't edit this category, because it can be used in many stores.</Value>
 	</Resource>
 	<Resource Name="Admin.Catalog.Categories.Products" Area="Admin">
@@ -2354,21 +1994,6 @@
 	</Resource>
 	<Resource Name="Admin.Catalog.Collections.Acl" Area="Admin">
 		<Value>Access control list</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Collections.ActivityLog" Area="Admin">
-		<Value>Activity Log</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Collections.ActivityLog.ActivityLogType" Area="Admin">
-		<Value>Activity Log Type</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Collections.ActivityLog.Comment" Area="Admin">
-		<Value>Comment</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Collections.ActivityLog.CreatedOn" Area="Admin">
-		<Value>Created on</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Collections.ActivityLog.Customer" Area="Admin">
-		<Value>Customer</Value>
 	</Resource>
 	<Resource Name="Admin.Catalog.Collections.Added" Area="Admin">
 		<Value>The new collection has been added successfully.</Value>
@@ -2484,7 +2109,7 @@
 	<Resource Name="Admin.Catalog.Collections.List.SearchStore" Area="Admin">
 		<Value>Store</Value>
 	</Resource>
-	<Resource Name="Admin.Catalog.Collections.Permisions" Area="Admin">
+	<Resource Name="Admin.Catalog.Collections.Permissions" Area="Admin">
 		<Value>You can't edit this collection, because it can be used in many stores.</Value>
 	</Resource>
 	<Resource Name="Admin.Catalog.Collections.Products" Area="Admin">
@@ -2618,21 +2243,6 @@
 	</Resource>
 	<Resource Name="Admin.Catalog.Products" Area="Admin">
 		<Value>Products</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Products.ActivityLog" Area="Admin">
-		<Value>Activity Log</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Products.ActivityLog.ActivityLogType" Area="Admin">
-		<Value>Activity Log Type</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Products.ActivityLog.Comment" Area="Admin">
-		<Value>Comment</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Products.ActivityLog.CreatedOn" Area="Admin">
-		<Value>Created on</Value>
-	</Resource>
-	<Resource Name="Admin.Catalog.Products.ActivityLog.Customer" Area="Admin">
-		<Value>Customer</Value>
 	</Resource>
 	<Resource Name="Admin.Catalog.Products.Added" Area="Admin">
 		<Value>The new product has been added successfully.</Value>
@@ -3357,8 +2967,8 @@
 	<Resource Name="Admin.Catalog.Products.Mappings" Area="Admin">
 		<Value>Mappings</Value>
 	</Resource>
-	<Resource Name="Admin.Catalog.Products.Permisions" Area="Admin">
-		<Value>You can't edit this product, because it can be used in many stores.</Value>
+	<Resource Name="Admin.Catalog.Products.Permissions" Area="Admin">
+		<Value>You can't edit this product, because it is not yours.</Value>
 	</Resource>
 	<Resource Name="Admin.Catalog.Products.Pictures" Area="Admin">
 		<Value>Pictures</Value>
@@ -4056,39 +3666,6 @@
 	<Resource Name="Admin.Configuration" Area="Admin">
 		<Value>Configuration</Value>
 	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog" Area="Admin">
-		<Value>Activity Log</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog" Area="Admin">
-		<Value>Activity Log</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.ActivityLogType" Area="Admin">
-		<Value>Activity Log Type</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.ActivityLogTypeColumn" Area="Admin">
-		<Value>Activity Log Type</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.Comment" Area="Admin">
-		<Value>Message</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.CreatedOn" Area="Admin">
-		<Value>Created On</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.CreatedOnFrom" Area="Admin">
-		<Value>Created From</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.CreatedOnTo" Area="Admin">
-		<Value>Created to</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.Customer" Area="Admin">
-		<Value>Customer</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.CustomerEmail" Area="Admin">
-		<Value>Customer Email</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.ActivityLog.ActivityLog.Fields.IpAddress" Area="Admin">
-		<Value>Ip address</Value>
-	</Resource>
 	<Resource Name="Admin.Configuration.Countries" Area="Admin">
 		<Value>Countries</Value>
 	</Resource>
@@ -4692,6 +4269,66 @@
 	<Resource Name="Admin.Configuration.Measures.Weights.Fields.SystemKeyword.Required" Area="Admin">
 		<Value>Please provide a system keyword.</Value>
 	</Resource>
+	<Resource Name="admin.configuration.menu" Area="Admin">
+		<Value>Admin menu</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.added" Area="Admin">
+		<Value>The new menu has been added successfully</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.addnew" Area="Admin">
+		<Value>Add new menu</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.backtolist" Area="Admin">
+		<Value>Back to list</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.child" Area="Admin">
+		<Value>Submenu</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.edit" Area="Admin">
+		<Value>Edit menu</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.info" Area="Admin">
+		<Value>Info</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.actionname" Area="Admin">
+		<Value>Action name</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.allpermissions" Area="Admin">
+		<Value>Require all selected permissions</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.controllername" Area="Admin">
+		<Value>Controller name</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.displayorder" Area="Admin">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.iconclass" Area="Admin">
+		<Value>Icon class</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.openurlinnewtab" Area="Admin">
+		<Value>To open URL in a new tab</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.resourcename" Area="Admin">
+		<Value>String resource name</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.resourcename.Required" Area="Admin">
+		<Value>Please provide a string resource name</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.systemname" Area="Admin">
+		<Value>System name</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.systemname.Required" Area="Admin">
+		<Value>Please provide a system name</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.fields.url" Area="Admin">
+		<Value>Url</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.permission" Area="Admin">
+		<Value>Permissions</Value>
+	</Resource>
+	<Resource Name="admin.configuration.menu.updated" Area="Admin">
+		<Value>Updated menu</Value>
+	</Resource>
 	<Resource Name="Admin.Configuration.Payment" Area="Admin">
 		<Value>Payment</Value>
 	</Resource>
@@ -4762,7 +4399,7 @@
 		<Value>Show payment info if cart is zero</Value>
 	</Resource>
 	<Resource Name="Admin.Configuration.Payment.Settings.SkipPaymentIfOnlyOne" Area="Admin">
-		<Value>Skip payment info if only one exist</Value>
+		<Value>Skip payment step if only one exist</Value>
 	</Resource>
 	<Resource Name="Admin.Configuration.Payment.Settings.SkipPaymentInfo" Area="Admin">
 		<Value>Skip payment info</Value>
@@ -4934,6 +4571,24 @@
 	</Resource>
 	<Resource Name="Admin.Configuration.Shipping.PickupPoint.Fields.Warehouses" Area="Admin">
 		<Value>Select warehouse</Value>
+	</Resource>
+	<Resource Name="admin.configuration.permissions.addnew" Area="Admin">
+		<Value>Add new permission</Value>
+	</Resource>
+	<Resource Name="admin.configuration.permissions.fields.area" Area="Admin">
+		<Value>Area</Value>
+	</Resource>
+	<Resource Name="admin.configuration.permissions.fields.category" Area="Admin">
+		<Value>Category</Value>
+	</Resource>
+	<Resource Name="admin.configuration.permissions.fields.name" Area="Admin">
+		<Value>Name</Value>
+	</Resource>
+	<Resource Name="admin.configuration.permissions.fields.systemName" Area="Admin">
+		<Value>System name</Value>
+	</Resource>
+	<Resource Name="admin.configuration.permissions.update" Area="Admin">
+		<Value>Update permission</Value>
 	</Resource>
 	<Resource Name="admin.configuration.shipping.pickuppoint.selectstore" Area="Admin">
 		<Value>Select store</Value>
@@ -5178,9 +4833,6 @@
 	<Resource Name="Admin.Configuration.Stores.Fields.CompanyVat" Area="Admin">
 		<Value>Company VAT</Value>
 	</Resource>
-	<Resource Name="Admin.Configuration.Stores.Fields.DefaultAdminTheme" Area="Admin">
-		<Value>Default admin theme</Value>
-	</Resource>
 	<Resource Name="Admin.Configuration.Stores.Fields.DefaultCountry" Area="Admin">
 		<Value>Default country</Value>
 	</Resource>
@@ -5289,9 +4941,6 @@
 	<Resource Name="Admin.Configuration.Tax.Settings.DisplayTaxRates" Area="Admin">
 		<Value>Display all applied tax rates</Value>
 	</Resource>
-	<Resource Name="Admin.Configuration.Tax.Settings.DisplayTaxSuffix" Area="Admin">
-		<Value>Display tax suffix</Value>
-	</Resource>
 	<Resource Name="Admin.Configuration.Tax.Settings.EuVatAllowVatExemption" Area="Admin">
 		<Value>Allow VAT exemption</Value>
 	</Resource>
@@ -5358,12 +5007,6 @@
 	<Resource Name="Admin.Configuration.Themes.Failed" Area="Admin">
 		<Value>Failed to upload theme. Make sure you are not uploading already existing one. If so, try deleting it manually before resubmitting.</Value>
 	</Resource>
-	<Resource Name="Admin.Configuration.Themes.Upload" Area="Admin">
-		<Value>Upload theme</Value>
-	</Resource>
-	<Resource Name="Admin.Configuration.Themes.Uploaded" Area="Admin">
-		<Value>Theme uploaded</Value>
-	</Resource>
 	<Resource Name="Admin.Configuration.Updated" Area="Admin">
 		<Value>The settings have been updated successfully.</Value>
 	</Resource>
@@ -5412,7 +5055,7 @@
 	<Resource Name="Admin.Content.blog.blogcategory.info" Area="Admin">
 		<Value>Info</Value>
 	</Resource>
-	<Resource Name="Admin.Content.Blog.BlogCategory.Permisions" Area="Admin">
+	<Resource Name="Admin.Content.Blog.BlogCategory.Permissions" Area="Admin">
 		<Value>You can't edit this category blog, because it can be used in many stores.</Value>
 	</Resource>
 	<Resource Name="Admin.Content.blog.blogcategory.posts" Area="Admin">
@@ -5520,7 +5163,7 @@
 	<Resource Name="Admin.Content.Blog.BlogPosts.Info" Area="Admin">
 		<Value>Info</Value>
 	</Resource>
-	<Resource Name="Admin.Content.Blog.BlogPosts.Permisions" Area="Admin">
+	<Resource Name="Admin.Content.Blog.BlogPosts.Permissions" Area="Admin">
 		<Value>You can't edit this blog post, because it can be used in many stores.</Value>
 	</Resource>
 	<Resource Name="Admin.Content.Blog.BlogPosts.Products" Area="Admin">
@@ -5571,18 +5214,6 @@
 	<Resource Name="Admin.Content.Knowledgebase" Area="Admin">
 		<Value>Knowledgebase</Value>
 	</Resource>
-	<Resource Name="Admin.Content.Knowledgebase.ActivityLog.Comment" Area="Admin">
-		<Value>Comment</Value>
-	</Resource>
-	<Resource Name="Admin.Content.Knowledgebase.ActivityLog.CreatedOn" Area="Admin">
-		<Value>Created on</Value>
-	</Resource>
-	<Resource Name="Admin.Content.Knowledgebase.ActivityLog.Customer" Area="Admin">
-		<Value>Customer</Value>
-	</Resource>
-	<Resource Name="Admin.Content.Knowledgebase.ActivityLogType" Area="Admin">
-		<Value>Activity log type</Value>
-	</Resource>
 	<Resource Name="Admin.Content.Knowledgebase.CreateKnowledgebaseArticle" Area="Admin">
 		<Value>Create article</Value>
 	</Resource>
@@ -5612,9 +5243,6 @@
 	</Resource>
 	<Resource Name="Admin.Content.Knowledgebase.KnowgledgebaseCategory.EditKnowgledgebaseCategory" Area="Admin">
 		<Value>Edit knowledgebase category</Value>
-	</Resource>
-	<Resource Name="Admin.Content.Knowledgebase.KnowledgebaseArticle.ActivityLog" Area="Admin">
-		<Value>Activity log</Value>
 	</Resource>
 	<Resource Name="Admin.Content.Knowledgebase.KnowledgebaseArticle.Added" Area="Admin">
 		<Value>Article added</Value>
@@ -5690,9 +5318,6 @@
 	</Resource>
 	<Resource Name="Admin.Content.Knowledgebase.KnowledgebaseArticle.Updated" Area="Admin">
 		<Value>Article updated</Value>
-	</Resource>
-	<Resource Name="Admin.Content.Knowledgebase.KnowledgebaseCategory.ActivityLog" Area="Admin">
-		<Value>Activity log</Value>
 	</Resource>
 	<Resource Name="Admin.Content.Knowledgebase.KnowledgebaseCategory.Added" Area="Admin">
 		<Value>Category added</Value>
@@ -6210,7 +5835,7 @@
 	<Resource Name="Admin.Courses.Course.Manage" Area="Admin">
 		<Value>Manage course</Value>
 	</Resource>
-	<Resource Name="Admin.Courses.Course.Permisions" Area="Admin">
+	<Resource Name="Admin.Courses.Course.Permissions" Area="Admin">
 		<Value>You can't edit this course, because it can be used in many stores.</Value>
 	</Resource>
 	<Resource Name="Admin.Courses.Course.Subject.Fields.CourseId.Required" Area="Admin">
@@ -6529,19 +6154,7 @@
 		<Value>Customers</Value>
 	</Resource>
 	<Resource Name="Admin.Customers.Customers.ActivityLog" Area="Admin">
-		<Value>Activity Log</Value>
-	</Resource>
-	<Resource Name="Admin.Customers.Customers.ActivityLog.ActivityLogType" Area="Admin">
-		<Value>Activity Log Type</Value>
-	</Resource>
-	<Resource Name="Admin.Customers.Customers.ActivityLog.Comment" Area="Admin">
-		<Value>Comment</Value>
-	</Resource>
-	<Resource Name="Admin.Customers.Customers.ActivityLog.CreatedOn" Area="Admin">
-		<Value>Created on</Value>
-	</Resource>
-	<Resource Name="Admin.Customers.Customers.ActivityLog.IpAddress" Area="Admin">
-		<Value>Ip address</Value>
+		<Value>Activity</Value>
 	</Resource>
 	<Resource Name="Admin.Customers.Customers.Added" Area="Admin">
 		<Value>The new customer has been added successfully.</Value>
@@ -7986,7 +7599,7 @@
 	<Resource Name="Admin.Marketing.Discounts.List.SearchDiscountType" Area="Admin">
 		<Value>Discount type</Value>
 	</Resource>
-	<Resource Name="Admin.Marketing.Discounts.Permisions" Area="Admin">
+	<Resource Name="Admin.Marketing.Discounts.Permissions" Area="Admin">
 		<Value>You can't edit this discount, because it can be used in many stores.</Value>
 	</Resource>
 	<Resource Name="Admin.Marketing.Discounts.Requirements" Area="Admin">
@@ -9300,6 +8913,21 @@
 	<Resource Name="Admin.PaymentTransaction.Fields.VoidOffline" Area="Admin">
 		<Value>Void offline</Value>
 	</Resource>
+	<Resource Name="admin.permissions.fields.area.required" Area="Admin">
+		<Value>Area is required.</Value>
+	</Resource>
+	<Resource Name="admin.permissions.fields.category.required" Area="Admin">
+		<Value>Category is required.</Value>
+	</Resource>
+	<Resource Name="admin.permissions.fields.id.notexist" Area="Admin">
+		<Value>Permission not exists.</Value>
+	</Resource>
+	<Resource Name="admin.permissions.fields.name.required" Area="Admin">
+		<Value>Name is required.</Value>
+	</Resource>
+	<Resource Name="admin.permissions.fields.systemname.required" Area="Admin">
+		<Value>System name is required.</Value>
+	</Resource>
 	<Resource Name="Admin.Picture.RemovePicture" Area="Admin">
 		<Value>Remove picture</Value>
 	</Resource>
@@ -9540,18 +9168,6 @@
 	<Resource Name="Admin.Reports" Area="Admin">
 		<Value>Reports</Value>
 	</Resource>
-	<Resource Name="Admin.Reports.ActivityLog.ActivityStats" Area="Admin">
-		<Value>Activity Stat</Value>
-	</Resource>
-	<Resource Name="Admin.Reports.ActivityLog.ActivityStats.Fields.ActivityLogType" Area="Admin">
-		<Value>Activity Types</Value>
-	</Resource>
-	<Resource Name="Admin.Reports.ActivityLog.ActivityStats.Fields.Count" Area="Admin">
-		<Value>Visit counter</Value>
-	</Resource>
-	<Resource Name="Admin.Reports.ActivityLog.ActivityStats.Fields.Name" Area="Admin">
-		<Value>Catalog name</Value>
-	</Resource>
 	<Resource Name="Admin.Reports.Average" Area="Admin">
 		<Value>Order totals</Value>
 	</Resource>
@@ -9791,18 +9407,6 @@
 	</Resource>
 	<Resource Name="Admin.Settings" Area="Admin">
 		<Value>Settings</Value>
-	</Resource>
-	<Resource Name="Admin.Settings.ActivityLog.ActivityLogType" Area="Admin">
-		<Value>Activity log types</Value>
-	</Resource>
-	<Resource Name="Admin.Settings.ActivityLog.ActivityLogType.Fields.Enabled" Area="Admin">
-		<Value>Is Enabled</Value>
-	</Resource>
-	<Resource Name="Admin.Settings.ActivityLog.ActivityLogType.Fields.Name" Area="Admin">
-		<Value>Name</Value>
-	</Resource>
-	<Resource Name="Admin.Settings.ActivityLog.ActivityLogType.Updated" Area="Admin">
-		<Value>The types have been updated successfully.</Value>
 	</Resource>
 	<Resource Name="Admin.Settings.AdminSearch" Area="Admin">
 		<Value>Admin search</Value>
@@ -10653,9 +10257,6 @@
 	<Resource Name="Admin.Settings.GeneralCommon.LinkedInLink" Area="Admin">
 		<Value>LinkedIn page URL</Value>
 	</Resource>
-	<Resource Name="Admin.Settings.GeneralCommon.Log404Errors" Area="Admin">
-		<Value>Log 404 errors</Value>
-	</Resource>
 	<Resource Name="Admin.Settings.GeneralCommon.Logo" Area="Admin">
 		<Value>Logo</Value>
 	</Resource>
@@ -10913,12 +10514,6 @@
 	</Resource>
 	<Resource Name="Admin.Settings.Media.ProductThumbPictureSizeOnProductDetailsPage" Area="Admin">
 		<Value>Product thumbnail image size (product page)</Value>
-	</Resource>
-	<Resource Name="Admin.Settings.Media.StoreLocation" Area="Admin">
-		<Value>Image location (url)</Value>
-	</Resource>
-	<Resource Name="Admin.Settings.Media.StoreLocation.hint" Area="Admin">
-		<Value>This settings is only for advanced user</Value>
 	</Resource>
 	<Resource Name="Admin.Settings.Media.VendorThumbPictureSize" Area="Admin">
 		<Value>Vendor thumbnail image size</Value>
@@ -11337,17 +10932,11 @@
 	<Resource Name="Admin.Settings.Vendor.AllowCustomersToContactVendors" Area="Admin">
 		<Value>Allow customers to contact vendors</Value>
 	</Resource>
-	<Resource Name="Admin.Settings.Vendor.AllowToUploadFile" Area="Admin">
-		<Value>Allow vendor to upload picture file</Value>
-	</Resource>
 	<Resource Name="Admin.Settings.Vendor.AllowSearchByVendor" Area="Admin">
 		<Value>Allow search by vendor in store advanced search</Value>
 	</Resource>
 	<Resource Name="Admin.Settings.Vendor.AllowVendorsToEditInfo" Area="Admin">
 		<Value>Allow vendors to edit info</Value>
-	</Resource>
-	<Resource Name="Admin.Settings.Vendor.DefaultAdminTheme" Area="Admin">
-		<Value>Default admin theme</Value>
 	</Resource>
 	<Resource Name="Admin.Settings.Vendor.DefaultAllowCustomerReview" Area="Admin">
 		<Value>Vendor Reviews Allowed by default</Value>
@@ -11484,63 +11073,6 @@
 	<Resource Name="admin.system.developertools" Area="Admin">
 		<Value>Developer Tools</Value>
 	</Resource>
-	<Resource Name="Admin.System.Log" Area="Admin">
-		<Value>Log</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.BackToList" Area="Admin">
-		<Value>back to system log</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Cleared" Area="Admin">
-		<Value>The log has been cleared successfully.</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.ClearLog" Area="Admin">
-		<Value>Clear log</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Deleted" Area="Admin">
-		<Value>Log was successfully deleted</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.DeleteSelected" Area="Admin">
-		<Value>Delete selected</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Fields.CreatedOn" Area="Admin">
-		<Value>Created on</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Fields.Customer" Area="Admin">
-		<Value>Customer</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Fields.FullMessage" Area="Admin">
-		<Value>Full message</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Fields.IPAddress" Area="Admin">
-		<Value>IP address</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Fields.LogLevel" Area="Admin">
-		<Value>Log level</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Fields.PageURL" Area="Admin">
-		<Value>Page URL</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Fields.ReferrerURL" Area="Admin">
-		<Value>Referrer URL</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.Fields.ShortMessage" Area="Admin">
-		<Value>Short message</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.List.CreatedOnFrom" Area="Admin">
-		<Value>Created from</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.List.CreatedOnTo" Area="Admin">
-		<Value>Created to</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.List.LogLevel" Area="Admin">
-		<Value>Log level</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.List.Message" Area="Admin">
-		<Value>Message</Value>
-	</Resource>
-	<Resource Name="Admin.System.Log.ViewLogDetails" Area="Admin">
-		<Value>View log entry details</Value>
-	</Resource>
 	<Resource Name="Admin.System.Maintenance" Area="Admin">
 		<Value>Maintenance</Value>
 	</Resource>
@@ -11568,12 +11100,6 @@
 	<Resource Name="Admin.System.Maintenance.DeleteAbandonedCarts.TotalDeleted" Area="Admin">
 		<Value>{0} items were deleted</Value>
 	</Resource>
-	<Resource Name="Admin.System.Maintenance.DeleteActivityLog" Area="Admin">
-		<Value>Deleting activity Log</Value>
-	</Resource>
-	<Resource Name="Admin.System.Maintenance.DeleteActivityLog.Deleted" Area="Admin">
-		<Value>Deleted activity Log</Value>
-	</Resource>
 	<Resource Name="Admin.System.Maintenance.DeleteExportedFiles" Area="Admin">
 		<Value>Deleting old exported files</Value>
 	</Resource>
@@ -11600,12 +11126,6 @@
 	</Resource>
 	<Resource Name="Admin.System.Maintenance.DeleteGuests.TotalDeleted" Area="Admin">
 		<Value>{0} customers were deleted</Value>
-	</Resource>
-	<Resource Name="Admin.System.Maintenance.DeleteSystemLog" Area="Admin">
-		<Value>Deleting system Log</Value>
-	</Resource>
-	<Resource Name="Admin.System.Maintenance.DeleteSystemLog.Deleted" Area="Admin">
-		<Value>Deleted system Log</Value>
 	</Resource>
 	<Resource Name="Admin.System.QueuedEmails" Area="Admin">
 		<Value>Message Queue</Value>
@@ -12695,9 +12215,6 @@
 	</Resource>
 	<Resource Name="Checkout.ShippingMethod" Area="Front">
 		<Value>Shipping method</Value>
-	</Resource>
-	<Resource Name="Checkout.ShippingOptionCouldNotBeLoaded" Area="Front">
-		<Value>Shipping options could not be loaded</Value>
 	</Resource>
 	<Resource Name="Checkout.ShipToThisAddress" Area="Front">
 		<Value>Ship to this address</Value>
@@ -14490,9 +14007,6 @@
 	<Resource Name="Permission.ManageACL" Area="Admin">
 		<Value>Admin area. Manage ACL</Value>
 	</Resource>
-	<Resource Name="Permission.ManageActivityLog" Area="Admin">
-		<Value>Admin area. Manage Activity Log</Value>
-	</Resource>
 	<Resource Name="Permission.ManageAffiliates" Area="Admin">
 		<Value>Admin area. Manage Affiliates</Value>
 	</Resource>
@@ -14606,9 +14120,6 @@
 	</Resource>
 	<Resource Name="Permission.ManageStores" Area="Admin">
 		<Value>Admin area. Manage Stores</Value>
-	</Resource>
-	<Resource Name="Permission.ManageSystemLog" Area="Admin">
-		<Value>Admin area. Manage System Log</Value>
 	</Resource>
 	<Resource Name="Permission.ManageTaxSettings" Area="Admin">
 		<Value>Admin area. Manage Tax Settings</Value>
@@ -15912,8 +15423,1950 @@
 	<Resource Name="Vendor.Address" Area="Front">
 		<Value>Address</Value>
 	</Resource>
+	<Resource Name="Vendor.Address.SelectState" Area="Vendor">
+		<Value>Select state</Value>
+	</Resource>
+	<Resource Name="Vendor.AccessDenied.Description" Area="Vendor">
+		<Value>You do not have permission to perform the selected operation.</Value>
+	</Resource>
+	<Resource Name="Vendor.AccessDenied.Title" Area="Vendor">
+		<Value>Access denied.</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.Address1" Area="Vendor">
+		<Value>Address 1</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.Address2" Area="Vendor">
+		<Value>Address 2</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.AddressName" Area="Vendor">
+		<Value>Address name</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.City" Area="Vendor">
+		<Value>City</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.Company" Area="Vendor">
+		<Value>Company</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.Country" Area="Vendor">
+		<Value>Country</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.Email" Area="Vendor">
+		<Value>Email</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.FaxNumber" Area="Vendor">
+		<Value>Fax number</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.FirstName" Area="Vendor">
+		<Value>First name</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.LastName" Area="Vendor">
+		<Value>Last name</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.Note" Area="Vendor">
+		<Value>Note</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.PhoneNumber" Area="Vendor">
+		<Value>Phone number</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.StateProvince" Area="Vendor">
+		<Value>State / province</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.VatNumber" Area="Vendor">
+		<Value>Vat number</Value>
+	</Resource>
+	<Resource Name="Vendor.Address.Fields.ZipPostalCode" Area="Vendor">
+		<Value>Zip / postal code</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Attributes.ProductAttributes.Fields.Description" Area="Vendor">
+		<Value>Description</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Attributes.ProductAttributes.Fields.Name" Area="Vendor">
+		<Value>Name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.Cost" Area="Vendor">
+		<Value>Cost</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.IsPreSelected" Area="Vendor">
+		<Value>Is pre-selected</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.Name" Area="Vendor">
+		<Value>Name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.PriceAdjustment" Area="Vendor">
+		<Value>Price adjustment</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.WeightAdjustment" Area="Vendor">
+		<Value>Weight adjustment</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit" Area="Vendor">
+		<Value>Bulk edit products</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.Fields.ManageInventoryMethod" Area="Vendor">
+		<Value>Manage inventory</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.Fields.Name" Area="Vendor">
+		<Value>Name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.Fields.OldPrice" Area="Vendor">
+		<Value>Old price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.Fields.Price" Area="Vendor">
+		<Value>Price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.Fields.Published" Area="Vendor">
+		<Value>Published</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.Fields.SKU" Area="Vendor">
+		<Value>SKU</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.Fields.SKU" Area="Vendor">
+		<Value>SKU</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.Fields.StockQuantity" Area="Vendor">
+		<Value>Stock qty</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.List.SearchCategory" Area="Vendor">
+		<Value>Category</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.List.SearchCollection" Area="Vendor">
+		<Value>Collection</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.BulkEdit.List.SearchProductName" Area="Vendor">
+		<Value>Product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReservations.CantDeleteWithOrder" Area="Vendor">
+		<Value>You can't delete reservation with the order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.CreatedOn" Area="Vendor">
+		<Value>Created on</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.Customer" Area="Vendor">
+		<Value>Customer</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.IsApproved" Area="Vendor">
+		<Value>Is approved</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.Product" Area="Vendor">
+		<Value>Product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.Rating" Area="Vendor">
+		<Value>Rating</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.ReplyText" Area="Vendor">
+		<Value>Reply text</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.ReviewText" Area="Vendor">
+		<Value>Review text</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.Signature" Area="Vendor">
+		<Value>Signature</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.Store" Area="Vendor">
+		<Value>Store</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.ProductReviews.Fields.Title" Area="Vendor">
+		<Value>Title</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Added" Area="Vendor">
+		<Value>The new product has been added successfully.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Additional" Area="Vendor">
+		<Value>Additional info</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.AddNew" Area="Vendor">
+		<Value>Add a new product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.AssociatedProducts" Area="Vendor">
+		<Value>Associated products</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.AssociatedProducts.AddNew" Area="Vendor">
+		<Value>Add new associated product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.AssociatedProducts.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.AssociatedProducts.Fields.Product" Area="Vendor">
+		<Value>Product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.AssociatedProducts.Note2" Area="Vendor">
+		<Value>A product could be associated to only one "grouped" product.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.AssociatedProducts.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can add associated products for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.AvailableDiscounts" Area="Vendor">
+		<Value>Available discount</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.BackToList" Area="Vendor">
+		<Value>back to product list</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Bids" Area="Vendor">
+		<Value>Bids</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Bids.Amount" Area="Vendor">
+		<Value>Amount</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Bids.CantDeleteWithOrder" Area="Vendor">
+		<Value>Cannot delete bid with order id</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Bids.CustomerId" Area="Vendor">
+		<Value>Customer Id</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Bids.Date" Area="Vendor">
+		<Value>Date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Bids.OrderId" Area="Vendor">
+		<Value>Order Id</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Bids.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save before editing this section</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.BundleProducts" Area="Vendor">
+		<Value>Bundle product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.BundleProducts.AddNew" Area="Vendor">
+		<Value>Add new products</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.BundleProducts.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.BundleProducts.Fields.Product" Area="Vendor">
+		<Value>Product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.BundleProducts.Fields.Quantity" Area="Vendor">
+		<Value>Quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.BundleProducts.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can add new bundle product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar" Area="Vendor">
+		<Value>Reservation calendar</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.Calendarconfiguration" Area="Vendor">
+		<Value>Calendar configuration</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.CannotChangeInterval" Area="Vendor">
+		<Value>You can't change interval because records with conflicting interval exist</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.Clearcalendar" Area="Vendor">
+		<Value>Clear calendar</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.Clearold" Area="Vendor">
+		<Value>Clear old, unused records</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.Date" Area="Vendor">
+		<Value>Date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.Duration" Area="Vendor">
+		<Value>Duration</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.Generatecalendar" Area="Vendor">
+		<Value>Generate calendar</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.OrderId" Area="Vendor">
+		<Value>Order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.Parameter" Area="Vendor">
+		<Value>Parameter</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.Resource" Area="Vendor">
+		<Value>Resource</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can generate calendar</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Calendar.WeekDay" Area="Vendor">
+		<Value>Week day</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Categories.Fields.Category" Area="Vendor">
+		<Value>Category</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Categories.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Categories.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can map categories for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Collections.Fields.Collection" Area="Vendor">
+		<Value>Collection</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Collections.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Collections.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can map collections for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Copy" Area="Vendor">
+		<Value>Copy product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Copy.CopyImages" Area="Vendor">
+		<Value>Copy images</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Copy.Name" Area="Vendor">
+		<Value>New product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Copy.Published" Area="Vendor">
+		<Value>Published</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.CrossSells" Area="Vendor">
+		<Value>Cross-sells</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.CrossSells.AddNew" Area="Vendor">
+		<Value>Add new cross-sell product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.CrossSells.Fields.Product" Area="Vendor">
+		<Value>Product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.CrossSells.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can add cross-sell products for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Deleted" Area="Vendor">
+		<Value>The product has been deleted successfully.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.EditProductDetails" Area="Vendor">
+		<Value>Edit product details</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AdditionalShippingCharge" Area="Vendor">
+		<Value>Additional shipping fee</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AdminComment" Area="Vendor">
+		<Value>Admin comment</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AllowCustomerReviews" Area="Vendor">
+		<Value>Allow to review this product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AllowedQuantities" Area="Vendor">
+		<Value>Allowed quantities</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AllowOutOfStockSubscriptions" Area="Vendor">
+		<Value>Allow out of stock subscriptions</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AssociatedToProductName" Area="Vendor">
+		<Value>Associated to product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AutomaticallyAddRequiredProducts" Area="Vendor">
+		<Value>Automatically add required products to the cart</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AvailableEndDateTime" Area="Vendor">
+		<Value>Available to</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AvailableEndDateTime.Required" Area="Vendor">
+		<Value>"Available to" date is required</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AvailableForPreOrder" Area="Vendor">
+		<Value>Available for pre-order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.AvailableStartDateTime" Area="Vendor">
+		<Value>Available from</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.BackorderMode" Area="Vendor">
+		<Value>Backorders</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.BasepriceAmount" Area="Vendor">
+		<Value>Amount in product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.BasepriceBaseAmount" Area="Vendor">
+		<Value>Base amount of the full product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.BasepriceBaseUnit" Area="Vendor">
+		<Value>Base unit of the full product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.BasepriceEnabled" Area="Vendor">
+		<Value>Use the PAngV (base price)</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.BasepriceUnit" Area="Vendor">
+		<Value>Unit of the product being sold</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Brand" Area="Vendor">
+		<Value>Brand</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.EndDate" Area="Vendor">
+		<Value>End date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.EndTime" Area="Vendor">
+		<Value>To hour</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Friday" Area="Vendor">
+		<Value>Friday</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.IncBothDate" Area="Vendor">
+		<Value>Include both dates</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Interval" Area="Vendor">
+		<Value>Interval</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Monday" Area="Vendor">
+		<Value>Monday</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Parameter" Area="Vendor">
+		<Value>Additional parameter</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Quantity" Area="Vendor">
+		<Value>Quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Resource" Area="Vendor">
+		<Value>Resource</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Saturday" Area="Vendor">
+		<Value>Saturday</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.StartDate" Area="Vendor">
+		<Value>Start date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.StartTime" Area="Vendor">
+		<Value>From hour</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Sunday" Area="Vendor">
+		<Value>Sunday</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Thursday" Area="Vendor">
+		<Value>Thursday</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Tuesday" Area="Vendor">
+		<Value>Tuesday</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Calendar.Wednesday" Area="Vendor">
+		<Value>Wednesday</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.CallForPrice" Area="Vendor">
+		<Value>Call for quote</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.CatalogPrice" Area="Vendor">
+		<Value>Catalog price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ChangedWarning" Area="Vendor">
+		<Value>You can't edit the product because has been changed. Please refresh page and try to change again.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.CreatedOn" Area="Vendor">
+		<Value>Created on</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DeliveryDate" Area="Vendor">
+		<Value>Delivery date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DeliveryDate.None" Area="Vendor">
+		<Value>None</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisableBuyButton" Area="Vendor">
+		<Value>Disable buy button</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisableWishlistButton" Area="Vendor">
+		<Value>Disable wishlist button</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisplayOrderBrand" Area="Vendor">
+		<Value>Display order for brand page</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisplayOrderCategory" Area="Vendor">
+		<Value>Display order for category page</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisplayOrderCollection" Area="Vendor">
+		<Value>Display order for collection page</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisplayOrderOnSale" Area="Vendor">
+		<Value>Sort product on sale</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisplayStockAvailability" Area="Vendor">
+		<Value>Display stock availability</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.DisplayStockQuantity" Area="Vendor">
+		<Value>Display stock quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.EnteredPrice" Area="Vendor">
+		<Value>Customer specify a price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Flag" Area="Vendor">
+		<Value>Flag</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.FullDescription" Area="Vendor">
+		<Value>Full description</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.GiftVoucherType" Area="Vendor">
+		<Value>Gift voucher type</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.GTIN" Area="Vendor">
+		<Value>GTIN (global trade item number)</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Height" Area="Vendor">
+		<Value>Height</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ID" Area="Vendor">
+		<Value>ID</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.IsFreeShipping" Area="Vendor">
+		<Value>Free shipping</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.IsGiftVoucher" Area="Vendor">
+		<Value>Is gift voucher</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.IsRecurring" Area="Vendor">
+		<Value>Recurring product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.IsShipEnabled" Area="Vendor">
+		<Value>Shippable product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.IsTaxExempt" Area="Vendor">
+		<Value>Tax exempt</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.IsTelecommunicationsOrBroadcastingOrElectronicServices" Area="Vendor">
+		<Value>TBE services</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Length" Area="Vendor">
+		<Value>Length</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.LowStockActivity" Area="Vendor">
+		<Value>Low stock activity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ManageInventoryMethod" Area="Vendor">
+		<Value>Manage inventory method</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MarkAsNew" Area="Vendor">
+		<Value>Mark as new</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MarkAsNewEndDateTime" Area="Vendor">
+		<Value>Mark as new. End date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MarkAsNewStartDateTime" Area="Vendor">
+		<Value>Mark as new. Start date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MaxEnteredPrice" Area="Vendor">
+		<Value>Maximum amount</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MetaDescription" Area="Vendor">
+		<Value>Meta description</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MetaKeywords" Area="Vendor">
+		<Value>Meta keywords</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MetaTitle" Area="Vendor">
+		<Value>Title</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MinEnteredPrice" Area="Vendor">
+		<Value>Minimum amount</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.MinStockQuantity" Area="Vendor">
+		<Value>Minimum stock quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Mpn" Area="Vendor">
+		<Value>Manufacturer part number</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Name" Area="Vendor">
+		<Value>Product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Name.Required" Area="Vendor">
+		<Value>Please provide a name.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.NotifyAdminForQuantityBelow" Area="Vendor">
+		<Value>Notify store owner for quantity below</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.NotReturnable" Area="Vendor">
+		<Value>Product is not returnable</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.OldPrice" Area="Vendor">
+		<Value>Old price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.OrderMaximumQuantity" Area="Vendor">
+		<Value>Maximum purchase quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.OrderMinimumQuantity" Area="Vendor">
+		<Value>Minimum purchase quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.OverriddenGiftVoucherAmount" Area="Vendor">
+		<Value>Override gift voucher amount</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.PictureThumbnailUrl" Area="Vendor">
+		<Value>Picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.PreOrderDateTime" Area="Vendor">
+		<Value>Pre-order availability  date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Price" Area="Vendor">
+		<Value>Price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ProductCost" Area="Vendor">
+		<Value>Product cost</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ProductLayout" Area="Vendor">
+		<Value>Product layout</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ProductType" Area="Vendor">
+		<Value>Product type</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Published" Area="Vendor">
+		<Value>Published</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.RecurringCycleLength" Area="Vendor">
+		<Value>Cycle length</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.RecurringCyclePeriod" Area="Vendor">
+		<Value>Cycle period</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.RecurringTotalCycles" Area="Vendor">
+		<Value>Total cycles</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.RequiredProductIds" Area="Vendor">
+		<Value>Required product IDs</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.RequiredProductIds.AddNew" Area="Vendor">
+		<Value>Add required product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.RequiredProductIds.Choose" Area="Vendor">
+		<Value>Choose</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.RequireOtherProducts" Area="Vendor">
+		<Value>Require other products added to the cart</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ReservedQuantity" Area="Vendor">
+		<Value>Reserved quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.SeName" Area="Vendor">
+		<Value>Search engine friendly page name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ShipSeparately" Area="Vendor">
+		<Value>Ship separately</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.ShortDescription" Area="Vendor">
+		<Value>Short description</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Sku" Area="Vendor">
+		<Value>SKU</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.StartPrice" Area="Vendor">
+		<Value>Start price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.StockQuantity" Area="Vendor">
+		<Value>Stock quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.TaxCategory" Area="Vendor">
+		<Value>Tax category</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Unit" Area="Vendor">
+		<Value>Unit</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.UpdatedOn" Area="Vendor">
+		<Value>Updated on</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.UseMultipleWarehouses" Area="Vendor">
+		<Value>Use multiple warehouses</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.VisibleIndividually" Area="Vendor">
+		<Value>Visible individually</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Warehouse" Area="Vendor">
+		<Value>Warehouse</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Warehouse.None" Area="Vendor">
+		<Value>None</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Weight" Area="Vendor">
+		<Value>Weight</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Fields.Width" Area="Vendor">
+		<Value>Width</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Info" Area="Vendor">
+		<Value>General</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Inventory" Area="Vendor">
+		<Value>Inventory</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.LinkedProducts" Area="Vendor">
+		<Value>Linked products</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.Brand" Area="Vendor">
+		<Value>Brand</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.GoDirectlyToSku" Area="Vendor">
+		<Value>Edit product with a specified SKU</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchCategory" Area="Vendor">
+		<Value>Category</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchCollection" Area="Vendor">
+		<Value>Collection</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchIncludeSubCategories" Area="Vendor">
+		<Value>Include subcategories</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchProductName" Area="Vendor">
+		<Value>Product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchProductType" Area="Vendor">
+		<Value>Product type</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchPublished" Area="Vendor">
+		<Value>Published</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchPublished.All" Area="Vendor">
+		<Value>All</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchPublished.MarkAsNew" Area="Vendor">
+		<Value>Mark as new</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchPublished.PublishedOnly" Area="Vendor">
+		<Value>Only published</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchPublished.ShowOnHomePage" Area="Vendor">
+		<Value>Show on homepage</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchPublished.UnpublishedOnly" Area="Vendor">
+		<Value>Only unpublished</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.List.SearchWarehouse" Area="Vendor">
+		<Value>Warehouse</Value>
+	</Resource>
+	<Resource Name="admin.catalog.products.list.skunotfound" Area="Vendor">
+		<Value>Entered SKU doesn't exist</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Manage" Area="Vendor">
+		<Value>Products</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Mappings" Area="Vendor">
+		<Value>Mappings</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Permissions" Area="Vendor">
+		<Value>You can't edit this product, because it is not yours.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures" Area="Vendor">
+		<Value>Pictures</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.AddNew" Area="Vendor">
+		<Value>Add a new picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.Details" Area="Vendor">
+		<Value>Picture details</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.Fields.ExtraField" Area="Vendor">
+		<Value>Extra field</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.Fields.ExtraField" Area="Vendor">
+		<Value>Extra field</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.Fields.OverrideAltAttribute" Area="Vendor">
+		<Value>Alt</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.Fields.OverrideTitleAttribute" Area="Vendor">
+		<Value>Title</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.Fields.Picture" Area="Vendor">
+		<Value>Picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.Fields.Style" Area="Vendor">
+		<Value>Style</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Pictures.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can upload pictures for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Prices" Area="Vendor">
+		<Value>Prices</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes" Area="Vendor">
+		<Value>Product attributes</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AddNew" Area="Vendor">
+		<Value>Add new attribute</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations" Area="Vendor">
+		<Value>Attribute combinations</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.AddNew" Area="Vendor">
+		<Value>Add combination</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.AddTitle" Area="Vendor">
+		<Value>Select new combination and enter details below</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.ClearAll" Area="Vendor">
+		<Value>Clear all combinations</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Description" Area="Vendor">
+		<Value>Attribute combinations are useful when your 'Manage inventory method' is set to 'Track inventory by product attributes'</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Description2" Area="Vendor">
+		<Value>Also note that some attribute control types that support custom user input (e.g. file upload, textboxes, date picker) are useless with attribute combinations</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.AllowOutOfStockOrders" Area="Vendor">
+		<Value>Allow out of stock</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.Attributes" Area="Vendor">
+		<Value>Attributes</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.GTIN" Area="Vendor">
+		<Value>GTIN (UPC, EAN, JAN, ISBN)</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.Mpn" Area="Vendor">
+		<Value>Manufacturer part number</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.NotifyAdminForQuantityBelow" Area="Vendor">
+		<Value>Notify admin for quantity below</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.OverriddenPrice" Area="Vendor">
+		<Value>Override product price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.Picture" Area="Vendor">
+		<Value>Assigned picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.Picture.NoPicture" Area="Vendor">
+		<Value>No picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.ReservedQuantity" Area="Vendor">
+		<Value>Reserved quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.Sku" Area="Vendor">
+		<Value>SKU (Stock Keeping Unit)</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.StockQuantity" Area="Vendor">
+		<Value>Stock quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Fields.Text" Area="Vendor">
+		<Value>Custom text</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.GenerateAll" Area="Vendor">
+		<Value>Generate all possible combinations</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.TierPrices" Area="Vendor">
+		<Value>Tier prices</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.TierPrices.Price" Area="Vendor">
+		<Value>Price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.TierPrices.Quantity" Area="Vendor">
+		<Value>Quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.AttributeCombinations.Update" Area="Vendor">
+		<Value>Enter details below</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes" Area="Vendor">
+		<Value>Attributes</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Condition" Area="Vendor">
+		<Value>Condition</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Condition.Attributes" Area="Vendor">
+		<Value>Attribute</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Condition.Description" Area="Vendor">
+		<Value>Conditional attributes appear if a previous attribute is selected, such as having an option for personalizing clothing with a name and only providing the text input box if the "Personalize" radio button is checked</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Condition.EnableCondition" Area="Vendor">
+		<Value>Enable condition</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Fields.Attribute" Area="Vendor">
+		<Value>Attribute</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Fields.AttributeControlType" Area="Vendor">
+		<Value>Control type</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Fields.Combination" Area="Vendor">
+		<Value>Allow to use in attribute combinations</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Fields.IsRequired" Area="Vendor">
+		<Value>Is Required</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Fields.ShowOnCatalogPage" Area="Vendor">
+		<Value>Show attribute on product catalog pages</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Fields.TextPrompt" Area="Vendor">
+		<Value>Text prompt</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.ValidationRules" Area="Vendor">
+		<Value>Validation rules</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.ValidationRules.DefaultValue" Area="Vendor">
+		<Value>Default value</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.ValidationRules.FileAllowedExtensions" Area="Vendor">
+		<Value>Allowed file extensions</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.ValidationRules.FileMaximumSize" Area="Vendor">
+		<Value>Maximum file size (KB)</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.ValidationRules.Link" Area="Vendor">
+		<Value>Edit rules</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.ValidationRules.MaxLength" Area="Vendor">
+		<Value>Maximum length</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.ValidationRules.MinLength" Area="Vendor">
+		<Value>Minimum length</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.AddNew" Area="Vendor">
+		<Value>Add a new value</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.EditValueDetails" Area="Vendor">
+		<Value>Edit value</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.AssociatedProduct" Area="Vendor">
+		<Value>Associated product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.AssociatedProduct.AddNew" Area="Vendor">
+		<Value>Associate a product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.AttributeValueType" Area="Vendor">
+		<Value>Attribute value type</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.ColorSquaresRgb" Area="Vendor">
+		<Value>RGB color</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Cost" Area="Vendor">
+		<Value>Cost</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.ImageSquaresPicture" Area="Vendor">
+		<Value>Square picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.IsPreSelected" Area="Vendor">
+		<Value>Is pre-selected</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Name" Area="Vendor">
+		<Value>Name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Name.Required" Area="Vendor">
+		<Value>Please provide a name.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Picture" Area="Vendor">
+		<Value>Picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Picture.NoPicture" Area="Vendor">
+		<Value>No picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.PriceAdjustment" Area="Vendor">
+		<Value>Additional fee</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Quantity" Area="Vendor">
+		<Value>Product quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Quantity.GreaterThanOrEqualTo1" Area="Vendor">
+		<Value>Quantity should be greater than or equal to 1</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Attributes.Values.Fields.WeightAdjustment" Area="Vendor">
+		<Value>Additional weight</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Details" Area="Vendor">
+		<Value>Details</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.Edit" Area="Vendor">
+		<Value>Edit attribute</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.NoAttributesAvailable" Area="Vendor">
+		<Value>No product attributes available. Create at least one product attribute before mapping.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductAttributes.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can add attributes for this page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductPrices.Fields.CurrencyCode" Area="Vendor">
+		<Value>Currency code</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductPrices.Fields.Price" Area="Vendor">
+		<Value>Price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory" Area="Vendor">
+		<Value>Warehouses</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory.Description1" Area="Vendor">
+		<Value>"Stock quantity" is total quantity. It's reduced from when a shipment is shipped.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory.Description2" Area="Vendor">
+		<Value>"Reserved qty" is product quantity that is ordered but not shipped yet.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory.Description3" Area="Vendor">
+		<Value>"Planned qty" is product quantity that is ordered and already added to a shipment but not shipped yet.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory.Fields.ReservedQuantity" Area="Vendor">
+		<Value>Reserved qty</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory.Fields.StockQuantity" Area="Vendor">
+		<Value>Stock quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory.Fields.Warehouse" Area="Vendor">
+		<Value>Warehouse</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory.Fields.Warehouse.NotDefined" Area="Vendor">
+		<Value>No warehouses defined</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.ProductWarehouseInventory.Fields.WarehouseUsed" Area="Vendor">
+		<Value>Use</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.PurchasedWithOrders" Area="Vendor">
+		<Value>Purchased with orders</Value>
+	</Resource>
+	<Resource Name="admin.catalog.products.recommended" Area="Vendor">
+		<Value>Recommended products</Value>
+	</Resource>
+	<Resource Name="admin.catalog.products.recommended.addnew" Area="Vendor">
+		<Value>Add new recommended products</Value>
+	</Resource>
+	<Resource Name="admin.catalog.products.recommended.fields.product" Area="Vendor">
+		<Value>Products</Value>
+	</Resource>
+	<Resource Name="vendor.catalog.products.recommended" Area="Admin">
+		<Value>Recommended products</Value>
+	</Resource>
+	<Resource Name="vendor.catalog.products.recommended.addnew" Area="Admin">
+		<Value>Add new recommended products</Value>
+	</Resource>
+	<Resource Name="vendor.catalog.products.recommended.fields.product" Area="Admin">
+		<Value>Products</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.RelatedProducts" Area="Vendor">
+		<Value>Related products</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.RelatedProducts.AddNew" Area="Vendor">
+		<Value>Add new related product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.RelatedProducts.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.RelatedProducts.Fields.Product" Area="Vendor">
+		<Value>Product</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.RelatedProducts.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can add related products for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Reviews" Area="Vendor">
+		<Value>Product Reviews</Value>
+	</Resource>
+	<Resource Name="Vendor.catalog.products.similarproducts" Area="Vendor">
+		<Value>Similar products</Value>
+	</Resource>
+	<Resource Name="Vendor.catalog.products.similarproducts.addnew" Area="Vendor">
+		<Value>Add new product</Value>
+	</Resource>
+	<Resource Name="Vendor.catalog.products.similarproducts.fields.displayorder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.catalog.products.similarproducts.fields.product" Area="Vendor">
+		<Value>Products</Value>
+	</Resource>
+	<Resource Name="Vendor.catalog.products.similarproducts.savebeforeedit" Area="Vendor">
+		<Value>You need to save the product before you can add similar products for this product page.</Value>
+	</Resource>
+	<Resource Name="vendor.catalog.products.similarproducts" Area="Admin">
+		<Value>Similar products</Value>
+	</Resource>
+	<Resource Name="vendor.catalog.products.similarproducts.addnew" Area="Admin">
+		<Value>Add new product</Value>
+	</Resource>
+	<Resource Name="vendor.catalog.products.similarproducts.fields.displayorder" Area="Admin">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="vendor.catalog.products.similarproducts.fields.product" Area="Admin">
+		<Value>Products</Value>
+	</Resource>
+	<Resource Name="vendor.catalog.products.similarproducts.savebeforeedit" Area="Admin">
+		<Value>You need to save the product before you can add similar products for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes" Area="Vendor">
+		<Value>Specification attributes</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.AddButton" Area="Vendor">
+		<Value>Add product specification</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.AddNew" Area="Vendor">
+		<Value>Add a new product specification attribute</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Edit" Area="Vendor">
+		<Value>Edit a product specification attribute</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.AllowFiltering" Area="Vendor">
+		<Value>Allow filtering</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.AttributeType" Area="Vendor">
+		<Value>Attribute type</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.CustomName" Area="Vendor">
+		<Value>Name</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.CustomValue" Area="Vendor">
+		<Value>Value</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.DisplayOrder" Area="Vendor">
+		<Value>Display order</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.ShowOnProductPage" Area="Vendor">
+		<Value>Show on product page</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.SpecificationAttribute" Area="Vendor">
+		<Value>Value</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.SpecificationAttributeOption" Area="Vendor">
+		<Value>Attribute option</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Fields.Value" Area="Vendor">
+		<Value>Value</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can add product specification attributes for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.SpecificationAttributes.Validate" Area="Vendor">
+		<Value>A product specification attribute is not valid</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices" Area="Vendor">
+		<Value>Tier prices</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.AddNew" Area="Vendor">
+		<Value>Add new tier price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.Edit" Area="Vendor">
+		<Value>Edit tier price details</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.Fields.CurrencyCode" Area="Vendor">
+		<Value>Currency code</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.Fields.EndDateTime" Area="Vendor">
+		<Value>End date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.Fields.Price" Area="Vendor">
+		<Value>Price</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.Fields.Quantity" Area="Vendor">
+		<Value>Quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.Fields.StartDateTime" Area="Vendor">
+		<Value>Start date</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.Fields.Store.All" Area="Vendor">
+		<Value>All stores</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.TierPrices.SaveBeforeEdit" Area="Vendor">
+		<Value>You need to save the product before you can add tier prices for this product page.</Value>
+	</Resource>
+	<Resource Name="Vendor.Catalog.Products.Updated" Area="Vendor">
+		<Value>The product has been updated successfully.</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.AddNew" Area="Vendor">
+		<Value>Add new</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.AddNewRecord" Area="Vendor">
+		<Value>Add new record</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.All" Area="Vendor">
+		<Value>All</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.AreYouSure" Area="Vendor">
+		<Value>Are you sure?</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Cancel" Area="Vendor">
+		<Value>Cancel</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Check" Area="Vendor">
+		<Value>Check</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Clear" Area="Vendor">
+		<Value>Clear</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Delete" Area="Vendor">
+		<Value>Delete</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Delete.Selected" Area="Vendor">
+		<Value>Delete (selected)</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.DeleteConfirmation" Area="Vendor">
+		<Value>Are you sure you want to delete this item?</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Edit" Area="Vendor">
+		<Value>Edit</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Export" Area="Vendor">
+		<Value>Export</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.ExportToExcel.All" Area="Vendor">
+		<Value>Export to Excel (all found)</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.ExportToExcel.Selected" Area="Vendor">
+		<Value>Export to Excel (selected)</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Filters" Area="Vendor">
+		<Value>Filters</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Go" Area="Vendor">
+		<Value>Go</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.NoCancel" Area="Vendor">
+		<Value>No, cancel</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Preview" Area="Vendor">
+		<Value>Show in the shop page</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Save" Area="Vendor">
+		<Value>Save</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.SaveContinue" Area="Vendor">
+		<Value>Save and Continue Edit</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Search" Area="Vendor">
+		<Value>Search</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Select" Area="Vendor">
+		<Value>Select</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.SEO" Area="Vendor">
+		<Value>SEO</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.Update" Area="Vendor">
+		<Value>Update</Value>
+	</Resource>
+	<Resource Name="Vendor.Updated" Area="Vendor">
+		<Value>The vendor data has been updated successfully</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.View" Area="Vendor">
+		<Value>View</Value>
+	</Resource>
+	<Resource Name="Vendor.Common.WrongEmail" Area="Vendor">
+		<Value>Wrong email</Value>
+	</Resource>
+	<Resource Name="Vendor.Configuration.Tax.Settings.TaxCategories.None" Area="Vendor">
+		<Value>[None]</Value>
+	</Resource>
+	<Resource Name="Vendor.Customers.Guest" Area="Vendor">
+		<Value>Guest</Value>
+	</Resource>
+	<Resource Name="Vendor.Dashboard" Area="Vendor">
+		<Value>Dashboard</Value>
+	</Resource>
+	<Resource Name="Vendor.Dashboard.ReportLatestOrder" Area="Vendor">
+		<Value>Latest orders</Value>
+	</Resource>
+	<Resource Name="Vendor.Dashboard.Statistics" Area="Vendor">
+		<Value>Statistics</Value>
+	</Resource>
+	<Resource Name="Vendor.Dashboard.Summary" Area="Vendor">
+		<Value>Summary</Value>
+	</Resource>
+	<Resource Name="Vendor.EditVendorDetails" Area="Vendor">
+		<Value>Edit vendor data</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.AllowCustomersToSelectPageSize" Area="Vendor">
+		<Value>Allow customers to select page size</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.Description" Area="Vendor">
+		<Value>Description</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.Email" Area="Vendor">
+		<Value>Vendor email</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.Email.Required" Area="Vendor">
+		<Value>Email is required</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.Name" Area="Vendor">
+		<Value>Vendor name</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.Name.Required" Area="Vendor">
+		<Value>Name is required</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.MetaDescription" Area="Vendor">
+		<Value>Meta description</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.MetaKeywords" Area="Vendor">
+		<Value>Meta keywords</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.MetaTitle" Area="Vendor">
+		<Value>Meta title</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.PageSize" Area="Vendor">
+		<Value>Page size</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.PageSizeOptions" Area="Vendor">
+		<Value>Page size options</Value>
+	</Resource>
+	<Resource Name="Vendor.Fields.SeName" Area="Vendor">
+		<Value>SeName</Value>
+	</Resource>
+	<Resource Name="Vendor.Header.Community" Area="Vendor">
+		<Value>Community</Value>
+	</Resource>
+	<Resource Name="Vendor.Header.Documentation" Area="Vendor">
+		<Value>Documentation</Value>
+	</Resource>
+	<Resource Name="Vendor.Header.Logout" Area="Vendor">
+		<Value>Logout?</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.Email" Area="Vendor">
+		<Value>Email</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.ForgotPassword" Area="Vendor">
+		<Value>Forgot password?</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.LoginButton" Area="Vendor">
+		<Value>Log in</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.PageTitle" Area="Vendor">
+		<Value>GrandNode admin</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.Password" Area="Vendor">
+		<Value>Password</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.RememberMe" Area="Vendor">
+		<Value>Remember me?</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.Title" Area="Vendor">
+		<Value>Welcome, please sign in</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.Unsuccessful" Area="Vendor">
+		<Value>Login was unsuccessful. Please correct the errors and try again.</Value>
+	</Resource>
+	<Resource Name="Vendor.Login.UserName" Area="Vendor">
+		<Value>Username</Value>
+	</Resource>
+	<Resource Name="Vendor.Marketing.Discounts.Fields.Name" Area="Vendor">
+		<Value>Name</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders" Area="Vendor">
+		<Value>Orders</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.Address1" Area="Vendor">
+		<Value>Address 1</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.Address2" Area="Vendor">
+		<Value>Address 2</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.City" Area="Vendor">
+		<Value>City</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.Company" Area="Vendor">
+		<Value>Company</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.Country" Area="Vendor">
+		<Value>Country</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.Email" Area="Vendor">
+		<Value>Email</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.Fax" Area="Vendor">
+		<Value>Fax</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.FullName" Area="Vendor">
+		<Value>Full name</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.Phone" Area="Vendor">
+		<Value>Phone</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.StateProvince" Area="Vendor">
+		<Value>State / province</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Address.ZipPostalCode" Area="Vendor">
+		<Value>Zip / postal code</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Addresses" Area="Vendor">
+		<Value>Billing and Shipping</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.BackToList" Area="Vendor">
+		<Value>back to order list</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.BillingInfo" Area="Vendor">
+		<Value>Billing info</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.EditOrderDetails" Area="Vendor">
+		<Value>Edit order details</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.BillingAddress" Area="Vendor">
+		<Value>Billing address</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.Code" Area="Vendor">
+		<Value>Code</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.CreatedOn" Area="Vendor">
+		<Value>Created on</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.Currency" Area="Vendor">
+		<Value>Currency code</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.CurrencyRate" Area="Vendor">
+		<Value>Currency rate</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.Customer" Area="Vendor">
+		<Value>Customer</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.CustomerEmail" Area="Vendor">
+		<Value>Email</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.Id" Area="Vendor">
+		<Value>Id</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.Id" Area="Vendor">
+		<Value>Id</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.OrderGuid" Area="Vendor">
+		<Value>Order GUID</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.PaymentMethod" Area="Vendor">
+		<Value>Payment method</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.PaymentStatus" Area="Vendor">
+		<Value>Payment status</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.PickupAddress" Area="Vendor">
+		<Value>Pickup point address</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.ShippingAddress" Area="Vendor">
+		<Value>Shipping address</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.ShippingAddress.ViewOnGoogleMaps" Area="Vendor">
+		<Value>View address on Google Maps</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.ShippingMethod" Area="Vendor">
+		<Value>Shipping method</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.Store" Area="Vendor">
+		<Value>Store</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Fields.VatNumber" Area="Vendor">
+		<Value>VAT number</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Info" Area="Vendor">
+		<Value>Info</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.BillingCountry" Area="Vendor">
+		<Value>Billing country</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.BillingEmail" Area="Vendor">
+		<Value>Billing email address</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.BillingLastName" Area="Vendor">
+		<Value>Billing last name</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.EndDate" Area="Vendor">
+		<Value>Orders creation date to</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.GoDirectlyToNumber" Area="Vendor">
+		<Value>Go directly to order #</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.OrderGuid" Area="Vendor">
+		<Value>Order GUID</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.OrderStatus" Area="Vendor">
+		<Value>Order status</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.OrderTagId" Area="Vendor">
+		<Value>Order's tag</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.PaymentMethod" Area="Vendor">
+		<Value>Payment method</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.PaymentStatus" Area="Vendor">
+		<Value>Payment status</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.Product" Area="Vendor">
+		<Value>Product</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.ShippingStatus" Area="Vendor">
+		<Value>Shipping status</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.StartDate" Area="Vendor">
+		<Value>Orders creation date from</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.List.Warehouse" Area="Vendor">
+		<Value>Warehouse</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns" Area="Vendor">
+		<Value>Merchandise returns</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Address" Area="Vendor">
+		<Value>Pickup address</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.BackToList" Area="Vendor">
+		<Value>back to merchandise return list</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Deleted" Area="Vendor">
+		<Value>The merchandise return has been deleted successfully.</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.EditMerchandiseReturnDetails" Area="Vendor">
+		<Value>Edit merchandise return details</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.CreatedOn" Area="Vendor">
+		<Value>Date</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.Customer" Area="Vendor">
+		<Value>Customer</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.CustomerComments" Area="Vendor">
+		<Value>Customer comments</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.ExternalId" Area="Vendor">
+		<Value>External identifier</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.ID" Area="Vendor">
+		<Value>ID</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.Item" Area="Vendor">
+		<Value>Returned item</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.Order" Area="Vendor">
+		<Value>Order</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.PickupAddress" Area="Vendor">
+		<Value>Pickup address</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.PickupDate" Area="Vendor">
+		<Value>Pickup date</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.Quantity" Area="Vendor">
+		<Value>Quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.ReturnAction" Area="Vendor">
+		<Value>Return action</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.ReturnReason" Area="Vendor">
+		<Value>Return reason</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.StaffNotes" Area="Vendor">
+		<Value>Staff notes</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.Status" Area="Vendor">
+		<Value>Merchandise return status</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.Total" Area="Vendor">
+		<Value>Total</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Fields.UnitPrice" Area="Vendor">
+		<Value>Unit price</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Info" Area="Vendor">
+		<Value>General info</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.MerchandiseReturnNotes" Area="Vendor">
+		<Value>Merchandise return notes</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.MerchandiseReturnNotes.AddButton" Area="Vendor">
+		<Value>Add merchandise return note</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.MerchandiseReturnNotes.AddTitle" Area="Vendor">
+		<Value>Add merchandise return note</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.MerchandiseReturnNotes.Fields.CreatedByCustomer" Area="Vendor">
+		<Value>Created by customer</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.MerchandiseReturnNotes.Fields.CreatedOn" Area="Vendor">
+		<Value>Created on</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.MerchandiseReturnNotes.Fields.DisplayToCustomer" Area="Vendor">
+		<Value>Display to customer</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.MerchandiseReturnNotes.Fields.Note" Area="Vendor">
+		<Value>Note</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.NotifyCustomer" Area="Vendor">
+		<Value>Notify customer about status change</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.Updated" Area="Vendor">
+		<Value>The merchandise return has been updated successfully.</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.MerchandiseReturns.View" Area="Vendor">
+		<Value>View</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.PdfInvoice" Area="Vendor">
+		<Value>Invoice (PDF)</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.PdfInvoice.All" Area="Vendor">
+		<Value>Print PDF invoices (all found)</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.PdfInvoice.NoOrders" Area="Vendor">
+		<Value>No orders selected</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.PdfInvoice.Selected" Area="Vendor">
+		<Value>Print PDF invoices (selected)</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products" Area="Vendor">
+		<Value>Products</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.Commission" Area="Vendor">
+		<Value>Commission</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.Discount" Area="Vendor">
+		<Value>Discount</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.MerchandiseReturns" Area="Vendor">
+		<Value>Merchandise return(s)</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.Picture" Area="Vendor">
+		<Value>Picture</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.Price" Area="Vendor">
+		<Value>Price</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.ProductName" Area="Vendor">
+		<Value>Product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.Quantity" Area="Vendor">
+		<Value>Quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.RecurringPeriod" Area="Vendor">
+		<Value>[Auto-ship, Every {0} {1} ({2})]</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.SKU" Area="Vendor">
+		<Value>SKU</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Products.Total" Area="Vendor">
+		<Value>Total</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments" Area="Vendor">
+		<Value>Shipments</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.AddNew" Area="Vendor">
+		<Value>Add shipment</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.AddNew.Title" Area="Vendor">
+		<Value>Add a new shipment to order #{0}</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.AdminComment" Area="Vendor">
+		<Value>Admin comment</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.AdminComment.Button" Area="Vendor">
+		<Value>Set admin comment</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.BackToList" Area="Vendor">
+		<Value>Back to shipment list</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.BackToOrder" Area="Vendor">
+		<Value>back to order details</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.DeliveryDate" Area="Vendor">
+		<Value>Date delivered</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.DeliveryDate.Button" Area="Vendor">
+		<Value>Set as delivered</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.DeliveryDate.Enter" Area="Vendor">
+		<Value>Date and time should entered in the default store time zone</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.DeliveryDate.NotYet" Area="Vendor">
+		<Value>Not yet</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.DeliverySelected" Area="Vendor">
+		<Value>Set as delivered (selected)</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ID" Area="Vendor">
+		<Value>Shipment #</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.List" Area="Vendor">
+		<Value>Shipments</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.List.City" Area="Vendor">
+		<Value>City</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.List.EndDate" Area="Vendor">
+		<Value>Shipments to</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.List.LoadNotShipped" Area="Vendor">
+		<Value>Load not shipped</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.List.StartDate" Area="Vendor">
+		<Value>Shipments from</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.List.TrackingNumber" Area="Vendor">
+		<Value>Tracking number</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.List.Warehouse" Area="Vendor">
+		<Value>Warehouse</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.NoShipmentsSelected" Area="Vendor">
+		<Value>No shipments selected</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.OrderID" Area="Vendor">
+		<Value>Order #</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.PrintPackagingSlip" Area="Vendor">
+		<Value>Print packaging slip</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.PrintPackagingSlip.All" Area="Vendor">
+		<Value>Print packaging slips (all found)</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.PrintPackagingSlip.Selected" Area="Vendor">
+		<Value>Print packaging slips (selected)</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products" Area="Vendor">
+		<Value>Products shipped</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.ItemDimensions" Area="Vendor">
+		<Value>Item dimensions</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.ItemWeight" Area="Vendor">
+		<Value>Item weight</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.ProductName" Area="Vendor">
+		<Value>Product</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.QtyOrdered" Area="Vendor">
+		<Value>Qty ordered</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.QtyShipped" Area="Vendor">
+		<Value>Qty shipped</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.QtyToShip" Area="Vendor">
+		<Value>Qty to ship</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.ShipSeparately" Area="Vendor">
+		<Value>this product should be shipped separately!</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.ShipSeparately.Warning" Area="Vendor">
+		<Value>Warning: </Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.SKU" Area="Vendor">
+		<Value>SKU</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.Warehouse" Area="Vendor">
+		<Value>Warehouse</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.Warehouse.ChooseQty" Area="Vendor">
+		<Value>{0} ({1} qty in stock, {2} qty reserved</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.Products.Warehouse.NotAvailabe" Area="Vendor">
+		<Value>No warehouses available. You cannot ship this product.</Value>
+	</Resource>
+	<Resource Name="Vendor.orders.shipments.shipmentnotes" Area="Vendor">
+		<Value>Shipment notes</Value>
+	</Resource>
+	<Resource Name="Vendor.orders.shipments.shipmentnotes.addbutton" Area="Vendor">
+		<Value>Add shipment note</Value>
+	</Resource>
+	<Resource Name="Vendor.orders.shipments.shipmentnotes.addtitle" Area="Vendor">
+		<Value>Add shipment note</Value>
+	</Resource>
+	<Resource Name="Vendor.orders.shipments.shipmentnotes.createdbycustomer" Area="Vendor">
+		<Value>Created by customer</Value>
+	</Resource>
+	<Resource Name="Vendor.orders.shipments.shipmentnotes.createdon" Area="Vendor">
+		<Value>Created on</Value>
+	</Resource>
+	<Resource Name="Vendor.orders.shipments.shipmentnotes.fields.displaytocustomer" Area="Vendor">
+		<Value>Display to customer</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShipmentNotes.Fields.Note" Area="Vendor">
+		<Value>Note</Value>
+	</Resource>
+	
+	<Resource Name="Vendor.orders.shipments.shipmentnotes.note" Area="Vendor">
+		<Value>Note</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShipmentStatusEvents" Area="Vendor">
+		<Value>Shipment status events</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShipmentStatusEvents.Date" Area="Vendor">
+		<Value>Date</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShipmentStatusEvents.Event" Area="Vendor">
+		<Value>Event</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShipmentStatusEvents.Location" Area="Vendor">
+		<Value>Location</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShippedDate" Area="Vendor">
+		<Value>Date shipped</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShippedDate.Button" Area="Vendor">
+		<Value>Set as shipped</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShippedDate.Enter" Area="Vendor">
+		<Value>Date and time should entered in the default store time zone</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShippedDate.NotYet" Area="Vendor">
+		<Value>Not yet</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ShipSelected" Area="Vendor">
+		<Value>Set as shipped (selected)</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.TotalWeight" Area="Vendor">
+		<Value>Total weight</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.TrackingNumber" Area="Vendor">
+		<Value>Tracking number</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.TrackingNumber.Button" Area="Vendor">
+		<Value>Set tracking number</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.TrackingNumber.ViewOnline" Area="Vendor">
+		<Value>View tracking info</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ViewDetails" Area="Vendor">
+		<Value>View shipment details</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.Shipments.ViewDetails.Info" Area="Vendor">
+		<Value>Shipment info</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.ShippingInfo" Area="Vendor">
+		<Value>Shipping info</Value>
+	</Resource>
+	<Resource Name="Vendor.Orders.ShippingInfo.NotRequired" Area="Vendor">
+		<Value>Shipping not required</Value>
+	</Resource>
+	<Resource Name="Vendor.PageTitle" Area="Vendor">
+		<Value>grandnode administration</Value>
+	</Resource>
+	<Resource Name="Vendor.Picture.RemovePicture" Area="Vendor">
+		<Value>Remove picture</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews" Area="Vendor">
+		<Value>Vendor reviews</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.ApproveSelected" Area="Vendor">
+		<Value>Approve selected</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.BackToList" Area="Vendor">
+		<Value>back to product review list</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.DisapproveSelected" Area="Vendor">
+		<Value>Disapprove selected</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.EditVendorReviewDetails" Area="Vendor">
+		<Value>Edit vendor review details</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.Fields.CreatedOn" Area="Vendor">
+		<Value>Created on</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.Fields.Customer" Area="Vendor">
+		<Value>Customer</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.Fields.IsApproved" Area="Vendor">
+		<Value>Is approved</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.Fields.Rating" Area="Vendor">
+		<Value>Rating</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.Fields.ReviewText" Area="Vendor">
+		<Value>Review text</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.Fields.Title" Area="Vendor">
+		<Value>Title</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.List.CreatedOnFrom" Area="Vendor">
+		<Value>Created from</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.List.CreatedOnTo" Area="Vendor">
+		<Value>Created to</Value>
+	</Resource>
+	<Resource Name="Vendor.VendorReviews.List.SearchText" Area="Vendor">
+		<Value>Review text</Value>
+	</Resource>
+	<Resource Name="Vendor.Portal" Area="Front">
+		<Value>Vendor portal</Value>
+	</Resource>
 	<Resource Name="Vendor.Description" Area="Front">
 		<Value>Description</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers" Area="Vendor">
+		<Value>Bestsellers</Value>
+	</Resource>
+	<Resource Name="vendor.reports.bestsellers.byamount" Area="Vendor">
+		<Value>Bestsellers by amount</Value>
+	</Resource>
+	<Resource Name="vendor.reports.bestsellers.byquantity" Area="Vendor">
+		<Value>Bestsellers by quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers.BillingCountry" Area="Vendor">
+		<Value>Billing country</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers.EndDate" Area="Vendor">
+		<Value>End date</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers.Fields.Name" Area="Vendor">
+		<Value>Product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers.Fields.TotalAmount" Area="Vendor">
+		<Value>Total amount</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers.Fields.TotalQuantity" Area="Vendor">
+		<Value>Total quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers.PaymentStatus" Area="Vendor">
+		<Value>Payment status</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers.StartDate" Area="Vendor">
+		<Value>Start date</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Bestsellers.RunReport" Area="Vendor">
+		<Value>Run report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Country" Area="Vendor">
+		<Value>Country report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Country.EndDate" Area="Vendor">
+		<Value>End date</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Country.Fields.CountryName" Area="Vendor">
+		<Value>Country name</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Country.Fields.SumOrders" Area="Vendor">
+		<Value>Sum orders</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Country.Fields.TotalOrders" Area="Vendor">
+		<Value>Total orders</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Country.PaymentStatus" Area="Vendor">
+		<Value>Payment status</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Country.RunReport" Area="Vendor">
+		<Value>Run report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Country.StartDate" Area="Vendor">
+		<Value>Start date</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Customer" Area="Vendor">
+		<Value>Customer report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Customer.BestBy.EndDate" Area="Vendor">
+		<Value>End date</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Customer.BestBy.Fields.Customer" Area="Vendor">
+		<Value>Customer name</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Customer.BestBy.Fields.OrderCount" Area="Vendor">
+		<Value>Order count</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Customer.BestBy.Fields.OrderTotal" Area="Vendor">
+		<Value>Order total</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Customer.BestBy.PaymentStatus" Area="Vendor">
+		<Value>Payment status</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Customer.RunReport" Area="Vendor">
+		<Value>Run report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.Customer.BestBy.StartDate" Area="Vendor">
+		<Value>Start date</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.LowStockReport" Area="Vendor">
+		<Value>Low stock report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.LowStockReport.Fields.Name" Area="Vendor">
+		<Value>Product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.LowStockReport.Fields.ManageInventoryMethod" Area="Vendor">
+		<Value>Manage inventory method</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.LowStockReport.Fields.Published" Area="Vendor">
+		<Value>Published</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.LowStockReport.Fields.StockQuantity" Area="Vendor">
+		<Value>Stock quantity</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.NeverSold" Area="Vendor">
+		<Value>Products never purchased report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.NeverSold" Area="Vendor">
+		<Value>Products never purchased report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.NeverSold.EndDate" Area="Vendor">
+		<Value>End date</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.NeverSold.Fields.Name" Area="Vendor">
+		<Value>Product name</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.NeverSold.RunReport" Area="Vendor">
+		<Value>Run report</Value>
+	</Resource>
+	<Resource Name="Vendor.Reports.NeverSold.StartDate" Area="Vendor">
+		<Value>Start date</Value>
 	</Resource>
 	<Resource Name="Vendor.Reviews" Area="Front">
 		<Value>Reviews</Value>
@@ -16010,6 +17463,12 @@
 	</Resource>
 	<Resource Name="Vendors.ViewAll" Area="Front">
 		<Value>View all</Value>
+	</Resource>
+	<Resource Name="View.Nomore" Area="Front">
+		<Value>No more products</Value>
+	</Resource>
+	<Resource Name="View.ScrollDown" Area="Front">
+		<Value>Scroll down to view more products</Value>
 	</Resource>
 	<Resource Name="voicenavigator.voice.annotation" Area="Front">
 		<Value>Say what do you want to do in the store, i.e Show me the cart</Value>

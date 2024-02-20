@@ -2,7 +2,7 @@ using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
 using Grand.Infrastructure.Extensions;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Localization;
 using MediatR;
 
@@ -111,8 +111,7 @@ namespace Grand.Business.Common.Services.Localization
         /// <param name="language">Language</param>
         public virtual async Task InsertLanguage(Language language)
         {
-            if (language == null)
-                throw new ArgumentNullException(nameof(language));
+            ArgumentNullException.ThrowIfNull(language);
 
             await _languageRepository.InsertAsync(language);
 
@@ -129,8 +128,7 @@ namespace Grand.Business.Common.Services.Localization
         /// <param name="language">Language</param>
         public virtual async Task UpdateLanguage(Language language)
         {
-            if (language == null)
-                throw new ArgumentNullException(nameof(language));
+            ArgumentNullException.ThrowIfNull(language);
 
             //update language
             await _languageRepository.UpdateAsync(language);
@@ -147,8 +145,7 @@ namespace Grand.Business.Common.Services.Localization
         /// <param name="language">Language</param>
         public virtual async Task DeleteLanguage(Language language)
         {
-            if (language == null)
-                throw new ArgumentNullException(nameof(language));
+            ArgumentNullException.ThrowIfNull(language);
 
             await _languageRepository.DeleteAsync(language);
 

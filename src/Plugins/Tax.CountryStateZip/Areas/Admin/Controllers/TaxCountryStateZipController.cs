@@ -4,7 +4,6 @@ using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Web.Common.Controllers;
 using Grand.Web.Common.DataSource;
-using Grand.Web.Common.Filters;
 using Grand.Web.Common.Security.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,12 +11,10 @@ using Tax.CountryStateZip.Domain;
 using Tax.CountryStateZip.Models;
 using Tax.CountryStateZip.Services;
 
-namespace Tax.CountryStateZip.Controllers
+namespace Tax.CountryStateZip.Areas.Admin.Controllers
 {
-    [AuthorizeAdmin]
-    [Area("Admin")]
     [PermissionAuthorize(PermissionSystemName.TaxSettings)]
-    public class TaxCountryStateZipController : BasePluginController
+    public class TaxCountryStateZipController : BaseAdminPluginController
     {
         private readonly ITaxCategoryService _taxCategoryService;
         private readonly ICountryService _countryService;

@@ -3,7 +3,7 @@ using Grand.Business.Core.Interfaces.System.Reports;
 using Grand.Business.Core.Utilities.System;
 using Grand.Domain;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Orders;
 using Grand.Domain.Payments;
 using Grand.Domain.Shipping;
@@ -53,13 +53,14 @@ namespace Grand.Business.System.Services.Reports
         /// Get "order by country" report
         /// </summary>
         /// <param name="storeId">Store identifier</param>
+        /// <param name="vendorId">Vendor identifier</param>
         /// <param name="os">Order status</param>
         /// <param name="ps">Payment status</param>
         /// <param name="ss">Shipping status</param>
         /// <param name="startTimeUtc">Start date</param>
         /// <param name="endTimeUtc">End date</param>
         /// <returns>Result</returns>
-        public virtual async Task<IList<OrderByCountryReportLine>> GetCountryReport(string storeId, int? os,
+        public virtual async Task<IList<OrderByCountryReportLine>> GetCountryReport(string storeId, string vendorId, int? os,
             PaymentStatus? ps, ShippingStatus? ss, DateTime? startTimeUtc, DateTime? endTimeUtc)
         {
             var query = from p in _orderRepository.Table
@@ -79,23 +80,62 @@ namespace Grand.Business.System.Services.Reports
             if (endTimeUtc.HasValue)
                 query = query.Where(o => endTimeUtc.Value >= o.CreatedOnUtc);
 
-            var report = (from oq in query
-                          group oq by oq.BillingAddress.CountryId into result
-                          select new
-                          {
-                              CountryId = result.Key,
-                              TotalOrders = result.Count(),
-                              SumOrders = result.Sum(o => o.OrderTotal / o.CurrencyRate)
-                          }
-                       )
-                       .OrderByDescending(x => x.SumOrders)
-                       .Select(r => new OrderByCountryReportLine {
-                           CountryId = r.CountryId,
-                           TotalOrders = r.TotalOrders,
-                           SumOrders = r.SumOrders
-                       });
+            if (!string.IsNullOrEmpty(vendorId))
+            {
+                query = query
+                    .Where(o => o.OrderItems
+                        .Any(orderItem => orderItem.VendorId == vendorId));
+            }
 
-            return await Task.FromResult(report.ToList());
+            if (string.IsNullOrEmpty(vendorId))
+            {
+                var report = (from oq in query
+                        group oq by oq.BillingAddress.CountryId
+                        into result
+                        select new {
+                            CountryId = result.Key,
+                            TotalOrders = result.Count(),
+                            SumOrders = result.Sum(o => o.OrderTotal / o.CurrencyRate)
+                        }
+                    )
+                    .OrderByDescending(x => x.SumOrders)
+                    .Select(r => new OrderByCountryReportLine {
+                        CountryId = r.CountryId,
+                        TotalOrders = r.TotalOrders,
+                        SumOrders = r.SumOrders
+                    });
+
+                return await Task.FromResult(report.ToList());
+            }
+
+            var vendorQuery = from p in query
+                from item in p.OrderItems
+                select new {
+                    item.VendorId, OrderCode = p.Code,
+                    p.BillingAddress.CountryId,
+                    item.Quantity,
+                    item.PriceInclTax,
+                    p.Rate };
+            
+            vendorQuery = vendorQuery.Where(x => x.VendorId == vendorId);
+            
+            var vendorReport = (from oq in vendorQuery
+                    group oq by oq.CountryId
+                    into result
+                    select new {
+                        CountryId = result.Key,
+                        TotalOrders = result.Count(),
+                        SumOrders = result.Sum(y => y.PriceInclTax / y.Rate)
+                    }
+                )
+                .OrderByDescending(x => x.SumOrders)
+                .Select(r => new OrderByCountryReportLine {
+                    CountryId = r.CountryId,
+                    TotalOrders = r.TotalOrders,
+                    SumOrders = r.SumOrders
+                });
+            return await Task.FromResult(vendorReport.ToList());
+            
         }
 
 
@@ -128,7 +168,7 @@ namespace Grand.Business.System.Services.Reports
             if (daydiff > 31)
             {
                 var query = builderquery.GroupBy(x =>
-                    new { Year = x.CreatedOnUtc.Year, Month = x.CreatedOnUtc.Month })
+                    new { x.CreatedOnUtc.Year, x.CreatedOnUtc.Month })
                     .Select(g => new OrderStats {
                         Year = g.Key.Year,
                         Month = g.Key.Month,
@@ -138,17 +178,17 @@ namespace Grand.Business.System.Services.Reports
                
                 foreach (var item in query)
                 {
-                    report.Add(new OrderByTimeReportLine() {
+                    report.Add(new OrderByTimeReportLine {
                         Time = item.Year.ToString().PadLeft(2, '0') + "-" + item.Month.ToString().PadLeft(2, '0'),
                         SumOrders = Math.Round(item.Amount, 2),
-                        TotalOrders = item.Count,
+                        TotalOrders = item.Count
                     });
                 }
             }
             else
             {
                 var query = builderquery.GroupBy(x =>
-                    new { Year = x.CreatedOnUtc.Year, Month = x.CreatedOnUtc.Month, Day = x.CreatedOnUtc.Day })
+                    new { x.CreatedOnUtc.Year, x.CreatedOnUtc.Month, x.CreatedOnUtc.Day })
                     .Select(g => new OrderStats {
                         Year = g.Key.Year,
                         Month = g.Key.Month,
@@ -159,10 +199,10 @@ namespace Grand.Business.System.Services.Reports
 
                 foreach (var item in query)
                 {
-                    report.Add(new OrderByTimeReportLine() {
+                    report.Add(new OrderByTimeReportLine {
                         Time = item.Year.ToString().PadLeft(2, '0') + "-" + item.Month.ToString().PadLeft(2, '0') + "-" + item.Day.ToString().PadLeft(2, '0'),
                         SumOrders = Math.Round(item.Amount, 2),
-                        TotalOrders = item.Count,
+                        TotalOrders = item.Count
                     });
                 }
             }
@@ -263,11 +303,11 @@ namespace Grand.Business.System.Services.Reports
                     }).ToList();
 
 
-            var item2 = query.Count() > 0 ? query.FirstOrDefault() : new OrderAverageReportLine {
+            var item2 = query.Count > 0 ? query.FirstOrDefault() : new OrderAverageReportLine {
                 CountOrders = 0,
                 SumShippingExclTax = 0,
                 SumTax = 0,
-                SumOrders = 0,
+                SumOrders = 0
             };
             return await Task.FromResult(item2);
         }
@@ -280,8 +320,9 @@ namespace Grand.Business.System.Services.Reports
         /// <returns>Result</returns>
         public virtual async Task<OrderAverageReportLineSummary> OrderAverageReport(string storeId, int os)
         {
-            var item = new OrderAverageReportLineSummary();
-            item.OrderStatus = os;
+            var item = new OrderAverageReportLineSummary {
+                OrderStatus = os
+            };
 
             DateTime nowDt = _dateTimeService.ConvertToUserTime(DateTime.Now);
             TimeZoneInfo timeZone = _dateTimeService.CurrentTimeZone;
@@ -396,14 +437,19 @@ namespace Grand.Business.System.Services.Reports
 
             var query = from p in builderquery
                         from item in p.OrderItems
-                        select new {VendorId = item.VendorId, ProductId = item.ProductId, Quantity = item.Quantity, PriceInclTax = item.PriceInclTax, Rate = p.Rate };
+                        select new {
+                            item.VendorId,
+                            item.ProductId,
+                            item.Quantity,
+                            item.PriceInclTax,
+                            p.Rate };
 
             if (!string.IsNullOrEmpty(vendorId))
             {
                 query = query.Where(x => x.VendorId == vendorId);
             }
 
-            var queryItem = query.GroupBy(x => new { ProductId = x.ProductId }).Select(x => new BestsellersReportLine() {
+            var queryItem = query.GroupBy(x => new { x.ProductId }).Select(x => new BestsellersReportLine {
                 ProductId = x.Key.ProductId,
                 TotalAmount = x.Sum(y => y.PriceInclTax / y.Rate),
                 TotalQuantity = x.Sum(y => y.Quantity)
@@ -436,10 +482,8 @@ namespace Grand.Business.System.Services.Reports
                         && (string.IsNullOrEmpty(storeId) || o.StoreId == storeId)
                         && (string.IsNullOrEmpty(salesEmployeeId) || o.SeId == salesEmployeeId)
                         group o by 1 into g
-                        select new ReportPeriodOrder() { Amount = g.Sum(x => x.OrderTotal / x.CurrencyRate), Count = g.Count() };
-            var report = query.ToList()?.FirstOrDefault();
-            if (report == null)
-                report = new ReportPeriodOrder();
+                        select new ReportPeriodOrder { Amount = g.Sum(x => x.OrderTotal / x.CurrencyRate), Count = g.Count() };
+            var report = query.ToList()?.FirstOrDefault() ?? new ReportPeriodOrder();
             report.Date = date;
             return await Task.FromResult(report);
         }
@@ -463,7 +507,7 @@ namespace Grand.Business.System.Services.Reports
                           select new
                           {
                               ProductId = g.Key,
-                              ProductsPurchased = g.Sum(x => x.Quantity),
+                              ProductsPurchased = g.Sum(x => x.Quantity)
                           };
             product = product.OrderByDescending(x => x.ProductsPurchased);
             if (recordsToReturn > 0)
@@ -498,7 +542,7 @@ namespace Grand.Business.System.Services.Reports
                     (string.IsNullOrEmpty(storeId) || order.StoreId == storeId) &&
                     createdFromUtc.Value <= order.CreatedOnUtc &&
                     createdToUtc.Value >= order.CreatedOnUtc &&
-                    (!order.Deleted)
+                    !order.Deleted
                 from orderItem in order.OrderItems
                 select new { orderItem.ProductId }).ToList().Distinct().Select(x => x.ProductId);
 
@@ -506,7 +550,7 @@ namespace Grand.Business.System.Services.Reports
                             orderby p.Name
                             where !query.Contains(p.Id) &&
                                   //include only simple products
-                                  (p.ProductTypeId == ProductType.SimpleProduct) &&
+                                  p.ProductTypeId == ProductType.SimpleProduct &&
                                   (vendorId == "" || p.VendorId == vendorId) &&
                                   (string.IsNullOrEmpty(storeId) || p.Stores.Contains(storeId) || p.LimitedToStores == false) &&
                                   (showHidden || p.Published)

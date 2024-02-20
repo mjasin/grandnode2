@@ -1,16 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Grand.Business.Common.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using Grand.Business.Core.Interfaces.Common.Localization;
+﻿using Grand.Business.Common.Events;
 using Grand.Business.Core.Interfaces.Common.Configuration;
+using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Domain.Localization;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace Grand.Business.Common.Events.Tests
+namespace Grand.Business.Common.Tests.Events
 {
     [TestClass()]
     public class LanguageDeletedEventHandlerTests
@@ -27,7 +22,7 @@ namespace Grand.Business.Common.Events.Tests
         {
             _languageServiceMock = new Mock<ILanguageService>();
             _settingServiceMock = new Mock<ISettingService>();
-            _languageSettings = new LanguageSettings() { DefaultAdminLanguageId = "1" };
+            _languageSettings = new LanguageSettings { DefaultAdminLanguageId = "1" };
             _handler = new LanguageDeletedEventHandler(_languageServiceMock.Object, _settingServiceMock.Object,
                 _languageSettings);
         }
@@ -39,7 +34,7 @@ namespace Grand.Business.Common.Events.Tests
             _languageServiceMock.Setup(x => x.GetAllLanguages(It.IsAny<bool>(), It.IsAny<string>())).Returns(Task.FromResult(
                 new List<Language> { new Language { Name = "English" }, new Language { Name = "Polish" } } as IList<Language>));
 
-            var notification = new Infrastructure.Events.EntityDeleted<Language>(new Language() { Id = "1" });
+            var notification = new Infrastructure.Events.EntityDeleted<Language>(new Language { Id = "1" });
             //Act
             await _handler.Handle(notification, CancellationToken.None);
 

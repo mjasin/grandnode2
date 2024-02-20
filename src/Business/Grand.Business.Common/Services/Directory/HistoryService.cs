@@ -1,6 +1,6 @@
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Domain;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.History;
 
 namespace Grand.Business.Common.Services.Directory
@@ -19,11 +19,9 @@ namespace Grand.Business.Common.Services.Directory
 
         public virtual async Task SaveObject<T>(T entity) where T : BaseEntity
         {
-            if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+            ArgumentNullException.ThrowIfNull(entity);
             var history = new HistoryObject
             {
-                CreatedOnUtc = DateTime.UtcNow,
                 Object = entity
             };
             await _historyRepository.InsertAsync(history);
@@ -31,8 +29,7 @@ namespace Grand.Business.Common.Services.Directory
 
         public virtual async Task<IList<T>> GetHistoryForEntity<T>(BaseEntity entity) where T : BaseEntity
         {
-            if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+            ArgumentNullException.ThrowIfNull(entity);
 
             var history = await Task.FromResult(_historyRepository.Table.Where(x => x.Object.Id == entity.Id).Select(x => (T)x.Object).ToList());
             return history;
@@ -40,8 +37,7 @@ namespace Grand.Business.Common.Services.Directory
 
         public virtual async Task<IList<HistoryObject>> GetHistoryObjectForEntity(BaseEntity entity)
         {
-            if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+            ArgumentNullException.ThrowIfNull(entity);
 
             var history = await Task.FromResult(_historyRepository.Table.Where(x => x.Object.Id == entity.Id).ToList());
             return history;

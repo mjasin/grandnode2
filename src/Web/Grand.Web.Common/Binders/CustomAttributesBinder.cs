@@ -1,5 +1,4 @@
 ﻿using Grand.Web.Common.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Text.RegularExpressions;
 
@@ -21,7 +20,7 @@ public class CustomAttributesBinder : IModelBinder
             foreach (var form in formCollection)
             {
                 if (form.Key.StartsWith("attributes"))
-                    model.Add(new CustomAttributeModel() { Key = GetKey(form.Key), Value = form.Value });
+                    model.Add(new CustomAttributeModel { Key = GetKey(form.Key), Value = form.Value });
             }
 
             bindingContext.Result = ModelBindingResult.Success(model);

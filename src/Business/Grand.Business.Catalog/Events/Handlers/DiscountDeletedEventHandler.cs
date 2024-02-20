@@ -1,5 +1,5 @@
 ﻿using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Discounts;
 using Grand.Domain.Vendors;
 using Grand.Infrastructure.Caching;
@@ -87,8 +87,6 @@ namespace Grand.Business.Catalog.Events.Handlers
                 case DiscountType.AssignedToOrderSubTotal:
                     break;
                 case DiscountType.AssignedToAllProducts:
-                    break;
-                default:
                     break;
             }
 

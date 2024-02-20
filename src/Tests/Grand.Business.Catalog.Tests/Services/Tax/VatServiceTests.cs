@@ -1,7 +1,8 @@
-﻿using Grand.Domain.Tax;
+﻿using Grand.Business.Catalog.Services.Tax;
+using Grand.Domain.Tax;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Business.Catalog.Services.Tax.Tests
+namespace Grand.Business.Catalog.Tests.Services.Tax
 {
     [TestClass()]
     public class VatServiceTests
@@ -12,7 +13,7 @@ namespace Grand.Business.Catalog.Services.Tax.Tests
         [TestInitialize()]
         public void Init()
         {
-            _taxSettings = new TaxSettings() { EuVatAssumeValid = true, EuVatUseWebService = false };
+            _taxSettings = new TaxSettings { EuVatAssumeValid = true, EuVatUseWebService = false };
             _vatService = new VatService(_taxSettings);
         }
 

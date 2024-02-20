@@ -1,7 +1,9 @@
-﻿using Grand.Business.Core.Interfaces.Common.Security;
+﻿using Grand.Business.Core.Interfaces.Common.Directory;
+using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Utilities.Common.Security;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Security;
+using Grand.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
@@ -22,7 +24,7 @@ namespace Grand.Web.Common.Filters
         public AuthorizeAdminAttribute(bool ignore = false) : base(typeof(AuthorizeAdminFilter))
         {
             _ignoreFilter = ignore;
-            Arguments = new object[] { ignore };
+            Arguments = [ignore];
         }
 
         public bool IgnoreFilter => _ignoreFilter;
@@ -38,17 +40,22 @@ namespace Grand.Web.Common.Filters
 
             private readonly bool _ignoreFilter;
             private readonly IPermissionService _permissionService;
+            private readonly IWorkContext _workContext;
+            private readonly IGroupService _groupService;
+
             private readonly SecuritySettings _securitySettings;
 
             #endregion
 
             #region Ctor
 
-            public AuthorizeAdminFilter(bool ignoreFilter, IPermissionService permissionService, SecuritySettings securitySettings)
+            public AuthorizeAdminFilter(bool ignoreFilter, IPermissionService permissionService, SecuritySettings securitySettings, IWorkContext workContext, IGroupService groupService)
             {
                 _ignoreFilter = ignoreFilter;
                 _permissionService = permissionService;
                 _securitySettings = securitySettings;
+                _workContext = workContext;
+                _groupService = groupService;
             }
 
             #endregion
@@ -61,9 +68,7 @@ namespace Grand.Web.Common.Filters
             /// <param name="filterContext">Authorization filter context</param>
             public async Task OnAuthorizationAsync(AuthorizationFilterContext filterContext)
             {
-
-                if (filterContext == null)
-                    throw new ArgumentNullException(nameof(filterContext));
+                ArgumentNullException.ThrowIfNull(filterContext);
 
                 //check whether this filter has been overridden for the action
                 var actionFilter = filterContext.ActionDescriptor.FilterDescriptors
@@ -81,7 +86,11 @@ namespace Grand.Web.Common.Filters
                 if (filterContext.Filters.Any(filter => filter is AuthorizeAdminFilter))
                 {
                     //authorize permission of access to the admin area
-                    if (!await _permissionService.Authorize(StandardPermission.AccessAdminPanel))
+                    if (!await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel))
+                        filterContext.Result = new RedirectToRouteResult("AdminLogin", new RouteValueDictionary());
+
+                    //whether current customer is vendor
+                    if (await _groupService.IsVendor(_workContext.CurrentCustomer) || _workContext.CurrentVendor is not null)
                         filterContext.Result = new RedirectToRouteResult("AdminLogin", new RouteValueDictionary());
 
                     //get allowed IP addresses
@@ -95,7 +104,7 @@ namespace Grand.Web.Common.Filters
                     var currentIp = filterContext.HttpContext.Connection.RemoteIpAddress?.ToString();
                     if (!ipAddresses.Any(ip => ip.Equals(currentIp, StringComparison.OrdinalIgnoreCase)))
                         filterContext.Result = new RedirectToRouteResult("AdminLogin", new RouteValueDictionary());
-
+                    
                 }
             }
 

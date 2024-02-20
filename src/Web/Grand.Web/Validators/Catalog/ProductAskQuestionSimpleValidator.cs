@@ -1,9 +1,7 @@
 ﻿using FluentValidation;
 using Grand.Business.Core.Interfaces.Catalog.Products;
-using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Domain.Catalog;
-using Grand.Infrastructure;
 using Grand.Infrastructure.Models;
 using Grand.Infrastructure.Validators;
 using Grand.Web.Common.Security.Captcha;
@@ -31,7 +29,7 @@ namespace Grand.Web.Validators.Catalog
             
             if (captchaSettings.Enabled && captchaSettings.ShowOnAskQuestionPage)
             {
-                RuleFor(x => x.Captcha).NotNull().WithMessage(translationService.GetResource("Account.Captcha.Required"));;
+                RuleFor(x => x.Captcha).NotNull().WithMessage(translationService.GetResource("Account.Captcha.Required"));
                 RuleFor(x => x.Captcha).SetValidator(new CaptchaValidator(validatorsCaptcha, contextAccessor, googleReCaptchaValidator));
             }
             RuleFor(x => x).CustomAsync(async (x, context, _) =>

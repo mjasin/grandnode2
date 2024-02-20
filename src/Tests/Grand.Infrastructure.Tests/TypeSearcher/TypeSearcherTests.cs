@@ -1,18 +1,12 @@
 ﻿using Grand.Infrastructure.Caching;
-using Grand.Infrastructure.TypeSearch;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Infrastructure.TypeSearchers.Tests
+namespace Grand.Infrastructure.Tests.TypeSearcher
 {
     [TestClass()]
     public class TypeSearcherTests
     {
-        private TypeSearcher _typeSearcher;
-
-        public TypeSearcherTests()
-        {
-            _typeSearcher = new TypeSearcher();
-        }
+        private TypeSearch.TypeSearcher _typeSearcher = new();
 
         [TestMethod()]
         public void GetAssembliesTest()

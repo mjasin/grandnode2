@@ -1,12 +1,12 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Runtime.CompilerServices;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Buffers;
+using System.Runtime.CompilerServices;
+using System.Text.Encodings.Web;
 
-namespace Grand.Web.Common.TagHelpers.Admin
+namespace Grand.Web.Common.TagHelpers.Admin.Extend
 {
     internal class ViewBuffer : IHtmlContentBuilder
     {
@@ -29,15 +29,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
         /// <param name="pageSize">The size of buffer pages.</param>
         public ViewBuffer(IViewBufferScope bufferScope, string name, int pageSize)
         {
-            if (bufferScope == null)
-            {
-                throw new ArgumentNullException(nameof(bufferScope));
-            }
-
-            if (pageSize <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(pageSize));
-            }
+            ArgumentNullException.ThrowIfNull(bufferScope);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(pageSize);
 
             _bufferScope = bufferScope;
             _name = name;
@@ -157,9 +150,10 @@ namespace Grand.Web.Common.TagHelpers.Admin
             }
             else if (_currentPage != null)
             {
-                _multiplePages = new List<ViewBufferPage>(2);
-                _multiplePages.Add(_currentPage);
-                _multiplePages.Add(page);
+                _multiplePages = [
+                    _currentPage,
+                    page
+                ];
             }
 
             _currentPage = page;
@@ -176,15 +170,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
         /// <inheritdoc />
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
         {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-
-            if (encoder == null)
-            {
-                throw new ArgumentNullException(nameof(encoder));
-            }
+            ArgumentNullException.ThrowIfNull(writer);
+            ArgumentNullException.ThrowIfNull(encoder);
 
             for (var i = 0; i < Count; i++)
             {
@@ -216,15 +203,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
         /// <returns>A <see cref="Task"/> which will complete once content has been written.</returns>
         public async Task WriteToAsync(TextWriter writer, HtmlEncoder encoder)
         {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-
-            if (encoder == null)
-            {
-                throw new ArgumentNullException(nameof(encoder));
-            }
+            ArgumentNullException.ThrowIfNull(writer);
+            ArgumentNullException.ThrowIfNull(encoder);
 
             for (var i = 0; i < Count; i++)
             {
@@ -255,14 +235,14 @@ namespace Grand.Web.Common.TagHelpers.Admin
             }
         }
 
-        private string DebuggerToString() => _name;
+        private string DebuggerToString()
+        {
+            return _name;
+        }
 
         public void CopyTo(IHtmlContentBuilder destination)
         {
-            if (destination == null)
-            {
-                throw new ArgumentNullException(nameof(destination));
-            }
+            ArgumentNullException.ThrowIfNull(destination);
 
             for (var i = 0; i < Count; i++)
             {
@@ -291,10 +271,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
 
         public void MoveTo(IHtmlContentBuilder destination)
         {
-            if (destination == null)
-            {
-                throw new ArgumentNullException(nameof(destination));
-            }
+            ArgumentNullException.ThrowIfNull(destination);
 
             // Perf: We have an efficient implementation when the destination is another view buffer,
             // we can just insert our pages as-is.

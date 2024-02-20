@@ -11,13 +11,12 @@ using Grand.Domain.Common;
 using Grand.Domain.Configuration;
 using Grand.Domain.Courses;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Directory;
 using Grand.Domain.Discounts;
 using Grand.Domain.Documents;
 using Grand.Domain.Knowledgebase;
 using Grand.Domain.Localization;
-using Grand.Domain.Logging;
 using Grand.Domain.Messages;
 using Grand.Domain.News;
 using Grand.Domain.Orders;
@@ -60,7 +59,6 @@ namespace Grand.Business.System.Services.Installation
         private readonly IRepository<TaxCategory> _taxCategoryRepository;
         private readonly IRepository<Language> _languageRepository;
         private readonly IRepository<TranslationResource> _lsrRepository;
-        private readonly IRepository<Log> _logRepository;
         private readonly IRepository<Currency> _currencyRepository;
         private readonly IRepository<Customer> _customerRepository;
         private readonly IRepository<CustomerGroup> _customerGroupRepository;
@@ -99,8 +97,6 @@ namespace Grand.Business.System.Services.Installation
         private readonly IRepository<NewsLetterSubscription> _newslettersubscriptionRepository;
         private readonly IRepository<ShippingMethod> _shippingMethodRepository;
         private readonly IRepository<DeliveryDate> _deliveryDateRepository;
-        private readonly IRepository<ActivityLog> _activityLogRepository;
-        private readonly IRepository<ActivityLogType> _activityLogTypeRepository;
         private readonly IRepository<ProductTag> _productTagRepository;
         private readonly IRepository<ProductReview> _productReviewRepository;
         private readonly IRepository<ProductLayout> _productLayoutRepository;
@@ -169,7 +165,6 @@ namespace Grand.Business.System.Services.Installation
             IRepository<TaxCategory> taxCategoryRepository,
             IRepository<Language> languageRepository,
             IRepository<TranslationResource> lsrRepository,
-            IRepository<Log> logRepository,
             IRepository<Currency> currencyRepository,
             IRepository<Customer> customerRepository,
             IRepository<CustomerGroup> customerGroupRepository,
@@ -208,8 +203,6 @@ namespace Grand.Business.System.Services.Installation
             IRepository<NewsLetterSubscription> newslettersubscriptionRepository,
             IRepository<ShippingMethod> shippingMethodRepository,
             IRepository<DeliveryDate> deliveryDateRepository,
-            IRepository<ActivityLog> activityLogRepository,
-            IRepository<ActivityLogType> activityLogTypeRepository,
             IRepository<ProductTag> productTagRepository,
             IRepository<ProductReview> productReviewRepository,
             IRepository<ProductLayout> productLayoutRepository,
@@ -266,7 +259,6 @@ namespace Grand.Business.System.Services.Installation
             _taxCategoryRepository = taxCategoryRepository;
             _languageRepository = languageRepository;
             _lsrRepository = lsrRepository;
-            _logRepository = logRepository;
             _currencyRepository = currencyRepository;
             _customerRepository = customerRepository;
             _customerGroupRepository = customerGroupRepository;
@@ -302,7 +294,6 @@ namespace Grand.Business.System.Services.Installation
             _newslettersubscriptionRepository = newslettersubscriptionRepository;
             _shippingMethodRepository = shippingMethodRepository;
             _deliveryDateRepository = deliveryDateRepository;
-            _activityLogTypeRepository = activityLogTypeRepository;
             _productTagRepository = productTagRepository;
             _productLayoutRepository = productLayoutRepository;
             _recentlyViewedProductRepository = recentlyViewedProductRepository;
@@ -341,7 +332,6 @@ namespace Grand.Business.System.Services.Installation
             _documentTypeRepository = documentTypeRepository;
             _documentRepository = documentRepository;
             _salesRepository = salesRepository;
-            _activityLogRepository = activityLogRepository;
             _vendorReviewRepository = vendorReviewRepository;
             _contactAttributeRepository = contactAttributeRepository;
             _newsletterCategoryRepository = newsletterCategoryRepository;
@@ -370,9 +360,10 @@ namespace Grand.Business.System.Services.Installation
             await _versionRepository.InsertAsync(version);
         }
 
-        protected virtual async Task InstallMenuAdminSiteMap()
+        protected virtual Task InstallMenuAdminSiteMap()
         {
-            await _adminRepository.InsertManyAsync(StandardAdminSiteMap.SiteMap);
+            StandardAdminSiteMap.SiteMap.ForEach(x=>_adminRepository.Insert(x));
+            return Task.CompletedTask;
         }
 
         protected virtual async Task HashDefaultCustomerPassword(string defaultUserEmail, string defaultUserPassword)
@@ -588,9 +579,6 @@ namespace Grand.Business.System.Services.Installation
             await dbContext.CreateIndex(_newslettersubscriptionRepository, OrderBuilder<NewsLetterSubscription>.Create().Ascending(x => x.CustomerId), "CustomerId");
             await dbContext.CreateIndex(_newslettersubscriptionRepository, OrderBuilder<NewsLetterSubscription>.Create().Ascending(x => x.Email), "Email");
 
-            //Log
-            await dbContext.CreateIndex(_logRepository, OrderBuilder<Log>.Create().Ascending(x => x.CreatedOnUtc), "CreatedOnUtc");
-
             //Campaign 
             await dbContext.CreateIndex(_campaignRepository, OrderBuilder<Campaign>.Create().Ascending(x => x.CreatedOnUtc), "CreatedOnUtc");
             await dbContext.CreateIndex(_campaignHistoryRepository, OrderBuilder<CampaignHistory>.Create().Ascending(x => x.CampaignId).Descending(x => x.CreatedDateUtc), "CampaignId");
@@ -659,10 +647,6 @@ namespace Grand.Business.System.Services.Installation
 
             //page
             await dbContext.CreateIndex(_pageRepository, OrderBuilder<Page>.Create().Ascending(x => x.DisplayOrder).Ascending(x => x.SystemName), "DisplayOrder_SystemName");
-
-            //customeractivity 
-            await dbContext.CreateIndex(_activityLogTypeRepository, OrderBuilder<ActivityLogType>.Create().Ascending(x => x.Name), "Name");
-            await dbContext.CreateIndex(_activityLogRepository, OrderBuilder<ActivityLog>.Create().Ascending(x => x.CreatedOnUtc), "CreatedOnUtc");
 
             //warehouse
             await dbContext.CreateIndex(_warehouseRepository, OrderBuilder<Warehouse>.Create().Ascending(x => x.DisplayOrder), "DisplayOrder");
@@ -768,7 +752,6 @@ namespace Grand.Business.System.Services.Installation
             await InstallPageLayouts();
             await InstallPages();
             await InstallLocaleResources();
-            await InstallActivityLogTypes();
             await HashDefaultCustomerPassword(defaultUserEmail, defaultUserPassword);
             await InstallProductLayouts();
             await InstallCategoryLayouts();

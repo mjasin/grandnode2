@@ -2,7 +2,6 @@
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Business.Core.Interfaces.Customers;
 using Grand.Web.Common.DataSource;
-using Grand.Web.Common.Extensions;
 using Grand.Web.Common.Security.Authorization;
 using Grand.SharedKernel.Extensions;
 using Grand.Web.Admin.Extensions.Mapping;
@@ -28,7 +27,10 @@ namespace Grand.Web.Admin.Controllers
             return (_encryptionService.EncryptText(password, pk), pk);
         }
 
-        public IActionResult Index() => View();
+        public IActionResult Index()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> List(string email, DataSourceRequest command)

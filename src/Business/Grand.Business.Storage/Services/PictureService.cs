@@ -1,16 +1,15 @@
 ﻿using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Domain;
 using Grand.Domain.Common;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Media;
-using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
 using Grand.Infrastructure.Extensions;
 using Grand.SharedKernel.Extensions;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using System.Linq.Expressions;
 
@@ -25,9 +24,8 @@ namespace Grand.Business.Storage.Services
         #region Fields
 
         private readonly IRepository<Picture> _pictureRepository;
-        private readonly ILogger _logger;
+        private readonly ILogger<PictureService> _logger;
         private readonly IMediator _mediator;
-        private readonly IWorkContext _workContext;
         private readonly ICacheBase _cacheBase;
         private readonly IMediaFileStore _mediaFileStore;
         private readonly MediaSettings _mediaSettings;
@@ -43,15 +41,13 @@ namespace Grand.Business.Storage.Services
         /// <param name="pictureRepository">Picture repository</param>
         /// <param name="logger">Logger</param>
         /// <param name="mediator">Mediator</param>
-        /// <param name="workContext">Current context</param>
         /// <param name="cacheBase">Cache manager</param>
         /// <param name="mediaFileStore">Media file storage</param>
         /// <param name="mediaSettings">Media settings</param>
         /// <param name="storageSettings">Storage settings</param>
         public PictureService(IRepository<Picture> pictureRepository,
-            ILogger logger,
+            ILogger<PictureService> logger,
             IMediator mediator,
-            IWorkContext workContext,
             ICacheBase cacheBase,
             IMediaFileStore mediaFileStore,
             MediaSettings mediaSettings,
@@ -60,7 +56,6 @@ namespace Grand.Business.Storage.Services
             _pictureRepository = pictureRepository;
             _logger = logger;
             _mediator = mediator;
-            _workContext = workContext;
             _cacheBase = cacheBase;
             _mediaFileStore = mediaFileStore;
             _mediaSettings = mediaSettings;
@@ -93,8 +88,6 @@ namespace Grand.Business.Storage.Services
                     break;
                 case "x-icon":
                     lastPart = "ico";
-                    break;
-                default:
                     break;
             }
             return lastPart;
@@ -137,7 +130,7 @@ namespace Grand.Business.Storage.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.InsertLog(Domain.Logging.LogLevel.Error, ex.Message);
+                    _logger.LogError(ex, ex.Message);
                 }
             }
             return Task.CompletedTask;
@@ -163,12 +156,7 @@ namespace Grand.Business.Storage.Services
         /// <returns>Local picture thumb path</returns>
         protected virtual string GetThumbUrl(string thumbFileName, string storeLocation = null)
         {
-            storeLocation = !string.IsNullOrEmpty(storeLocation)
-                                    ? storeLocation
-                                    : string.IsNullOrEmpty(_mediaSettings.StoreLocation) ?
-                                    _workContext.CurrentStore.SslEnabled ? _workContext.CurrentStore.SecureUrl : _workContext.CurrentStore.Url :
-                                    _mediaSettings.StoreLocation;
-
+            storeLocation = !string.IsNullOrEmpty(storeLocation) ? storeLocation : "";
             return _mediaFileStore.Combine(storeLocation, CommonPath.Param, CommonPath.ImageThumbPath, thumbFileName);
         }
 
@@ -191,8 +179,7 @@ namespace Grand.Business.Storage.Services
         /// <returns>Picture binary</returns>
         public virtual async Task<byte[]> LoadPictureBinary(Picture picture, bool fromDb)
         {
-            if (picture == null)
-                throw new ArgumentNullException(nameof(picture));
+            ArgumentNullException.ThrowIfNull(picture);
 
             var result = fromDb
                 ? (await _pictureRepository.GetByIdAsync(picture.Id)).PictureBinary
@@ -224,12 +211,12 @@ namespace Grand.Business.Storage.Services
                     File.WriteAllBytes(file, binary ?? Array.Empty<byte>());
                 }
                 else
-                    _logger.InsertLog(Domain.Logging.LogLevel.Error, "Directory thumb not exist.");
+                    _logger.LogError("Directory thumb not exist");
 
             }
             catch (Exception ex)
             {
-                _logger.InsertLog(Domain.Logging.LogLevel.Error, ex.Message);
+                _logger.LogError(ex, ex.Message);
             }
             return Task.CompletedTask;
         }
@@ -270,15 +257,12 @@ namespace Grand.Business.Storage.Services
             var filePath = await GetPicturePhysicalPath(_mediaSettings.DefaultImageName);
             if (string.IsNullOrEmpty(filePath))
             {
-                return _mediaFileStore.Combine(_mediaSettings.StoreLocation, CommonPath.ImagePath, "no-image.png");
+                return _mediaFileStore.Combine(CommonPath.ImagePath, "no-image.png");
             }
             if (targetSize == 0)
             {
                 return !string.IsNullOrEmpty(storeLocation)
-                        ? storeLocation
-                        : string.IsNullOrEmpty(_mediaSettings.StoreLocation) ?
-                        _workContext.CurrentStore.SslEnabled ? _workContext.CurrentStore.SecureUrl : _workContext.CurrentStore.Url :
-                        _mediaFileStore.Combine(_mediaSettings.StoreLocation, CommonPath.ImagePath, _mediaSettings.DefaultImageName);
+                        ? storeLocation : _mediaFileStore.Combine(CommonPath.ImagePath, _mediaSettings.DefaultImageName);
             }
 
             var fileExtension = Path.GetExtension(filePath);
@@ -317,7 +301,7 @@ namespace Grand.Business.Storage.Services
             bool showDefaultPicture = true,
             string storeLocation = null)
         {
-            var pictureKey = string.Format(CacheKey.PICTURE_BY_KEY, pictureId, _workContext.CurrentStore?.Id, targetSize, showDefaultPicture, storeLocation);
+            var pictureKey = string.Format(CacheKey.PICTURE_BY_KEY, pictureId, targetSize, showDefaultPicture, storeLocation);
             return await _cacheBase.GetAsync(pictureKey, async () =>
             {
                 var picture = await GetPictureById(pictureId);
@@ -461,8 +445,7 @@ namespace Grand.Business.Storage.Services
         /// <param name="picture">Picture</param>
         public virtual async Task DeletePicture(Picture picture)
         {
-            if (picture == null)
-                throw new ArgumentNullException(nameof(picture));
+            ArgumentNullException.ThrowIfNull(picture);
 
             //delete thumbs
             await DeletePictureThumbs(picture);
@@ -484,8 +467,7 @@ namespace Grand.Business.Storage.Services
         /// <param name="picture">Picture</param>
         public virtual async Task DeletePictureOnFileSystem(Picture picture)
         {
-            if (picture == null)
-                throw new ArgumentNullException(nameof(picture));
+            ArgumentNullException.ThrowIfNull(picture);
 
             var lastPart = GetFileExtensionFromMimeType(picture.MimeType);
             var fileName = $"{picture.Id}_0.{lastPart}";
@@ -514,7 +496,7 @@ namespace Grand.Business.Storage.Services
                 }
                 catch (Exception ex)
                 {
-                    _ = _logger.Error(ex.Message, ex);
+                    _logger.LogError(ex, ex.Message);
                 }
             }
             await Task.CompletedTask;
@@ -567,7 +549,7 @@ namespace Grand.Business.Storage.Services
                 TitleAttribute = titleAttribute,
                 Reference = reference,
                 ObjectId = objectId,
-                IsNew = isNew,
+                IsNew = isNew
             };
             await _pictureRepository.InsertAsync(picture);
 
@@ -661,8 +643,7 @@ namespace Grand.Business.Storage.Services
         /// <returns>Picture</returns>
         public virtual async Task<Picture> UpdatePicture(Picture picture)
         {
-            if (picture == null)
-                throw new ArgumentNullException(nameof(picture));
+            ArgumentNullException.ThrowIfNull(picture);
 
             await _pictureRepository.UpdateAsync(picture);
 
@@ -684,8 +665,7 @@ namespace Grand.Business.Storage.Services
         /// <returns>Picture</returns>
         public virtual async Task UpdatePictureField<T>(Picture picture, Expression<Func<Picture, T>> expression, T value)
         {
-            if (picture == null)
-                throw new ArgumentNullException(nameof(picture));
+            ArgumentNullException.ThrowIfNull(picture);
 
             await _pictureRepository.UpdateField(picture.Id, expression, value);
 
@@ -714,7 +694,7 @@ namespace Grand.Business.Storage.Services
                 File.WriteAllBytes(filepath, pictureBinary);
             }
             else
-                _ = _logger.Error("Directory path not exist.");
+                _logger.LogError("Directory path not exist");
 
             return Task.CompletedTask;
         }
@@ -845,8 +825,7 @@ namespace Grand.Business.Storage.Services
 
         private byte[] ApplyResize(SKBitmap image, SKEncodedImageFormat format, int targetSize)
         {
-            if (image == null)
-                throw new ArgumentNullException(nameof(image));
+            ArgumentNullException.ThrowIfNull(image);
 
             if (targetSize <= 0)
             {
@@ -881,7 +860,7 @@ namespace Grand.Business.Storage.Services
             }
             catch (Exception ex)
             {
-                _logger.Error($"ApplyResize - format {format}", ex);
+                _logger.LogError(ex, "ApplyResize - format {Format}", format);
                 return null;
             }
 

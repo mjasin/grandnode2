@@ -2,7 +2,7 @@ using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 
 namespace Grand.Business.Catalog.Services.Products
 {
@@ -105,11 +105,10 @@ namespace Grand.Business.Catalog.Services.Products
             var recentlyViewedProduct = recentlyViewedProducts.FirstOrDefault(x => x.ProductId == productId);
             if (recentlyViewedProduct == null)
             {
-                await _recentlyViewedProducts.InsertAsync(new RecentlyViewedProduct() { CustomerId = customerId, ProductId = productId, CreatedOnUtc = DateTime.UtcNow });
+                await _recentlyViewedProducts.InsertAsync(new RecentlyViewedProduct { CustomerId = customerId, ProductId = productId });
             }
             else
             {
-                recentlyViewedProduct.CreatedOnUtc = DateTime.UtcNow;
                 await _recentlyViewedProducts.UpdateAsync(recentlyViewedProduct);
             }
             var maxProducts = _catalogSettings.RecentlyViewedProductsNumber;

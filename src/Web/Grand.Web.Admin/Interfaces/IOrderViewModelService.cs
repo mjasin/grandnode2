@@ -1,7 +1,6 @@
 ﻿using Grand.Domain.Common;
 using Grand.Domain.Orders;
 using Grand.Web.Admin.Models.Orders;
-using Microsoft.AspNetCore.Http;
 
 namespace Grand.Web.Admin.Interfaces
 {
@@ -13,7 +12,6 @@ namespace Grand.Web.Admin.Interfaces
         Task<OrderModel.AddOrderProductModel> PrepareAddOrderProductModel(Order order);
         Task<OrderModel.AddOrderProductModel.ProductDetailsModel> PrepareAddProductToOrderModel(Order order, string productId);
         Task<OrderAddressModel> PrepareOrderAddressModel(Order order, Address address);
-        Task LogEditOrder(string orderId);
         Task<IList<OrderModel.OrderNote>> PrepareOrderNotes(Order order);
         Task InsertOrderNote(Order order, string downloadId, bool displayToCustomer, string message);
         Task DeleteOrderNote(Order order, string id);

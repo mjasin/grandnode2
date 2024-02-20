@@ -1,5 +1,4 @@
-﻿using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Discounts;
+﻿using Grand.Domain.Discounts;
 
 namespace Grand.Business.System.Services.Installation
 {
@@ -32,20 +31,21 @@ namespace Grand.Business.System.Services.Installation
                                             RequiresCouponCode = true,
                                             IsEnabled = true,
                                             CurrencyCode = "USD"
-                                        },
+                                        }
                                 };
-            await _discountRepository.InsertAsync(discounts);
+            discounts.ForEach(x=>_discountRepository.Insert(x));
+
             var coupon1 = new DiscountCoupon
             {
                 CouponCode = "123",
-                DiscountId = _discountRepository.Table.Where(x => x.Name == "Sample discount with coupon code").FirstOrDefault().Id
+                DiscountId = _discountRepository.Table.Where(x => x.Name == "Sample discount with coupon code").FirstOrDefault()!.Id
             };
             await _discountCouponRepository.InsertAsync(coupon1);
 
             var coupon2 = new DiscountCoupon
             {
                 CouponCode = "456",
-                DiscountId = _discountRepository.Table.Where(x => x.Name == "'20% order total' discount").FirstOrDefault().Id
+                DiscountId = _discountRepository.Table.Where(x => x.Name == "'20% order total' discount").FirstOrDefault()!.Id
             };
             await _discountCouponRepository.InsertAsync(coupon2);
         }

@@ -1,4 +1,5 @@
-﻿using Grand.Business.Core.Interfaces.Checkout.Orders;
+﻿using Grand.Business.Checkout.Commands.Handlers.Shipping;
+using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Shipping;
 using Grand.Business.Core.Interfaces.Messages;
 using Grand.Domain.Orders;
@@ -7,7 +8,7 @@ using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Shipping.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Shipping
 {
     [TestClass()]
     public class DeliveryCommandHandlerTests
@@ -34,7 +35,7 @@ namespace Grand.Business.Checkout.Commands.Handlers.Shipping.Tests
             //Arrange
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<string>())).Returns(Task.FromResult(new Order()));
             _shipmentServiceMock.Setup(x => x.GetShipmentsByOrder(It.IsAny<string>())).Returns(Task.FromResult((IList<Shipment>)new List<Shipment>()));
-            var deliveryCommand = new Core.Commands.Checkout.Shipping.DeliveryCommand() { NotifyCustomer = true, Shipment = new Domain.Shipping.Shipment() { ShippedDateUtc = DateTime.Now } };
+            var deliveryCommand = new Core.Commands.Checkout.Shipping.DeliveryCommand { NotifyCustomer = true, Shipment = new Domain.Shipping.Shipment { ShippedDateUtc = DateTime.Now } };
             //Act
             var result = await _deliveryCommandHandler.Handle(deliveryCommand, CancellationToken.None);
             //Assert

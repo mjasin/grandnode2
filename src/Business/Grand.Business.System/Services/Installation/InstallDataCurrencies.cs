@@ -1,11 +1,10 @@
-﻿using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Directory;
+﻿using Grand.Domain.Directory;
 
 namespace Grand.Business.System.Services.Installation
 {
     public partial class InstallationService
     {
-        protected virtual async Task InstallCurrencies()
+        protected virtual Task InstallCurrencies()
         {
             var currencies = new List<Currency>
             {
@@ -20,9 +19,7 @@ namespace Grand.Business.System.Services.Installation
                     Published = true,
                     DisplayOrder = 1,
                     RoundingTypeId = RoundingType.Rounding001,
-                    MidpointRoundId = MidpointRounding.ToEven,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    UpdatedOnUtc = DateTime.UtcNow,
+                    MidpointRoundId = MidpointRounding.ToEven
                 },
                 new Currency
                 {
@@ -30,14 +27,12 @@ namespace Grand.Business.System.Services.Installation
                     CurrencyCode = "EUR",
                     Rate = 0.95,
                     DisplayLocale = "",
-                    CustomFormatting = string.Format("{0}0.00", "\u20ac"),
+                    CustomFormatting = $"{"\u20ac"}0.00",
                     NumberDecimal = 2,
                     Published = true,
                     DisplayOrder = 2,
                     RoundingTypeId = RoundingType.Rounding001,
-                    MidpointRoundId = MidpointRounding.AwayFromZero,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    UpdatedOnUtc = DateTime.UtcNow,
+                    MidpointRoundId = MidpointRounding.AwayFromZero
                 },
                 new Currency
                 {
@@ -50,9 +45,7 @@ namespace Grand.Business.System.Services.Installation
                     Published = false,
                     DisplayOrder = 3,
                     RoundingTypeId = RoundingType.Rounding001,
-                    MidpointRoundId = MidpointRounding.AwayFromZero,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    UpdatedOnUtc = DateTime.UtcNow,
+                    MidpointRoundId = MidpointRounding.AwayFromZero
                 },
                 new Currency
                 {
@@ -65,9 +58,7 @@ namespace Grand.Business.System.Services.Installation
                     Published = false,
                     DisplayOrder = 4,
                     RoundingTypeId = RoundingType.Rounding001,
-                    MidpointRoundId = MidpointRounding.ToEven,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    UpdatedOnUtc = DateTime.UtcNow,
+                    MidpointRoundId = MidpointRounding.ToEven
                 },
                 new Currency
                 {
@@ -80,9 +71,7 @@ namespace Grand.Business.System.Services.Installation
                     Published = false,
                     DisplayOrder = 5,
                     RoundingTypeId = RoundingType.Rounding001,
-                    MidpointRoundId = MidpointRounding.ToEven,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    UpdatedOnUtc = DateTime.UtcNow,
+                    MidpointRoundId = MidpointRounding.ToEven
                 },
                 new Currency
                 {
@@ -95,12 +84,11 @@ namespace Grand.Business.System.Services.Installation
                     Published = false,
                     DisplayOrder = 6,
                     RoundingTypeId = RoundingType.Rounding001,
-                    MidpointRoundId = MidpointRounding.AwayFromZero,
-                    CreatedOnUtc = DateTime.UtcNow,
-                    UpdatedOnUtc = DateTime.UtcNow,
-                },
+                    MidpointRoundId = MidpointRounding.AwayFromZero
+                }
             };
-            await _currencyRepository.InsertAsync(currencies);
+            currencies.ForEach(x=>_currencyRepository.Insert(x));
+            return Task.CompletedTask;
         }
     }
 }

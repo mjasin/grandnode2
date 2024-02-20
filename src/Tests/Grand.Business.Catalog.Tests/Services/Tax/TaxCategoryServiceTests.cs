@@ -1,13 +1,15 @@
-﻿using Grand.Data.Tests.MongoDb;
-using Grand.Domain.Data;
+﻿using Grand.Business.Catalog.Services.Tax;
+using Grand.Data.Tests.MongoDb;
+using Grand.Data;
 using Grand.Domain.Tax;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Tax.Tests
+namespace Grand.Business.Catalog.Tests.Services.Tax
 {
     [TestClass()]
     public class TaxCategoryServiceTests
@@ -23,7 +25,7 @@ namespace Grand.Business.Catalog.Services.Tax.Tests
             _repository = new MongoDBRepositoryTest<TaxCategory>();
             _mediatorMock = new Mock<IMediator>();
 
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _taxCategoryService = new TaxCategoryService(_cacheBase, _repository, _mediatorMock.Object);
         }
 
@@ -48,7 +50,7 @@ namespace Grand.Business.Catalog.Services.Tax.Tests
         public async Task GetTaxCategoryByIdTest()
         {
             //Arrange
-            var taxCategory = new TaxCategory() {
+            var taxCategory = new TaxCategory {
                 Name = "test1"
             };
             await _repository.InsertAsync(taxCategory);
@@ -75,7 +77,7 @@ namespace Grand.Business.Catalog.Services.Tax.Tests
         public async Task UpdateTaxCategoryTest()
         {
             //Arrange
-            var tax = new TaxCategory() {
+            var tax = new TaxCategory {
                 Name = "test"
             };
             await _taxCategoryService.InsertTaxCategory(tax);
@@ -93,7 +95,7 @@ namespace Grand.Business.Catalog.Services.Tax.Tests
         public async Task DeleteTaxCategoryTest()
         {
             //Arrange
-            var tax = new TaxCategory() {
+            var tax = new TaxCategory {
                 Name = "test"
             };
             await _taxCategoryService.InsertTaxCategory(tax);

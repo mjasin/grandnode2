@@ -5,13 +5,13 @@
     <validation-observer v-slot="{ handleSubmit }">
         <form asp-route="AddOrderNote"  asp-route-OrderId="@Model.OrderId" method="post" ref="form" v-on:submit.prevent="handleSubmit(formSubmit)">
             <input asp-for="OrderId" type="hidden" />
-            <div asp-validation-summary="ModelOnly" class="message-error alert alert-info my-3"></div>
+            <div asp-validation-summary="All" class="message-error my-3"></div>
             <fieldset>
                 <div class="form-fields">
                     <div class="form-group">
                         <validation-provider tag="div" rules="required" name="Note" v-slot="{ errors, classes }">
                             <label asp-for="Note" class="col-form-label">@Loc["OrderNote.Fields.Title"]:</label>
-                            <textarea asp-for="Note" v-model="ordernote.Note" v-bind:class="[classes , 'form-control']" autofocus="autofocus" rows="4"></textarea>
+                            <textarea asp-for="Note" v-model="ordernote.Note" v-bind:class="[classes , 'form-control']" autofocus="autofocus" rows="4" data-val-required="@Loc["OrderNote.Fields.Title.Required"]" ></textarea>
                             <span class="field-validation-error">{{ errors[0] }}</span>
                         </validation-provider>
                     </div>

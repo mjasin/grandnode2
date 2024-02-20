@@ -1,11 +1,12 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Products;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class ProductReservationServiceTests
@@ -30,9 +31,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetProductReservationsByProductIdTest()
         {
             //Arrange
-            await _repository.InsertAsync(new ProductReservation() { ProductId = "1" });
-            await _repository.InsertAsync(new ProductReservation() { ProductId = "1" });
-            await _repository.InsertAsync(new ProductReservation() { ProductId = "2" });
+            await _repository.InsertAsync(new ProductReservation { ProductId = "1" });
+            await _repository.InsertAsync(new ProductReservation { ProductId = "1" });
+            await _repository.InsertAsync(new ProductReservation { ProductId = "2" });
             //Act
             var result = await _service.GetProductReservationsByProductId("1", null, null);
 
@@ -43,7 +44,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task InsertProductReservationTest()
         {
             //Arrange
-            var p = new ProductReservation() { ProductId = "1" };
+            var p = new ProductReservation { ProductId = "1" };
             //Act
             await _service.InsertProductReservation(p);
             //Assert
@@ -54,7 +55,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UpdateProductReservationTest()
         {
             //Arrange
-            var p = new ProductReservation() { ProductId = "1" };
+            var p = new ProductReservation { ProductId = "1" };
             await _repository.InsertAsync(p);
             //Act
             p.ProductId = "2";
@@ -67,7 +68,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task DeleteProductReservationTest()
         {
             //Arrange
-            var p = new ProductReservation() { ProductId = "1" };
+            var p = new ProductReservation { ProductId = "1" };
             await _repository.InsertAsync(p);
             //Act
             await _service.DeleteProductReservation(p);
@@ -79,7 +80,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetProductReservationTest()
         {
             //Arrange
-            var p = new ProductReservation() { ProductId = "1" };
+            var p = new ProductReservation { ProductId = "1" };
             await _repository.InsertAsync(p);
             //Act
             var result = await _service.GetProductReservation(p.Id);
@@ -115,8 +116,8 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task CancelReservationsByOrderIdTest()
         {
             //Arrange
-            await _repository.InsertAsync(new ProductReservation() { OrderId = "1" });
-            await _repository.InsertAsync(new ProductReservation() { OrderId = "2" });
+            await _repository.InsertAsync(new ProductReservation { OrderId = "1" });
+            await _repository.InsertAsync(new ProductReservation { OrderId = "2" });
             //Act
             await _service.CancelReservationsByOrderId("1");
             //Assert
@@ -127,7 +128,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetCustomerReservationsHelperByIdTest()
         {
             //Arrange
-            var p = new CustomerReservationsHelper() { CustomerId = "1" };
+            var p = new CustomerReservationsHelper { CustomerId = "1" };
             await _repositoryCustomerReservationsHelper.InsertAsync(p);
             //Act
             var result = await _service.GetCustomerReservationsHelperById(p.Id);
@@ -140,9 +141,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetCustomerReservationsHelpersTest()
         {
             //Arrange
-            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper() { CustomerId = "1" });
-            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper() { CustomerId = "1" });
-            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper() { CustomerId = "2" });
+            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper { CustomerId = "1" });
+            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper { CustomerId = "1" });
+            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper { CustomerId = "2" });
             //Act
             var result = await _service.GetCustomerReservationsHelpers("1");
             //Assert
@@ -154,9 +155,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetCustomerReservationsHelperBySciIdTest()
         {
             //Arrange
-            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper() { ShoppingCartItemId = "1" });
-            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper() { ShoppingCartItemId = "1" });
-            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper() { CustomerId = "2" });
+            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper { ShoppingCartItemId = "1" });
+            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper { ShoppingCartItemId = "1" });
+            await _repositoryCustomerReservationsHelper.InsertAsync(new CustomerReservationsHelper { CustomerId = "2" });
             //Act
             var result = await _service.GetCustomerReservationsHelperBySciId("1");
             //Assert

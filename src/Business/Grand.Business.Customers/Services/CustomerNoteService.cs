@@ -1,6 +1,6 @@
 ﻿using Grand.Business.Core.Interfaces.Customers;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Extensions;
 using MediatR;
 
@@ -36,8 +36,7 @@ namespace Grand.Business.Customers.Services
         /// <param name="customerNote">The customer note</param>
         public virtual async Task InsertCustomerNote(CustomerNote customerNote)
         {
-            if (customerNote == null)
-                throw new ArgumentNullException(nameof(customerNote));
+            ArgumentNullException.ThrowIfNull(customerNote);
 
             await _customerNoteRepository.InsertAsync(customerNote);
 
@@ -51,8 +50,7 @@ namespace Grand.Business.Customers.Services
         /// <param name="customerNote">The customer note</param>
         public virtual async Task DeleteCustomerNote(CustomerNote customerNote)
         {
-            if (customerNote == null)
-                throw new ArgumentNullException(nameof(customerNote));
+            ArgumentNullException.ThrowIfNull(customerNote);
 
             await _customerNoteRepository.DeleteAsync(customerNote);
 

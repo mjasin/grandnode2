@@ -1,14 +1,13 @@
-﻿using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
-using Grand.Business.Core.Interfaces.Marketing.PushNotifications;
+﻿using Grand.Business.Core.Interfaces.Marketing.PushNotifications;
 using Grand.Business.Marketing.Utilities;
 using Grand.Domain;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.PushNotifications;
 using Grand.Infrastructure.Extensions;
 using MediatR;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using System.Net.Http;
+using System.Text.Json;
 
 namespace Grand.Business.Marketing.Services.PushNotifications
 {
@@ -18,8 +17,7 @@ namespace Grand.Business.Marketing.Services.PushNotifications
         private readonly IRepository<PushMessage> _pushMessagesRepository;
         private readonly IMediator _mediator;
         private readonly PushNotificationsSettings _pushNotificationsSettings;
-        private readonly ITranslationService _translationService;
-        private readonly ILogger _logger;
+        private readonly ILogger<PushNotificationsService> _logger;
         private readonly HttpClient _httpClient;
 
         private const string FcmUrl = "https://fcm.googleapis.com/fcm/send";
@@ -29,15 +27,13 @@ namespace Grand.Business.Marketing.Services.PushNotifications
             IRepository<PushMessage> pushMessagesRepository,
             IMediator mediator,
             PushNotificationsSettings pushNotificationsSettings,
-            ITranslationService translationService,
-            ILogger logger,
+            ILogger<PushNotificationsService> logger,
             HttpClient httpClient)
         {
             _pushRegistrationRepository = pushRegistrationRepository;
             _pushMessagesRepository = pushMessagesRepository;
             _mediator = mediator;
             _pushNotificationsSettings = pushNotificationsSettings;
-            _translationService = translationService;
             _logger = logger;
             _httpClient = httpClient;
         }
@@ -156,7 +152,7 @@ namespace Grand.Business.Marketing.Services.PushNotifications
                 var receivers = await GetPushReceivers();
                 if (!receivers.Any())
                 {
-                    return (false, _translationService.GetResource("Admin.PushNotifications.Error.NoReceivers"));
+                    return (false, "Admin.PushNotifications.Error.NoReceivers");
                 }
 
                 const int batchSize = 1000;
@@ -176,14 +172,13 @@ namespace Grand.Business.Marketing.Services.PushNotifications
                 notification = new
                 {
                     body = text,
-                    title = title,
+                    title,
                     icon = pictureUrl,
                     click_action = clickUrl
                 }
             };
 
-            var json = JsonConvert.SerializeObject(data);
-
+            var json = JsonSerializer.Serialize(data);
             try
             {
                 using var httpRequest = new HttpRequestMessage(HttpMethod.Post, FcmUrl);
@@ -196,11 +191,11 @@ namespace Grand.Business.Marketing.Services.PushNotifications
                 var responseString = await response.Content.ReadAsStringAsync();
                 if (!response.IsSuccessStatusCode)
                 {
-                    await _logger.InsertLog(Domain.Logging.LogLevel.Error, "Error occured while sending push notification.", responseString);
+                    _logger.LogError("Error occured while sending push notification {ResponseString}", responseString);
                     return (false, responseString);
                 }
 
-                var responseMessage = JsonConvert.DeserializeObject<JsonResponse>(responseString);
+                var responseMessage = JsonSerializer.Deserialize<JsonResponse>(responseString);
                 if (responseMessage == null) return (false, "PushNotifications.ResponseMessage.Empty");
                     
                 await InsertPushMessage(new PushMessage {
@@ -210,7 +205,7 @@ namespace Grand.Business.Marketing.Services.PushNotifications
                     Title = title
                 });
 
-                return (true, string.Format(_translationService.GetResource("Admin.PushNotifications.MessageSent"), responseMessage.success, responseMessage.failure));
+                return (true, "Admin.PushNotifications.MessageSent");
             }
             catch (Exception ex)
             {
@@ -229,7 +224,8 @@ namespace Grand.Business.Marketing.Services.PushNotifications
         /// <returns>Bool indicating whether message was sent successfully and string result to display</returns>
         public virtual async Task<(bool, string)> SendPushNotification(string title, string text, string pictureUrl, string customerId, string clickUrl)
         {
-            return await SendPushNotification(title, text, pictureUrl, clickUrl, new List<string> { GetPushReceiverByCustomerId(customerId).Id.ToString() });
+            return await SendPushNotification(title, text, pictureUrl, clickUrl,
+                [GetPushReceiverByCustomerId(customerId).Id.ToString()]);
         }
 
         /// <summary>

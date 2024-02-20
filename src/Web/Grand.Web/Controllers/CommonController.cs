@@ -54,7 +54,7 @@ namespace Grand.Web.Controllers
             if (string.IsNullOrEmpty(url))
                 return url;
 
-            var _ = new PathString(url).StartsWithSegments(pathBase, out PathString resultpath);
+            _ = new PathString(url).StartsWithSegments(pathBase, out PathString resultpath);
             url = WebUtility.UrlDecode(resultpath);
 
             url = url.TrimStart('/');
@@ -66,24 +66,25 @@ namespace Grand.Web.Controllers
 
         private async Task<bool> IsLocalized(string url, PathString pathBase)
         {
-            var _ = new PathString(url).StartsWithSegments(pathBase, out PathString result);
+            _ = new PathString(url).StartsWithSegments(pathBase, out PathString result);
             url = WebUtility.UrlDecode(result);
 
-            var firstSegment = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? string.Empty;
+            var firstSegment = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ??
+                               string.Empty;
             if (string.IsNullOrEmpty(firstSegment))
                 return false;
 
             //suppose that the first segment is the language code and try to get language
             var language = (await _languageService.GetAllLanguages())
-                .FirstOrDefault(urlLanguage => urlLanguage.UniqueSeoCode.Equals(firstSegment, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(urlLanguage =>
+                    urlLanguage.UniqueSeoCode.Equals(firstSegment, StringComparison.OrdinalIgnoreCase));
 
             return language?.Published ?? false;
         }
 
         private static string AddLanguageSeo(string url, Language language)
         {
-            if (language == null)
-                throw new ArgumentNullException(nameof(language));
+            ArgumentNullException.ThrowIfNull(language);
 
             if (!string.IsNullOrEmpty(url))
             {
@@ -91,7 +92,7 @@ namespace Grand.Web.Controllers
             }
 
             //add language code
-            return $"/{language.UniqueSeoCode}/{url.TrimStart('/')}";
+            return $"/{language.UniqueSeoCode}/{url?.TrimStart('/')}";
         }
 
         #endregion
@@ -117,6 +118,7 @@ namespace Grand.Web.Controllers
             Response.ContentType = "text/html";
             return View();
         }
+
         [IgnoreApi]
         [HttpGet]
         public virtual IActionResult Route(string routeName)
@@ -136,6 +138,7 @@ namespace Grand.Web.Controllers
         {
             return View(errors);
         }
+
         [HttpGet]
         [PublicStore(true)]
         [DenySystemAccount]
@@ -143,7 +146,6 @@ namespace Grand.Web.Controllers
             [FromServices] AppConfig config,
             string langCode, string returnUrl = default)
         {
-
             var language = await _languageService.GetLanguageByCode(langCode);
             if (!language?.Published ?? false)
                 language = _workContext.WorkingLanguage;
@@ -218,10 +220,12 @@ namespace Grand.Web.Controllers
                 await _workContext.SetWorkingCurrency(currency);
 
             //clear coupon code
-            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.DiscountCoupons, "");
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.DiscountCoupons,
+                "");
 
             //clear gift card
-            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.GiftVoucherCoupons, "");
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.GiftVoucherCoupons,
+                "");
 
             //notification
             await _mediator.Publish(new ChangeCurrencyEvent(_workContext.CurrentCustomer, currency));
@@ -252,7 +256,8 @@ namespace Grand.Web.Controllers
             {
                 if (commonSettings.AllowToSelectStore)
                 {
-                    var selectedstore = storeService.GetAll().FirstOrDefault(x => string.Equals(x.Shortcut, shortcut, StringComparison.InvariantCultureIgnoreCase));
+                    var selectedstore = storeService.GetAll().FirstOrDefault(x =>
+                        string.Equals(x.Shortcut, shortcut, StringComparison.InvariantCultureIgnoreCase));
                     if (selectedstore != null)
                     {
                         await storeHelper.SetStoreCookie(selectedstore.Id);
@@ -305,9 +310,13 @@ namespace Grand.Web.Controllers
         [DenySystemAccount]
         [HttpGet]
         public virtual async Task<IActionResult> SetStoreTheme(
-            [FromServices] IThemeContext themeContext, string themeName, string returnUrl = "")
+            [FromServices] StoreInformationSettings storeInformationSettings,
+            [FromServices] IThemeContextFactory themeContextFactory, string themeName, string returnUrl = "")
         {
-            await themeContext.SetWorkingTheme(themeName);
+            if (!storeInformationSettings.AllowCustomerToSelectTheme) return Redirect(returnUrl);
+
+            var themeContext = themeContextFactory.GetThemeContext("");
+            if (themeContext != null) await themeContext.SetTheme(themeName);
 
             //notification
             await _mediator.Publish(new ChangeThemeEvent(_workContext.CurrentCustomer, themeName));
@@ -352,18 +361,22 @@ namespace Grand.Web.Controllers
                 return Json(new { stored = false });
 
             //save consent cookies
-            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies, "", _workContext.CurrentStore.Id);
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies, "",
+                _workContext.CurrentStore.Id);
             var dictionary = new Dictionary<string, bool>();
             var consentCookies = cookiePreference.GetConsentCookies();
             foreach (var item in consentCookies.Where(x => x.AllowToDisable))
             {
                 dictionary.Add(item.SystemName, accept);
             }
+
             if (dictionary.Any())
-                await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies, dictionary, _workContext.CurrentStore.Id);
+                await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies,
+                    dictionary, _workContext.CurrentStore.Id);
 
             //save setting - CookieAccepted
-            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.CookieAccepted, true, _workContext.CurrentStore.Id);
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.CookieAccepted,
+                true, _workContext.CurrentStore.Id);
 
             return Json(new { stored = true });
         }
@@ -383,8 +396,7 @@ namespace Grand.Web.Controllers
                 Store = _workContext.CurrentStore
             });
 
-            return Json(new
-            {
+            return Json(new {
                 html = await this.RenderPartialViewToString("PrivacyPreference", model, true),
                 model
             });
@@ -399,18 +411,19 @@ namespace Grand.Web.Controllers
             [FromServices] IUserFieldService userFieldService,
             [FromServices] ICookiePreference cookiePreference)
         {
-
             if (!storeInformationSettings.DisplayPrivacyPreference)
                 return Json(new { success = false });
 
             const string consent = "ConsentCookies";
-            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies, "", _workContext.CurrentStore.Id);
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies, "",
+                _workContext.CurrentStore.Id);
             var selectedConsentCookies = new List<string>();
             foreach (var item in model)
             {
                 if (item.Key.StartsWith(consent))
                     selectedConsentCookies.Add(item.Value);
             }
+
             var dictionary = new Dictionary<string, bool>();
             var consentCookies = cookiePreference.GetConsentCookies();
             foreach (var item in consentCookies)
@@ -419,7 +432,8 @@ namespace Grand.Web.Controllers
                     dictionary.Add(item.SystemName, selectedConsentCookies.Contains(item.SystemName));
             }
 
-            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies, dictionary, _workContext.CurrentStore.Id);
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies,
+                dictionary, _workContext.CurrentStore.Id);
 
             return Json(new { success = true });
         }
@@ -433,6 +447,7 @@ namespace Grand.Web.Controllers
             var sb = await _mediator.Send(new GetRobotsTextFile { StoreId = _workContext.CurrentStore.Id });
             return Content(sb, "text/plain");
         }
+
         [IgnoreApi]
         [HttpGet]
         public virtual IActionResult GenericUrl()

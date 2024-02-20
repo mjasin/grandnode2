@@ -5,7 +5,7 @@ namespace Grand.Domain.Messages
     /// <summary>
     /// Search term record (for statistics)
     /// </summary>
-    public partial class ContactUs : BaseEntity
+    public class ContactUs : BaseEntity
     {
         /// <summary>
         /// Gets or sets the customer identifier
@@ -21,13 +21,7 @@ namespace Grand.Domain.Messages
         /// Gets or sets the IP address
         /// </summary>
         public string IpAddress { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time of entity creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
-
-
+        
         /// <summary>
         /// Gets or sets the email
         /// </summary>

@@ -1,7 +1,6 @@
 ﻿using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Business.Core.Interfaces.Marketing.Contacts;
-using Grand.Infrastructure;
 using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Security.Authorization;
 using Grand.Web.Admin.Interfaces;
@@ -16,20 +15,20 @@ namespace Grand.Web.Admin.Controllers
         private readonly IContactUsService _contactUsService;
         private readonly IContactFormViewModelService _contactFormViewModelService;
         private readonly ITranslationService _translationService;
-        private readonly IWorkContext _workContext;
 
         public ContactFormController(IContactUsService contactUsService,
             IContactFormViewModelService contactFormViewModelService,
-            ITranslationService translationService,
-            IWorkContext workContext)
+            ITranslationService translationService)
         {
             _contactUsService = contactUsService;
             _contactFormViewModelService = contactFormViewModelService;
             _translationService = translationService;
-            _workContext = workContext;
         }
 
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
         public async Task<IActionResult> List()
         {
@@ -56,12 +55,7 @@ namespace Grand.Web.Admin.Controllers
             var contactform = await _contactUsService.GetContactUsById(id);
             if (contactform == null)
                 return RedirectToAction("List");
-
-            if (_workContext.CurrentVendor != null)
-            {
-                if (contactform.VendorId != _workContext.CurrentVendor.Id)
-                    return RedirectToAction("List");
-            }
+            
             var model = await _contactFormViewModelService.PrepareContactFormModel(contactform);
             return View(model);
         }
@@ -86,19 +80,7 @@ namespace Grand.Web.Admin.Controllers
         [PermissionAuthorizeAction(PermissionActionName.Delete)]
         public async Task<IActionResult> DeleteAll()
         {
-            if (_workContext.CurrentVendor != null)
-            {
-                var contactforms = await _contactUsService.GetAllContactUs(
-                vendorId: _workContext.CurrentVendor.Id,
-                pageIndex: 0,
-                pageSize: int.MaxValue);
-                foreach (var item in contactforms)
-                {
-                    await _contactUsService.DeleteContactUs(item);
-                }
-            }
-            else
-                await _contactUsService.ClearTable();
+            await _contactUsService.ClearTable();
 
             Success(_translationService.GetResource("Admin.System.ContactForm.DeletedAll"));
             return RedirectToAction("List");

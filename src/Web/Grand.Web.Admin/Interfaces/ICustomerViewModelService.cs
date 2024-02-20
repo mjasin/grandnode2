@@ -15,7 +15,6 @@ namespace Grand.Web.Admin.Interfaces
         Task<(IEnumerable<CustomerModel> customerModelList, int totalCount)> PrepareCustomerList(CustomerListModel model,
             string[] searchCustomerGroupIds, string[] searchCustomerTagIds, int pageIndex, int pageSize);
         Task PrepareCustomerModel(CustomerModel model, Customer customer, bool excludeProperties);
-        Task<string> ValidateCustomerGroups(IList<CustomerGroup> customerGroups);
         Task<Customer> InsertCustomerModel(CustomerModel model);
         Task<Customer> UpdateCustomerModel(Customer customer, CustomerModel model);
         Task DeleteCustomer(Customer customer);
@@ -40,8 +39,7 @@ namespace Grand.Web.Admin.Interfaces
         Task DeleteProductPrice(string id);
         Task UpdatePersonalizedProduct(CustomerModel.ProductModel model);
         Task DeletePersonalizedProduct(string id);
-        Task<(IEnumerable<CustomerModel.ActivityLogModel> activityLogModels, int totalCount)> PrepareActivityLogModel(string customerId, int pageIndex, int pageSize);
-        Task<(IEnumerable<ContactFormModel> contactFormModels, int totalCount)> PrepareContactFormModel(string customerId, string vendorId, int pageIndex, int pageSize);
+        Task<(IEnumerable<ContactFormModel> contactFormModels, int totalCount)> PrepareContactFormModel(string customerId, int pageIndex, int pageSize);
         Task<(IEnumerable<CustomerModel.OutOfStockSubscriptionModel> outOfStockSubscriptionModels, int totalCount)> PrepareOutOfStockSubscriptionModel(string customerId, int pageIndex, int pageSize);
         Task<IList<CustomerModel.CustomerNote>> PrepareCustomerNoteList(string customerId);
         Task<CustomerNote> InsertCustomerNote(string customerId, string downloadId, bool displayToCustomer, string title, string message);

@@ -46,7 +46,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Category layouts
 
-        public IActionResult CategoryLayouts() => View();
+        public IActionResult CategoryLayouts()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> CategoryLayouts(DataSourceRequest command)
@@ -87,19 +90,19 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> CategoryLayoutAdd(CategoryLayoutModel model)
         {
-            if (!ModelState.IsValid)
+            switch (ModelState.IsValid)
             {
-                return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
-            }
-            if (ModelState.IsValid)
-            {
-                var layout = new CategoryLayout();
-                layout = model.ToEntity(layout);
-                await _categoryLayoutService.InsertCategoryLayout(layout);
+                case false:
+                    return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case true:
+                {
+                    var layout = new CategoryLayout();
+                    layout = model.ToEntity(layout);
+                    await _categoryLayoutService.InsertCategoryLayout(layout);
 
-                return new JsonResult("");
+                    return new JsonResult("");
+                }
             }
-            return ErrorForKendoGridJson(ModelState);
         }
 
         [HttpPost]
@@ -121,7 +124,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Brand layouts
 
-        public IActionResult BrandLayouts() => View();
+        public IActionResult BrandLayouts()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> BrandLayouts(DataSourceRequest command)
@@ -160,18 +166,18 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> BrandLayoutAdd(BrandLayoutModel model)
         {
-            if (!ModelState.IsValid)
+            switch (ModelState.IsValid)
             {
-                return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case false:
+                    return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case true:
+                {
+                    var layout = new BrandLayout();
+                    layout = model.ToEntity(layout);
+                    await _brandLayoutService.InsertBrandLayout(layout);
+                    return new JsonResult("");
+                }
             }
-            if (ModelState.IsValid)
-            {
-                var layout = new BrandLayout();
-                layout = model.ToEntity(layout);
-                await _brandLayoutService.InsertBrandLayout(layout);
-                return new JsonResult("");
-            }
-            return ErrorForKendoGridJson(ModelState);
         }
 
         [HttpPost]
@@ -191,7 +197,10 @@ namespace Grand.Web.Admin.Controllers
         #endregion
 
         #region Collection layouts
-        public IActionResult CollectionLayouts() => View();
+        public IActionResult CollectionLayouts()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> CollectionLayouts(DataSourceRequest command)
@@ -230,18 +239,18 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> CollectionLayoutAdd(CollectionLayoutModel model)
         {
-            if (!ModelState.IsValid)
+            switch (ModelState.IsValid)
             {
-                return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case false:
+                    return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case true:
+                {
+                    var layout = new CollectionLayout();
+                    layout = model.ToEntity(layout);
+                    await _collectionLayoutService.InsertCollectionLayout(layout);
+                    return new JsonResult("");
+                }
             }
-            if (ModelState.IsValid)
-            {
-                var layout = new CollectionLayout();
-                layout = model.ToEntity(layout);
-                await _collectionLayoutService.InsertCollectionLayout(layout);
-                return new JsonResult("");
-            }
-            return ErrorForKendoGridJson(ModelState);
         }
 
         [HttpPost]
@@ -262,7 +271,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Product layouts
 
-        public IActionResult ProductLayouts() => View();
+        public IActionResult ProductLayouts()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> ProductLayouts(DataSourceRequest command)
@@ -300,18 +312,18 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> ProductLayoutAdd(ProductLayoutModel model)
         {
-            if (!ModelState.IsValid)
+            switch (ModelState.IsValid)
             {
-                return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case false:
+                    return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case true:
+                {
+                    var layout = new ProductLayout();
+                    layout = model.ToEntity(layout);
+                    await _productLayoutService.InsertProductLayout(layout);
+                    return new JsonResult("");
+                }
             }
-            if (ModelState.IsValid)
-            {
-                var layout = new ProductLayout();
-                layout = model.ToEntity(layout);
-                await _productLayoutService.InsertProductLayout(layout);
-                return new JsonResult("");
-            }
-            return ErrorForKendoGridJson(ModelState);
         }
 
         [HttpPost]
@@ -320,19 +332,19 @@ namespace Grand.Web.Admin.Controllers
             var layout = await _productLayoutService.GetProductLayoutById(id);
             if (layout == null)
                 throw new ArgumentException("No template found with the specified id");
-            if (ModelState.IsValid)
-            {
-                await _productLayoutService.DeleteProductLayout(layout);
-                return new JsonResult("");
-            }
-            return ErrorForKendoGridJson(ModelState);
+            if (!ModelState.IsValid) return ErrorForKendoGridJson(ModelState);
+            await _productLayoutService.DeleteProductLayout(layout);
+            return new JsonResult("");
         }
 
         #endregion
 
         #region Page layouts
 
-        public IActionResult PageLayouts() => View();
+        public IActionResult PageLayouts()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> PageLayouts(DataSourceRequest command)
@@ -359,30 +371,27 @@ namespace Grand.Web.Admin.Controllers
             var layout = await _pageLayoutService.GetPageLayoutById(model.Id);
             if (layout == null)
                 throw new ArgumentException("No template found with the specified id");
-            if (ModelState.IsValid)
-            {
-                layout = model.ToEntity(layout);
-                await _pageLayoutService.UpdatePageLayout(layout);
-                return new JsonResult("");
-            }
-            return ErrorForKendoGridJson(ModelState);
+            if (!ModelState.IsValid) return ErrorForKendoGridJson(ModelState);
+            layout = model.ToEntity(layout);
+            await _pageLayoutService.UpdatePageLayout(layout);
+            return new JsonResult("");
         }
 
         [HttpPost]
         public async Task<IActionResult> PageLayoutAdd(PageLayoutModel model)
         {
-            if (!ModelState.IsValid)
+            switch (ModelState.IsValid)
             {
-                return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case false:
+                    return Json(new DataSourceResult { Errors = ModelState.SerializeErrors() });
+                case true:
+                {
+                    var layout = new PageLayout();
+                    layout = model.ToEntity(layout);
+                    await _pageLayoutService.InsertPageLayout(layout);
+                    return new JsonResult("");
+                }
             }
-            if (ModelState.IsValid)
-            {
-                var layout = new PageLayout();
-                layout = model.ToEntity(layout);
-                await _pageLayoutService.InsertPageLayout(layout);
-                return new JsonResult("");
-            }
-            return ErrorForKendoGridJson(ModelState);
         }
 
         [HttpPost]
@@ -391,12 +400,9 @@ namespace Grand.Web.Admin.Controllers
             var layout = await _pageLayoutService.GetPageLayoutById(id);
             if (layout == null)
                 throw new ArgumentException("No layout found with the specified id");
-            if (ModelState.IsValid)
-            {
-                await _pageLayoutService.DeletePageLayout(layout);
-                return new JsonResult("");
-            }
-            return ErrorForKendoGridJson(ModelState);
+            if (!ModelState.IsValid) return ErrorForKendoGridJson(ModelState);
+            await _pageLayoutService.DeletePageLayout(layout);
+            return new JsonResult("");
         }
 
         #endregion

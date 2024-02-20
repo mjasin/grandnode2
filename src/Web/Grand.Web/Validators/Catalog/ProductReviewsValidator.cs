@@ -10,7 +10,6 @@ using Grand.Infrastructure.Models;
 using Grand.Infrastructure.Validators;
 using Grand.Web.Common.Security.Captcha;
 using Grand.Web.Common.Validators;
-using Grand.Web.Features.Models.Customers;
 using Grand.Web.Models.Catalog;
 using Microsoft.AspNetCore.Http;
 
@@ -48,7 +47,7 @@ namespace Grand.Web.Validators.Catalog
             
             if (captchaSettings.Enabled && captchaSettings.ShowOnProductReviewPage)
             {
-                RuleFor(x => x.Captcha).NotNull().WithMessage(translationService.GetResource("Account.Captcha.Required"));;
+                RuleFor(x => x.Captcha).NotNull().WithMessage(translationService.GetResource("Account.Captcha.Required"));
                 RuleFor(x => x.Captcha).SetValidator(new CaptchaValidator(validatorsCaptcha, contextAccessor, googleReCaptchaValidator));
             }
             RuleFor(x => x).CustomAsync(async (x, context, _) =>

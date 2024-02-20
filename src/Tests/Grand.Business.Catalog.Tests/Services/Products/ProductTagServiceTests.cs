@@ -1,15 +1,16 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Products;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using Grand.SharedKernel.Extensions;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class ProductTagServiceTests
@@ -28,7 +29,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             _repositoryProductTag = new MongoDBRepositoryTest<ProductTag>();
             _productRepository = new MongoDBRepositoryTest<Product>();
             _mediatorMock = new Mock<IMediator>();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _productTagService = new ProductTagService(_repositoryProductTag, _productRepository, _cacheBase, _mediatorMock.Object);
         }
 
@@ -53,7 +54,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         {
             //Arrange
             await _repositoryProductTag.InsertAsync(new ProductTag());
-            await _repositoryProductTag.InsertAsync(new ProductTag() { Id = "1", Name = "test" });
+            await _repositoryProductTag.InsertAsync(new ProductTag { Id = "1", Name = "test" });
             await _repositoryProductTag.InsertAsync(new ProductTag());
 
             //Act
@@ -69,7 +70,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         {
             //Arrange
             await _repositoryProductTag.InsertAsync(new ProductTag());
-            await _repositoryProductTag.InsertAsync(new ProductTag() { Id = "1", Name = "test" });
+            await _repositoryProductTag.InsertAsync(new ProductTag { Id = "1", Name = "test" });
             await _repositoryProductTag.InsertAsync(new ProductTag());
 
             //Act
@@ -85,7 +86,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         {
             //Arrange
             await _repositoryProductTag.InsertAsync(new ProductTag());
-            await _repositoryProductTag.InsertAsync(new ProductTag() { Id = "1", Name = "test", SeName = "test" });
+            await _repositoryProductTag.InsertAsync(new ProductTag { Id = "1", Name = "test", SeName = "test" });
             await _repositoryProductTag.InsertAsync(new ProductTag());
 
             //Act
@@ -100,8 +101,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task InsertProductTagTest()
         {
             //Arrange
-            var productTag = new ProductTag();
-            productTag.Name = "test";
+            var productTag = new ProductTag {
+                Name = "test"
+            };
             //Act
             await _productTagService.InsertProductTag(productTag);
             var result = await _productTagService.GetProductTagById(productTag.Id);
@@ -114,8 +116,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UpdateProductTagTest()
         {
             //Arrange
-            var productTag = new ProductTag();
-            productTag.Name = "test";
+            var productTag = new ProductTag {
+                Name = "test"
+            };
             await _productTagService.InsertProductTag(productTag);
             //Act
             productTag.Name = "test2";
@@ -130,8 +133,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task DeleteProductTagTest()
         {
             //Arrange
-            var productTag = new ProductTag();
-            productTag.Name = "test";
+            var productTag = new ProductTag {
+                Name = "test"
+            };
             await _productTagService.InsertProductTag(productTag);
 
             //Act
@@ -146,8 +150,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task AttachProductTagTest()
         {
             //Arrange
-            var productTag = new ProductTag();
-            productTag.Name = "test";
+            var productTag = new ProductTag {
+                Name = "test"
+            };
             await _productTagService.InsertProductTag(productTag);
             var product = new Product();
             await _productRepository.InsertAsync(product);
@@ -165,8 +170,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task DetachProductTagTest()
         {
             //Arrange
-            var productTag = new ProductTag();
-            productTag.Name = "test";
+            var productTag = new ProductTag {
+                Name = "test"
+            };
             await _productTagService.InsertProductTag(productTag);
             var product = new Product();
             await _productRepository.InsertAsync(product);
@@ -185,12 +191,13 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetProductCountTest()
         {
             //Arrange
-            var productTag = new ProductTag();
-            productTag.Name = "test";
-            productTag.Count = 10;
+            var productTag = new ProductTag {
+                Name = "test",
+                Count = 10
+            };
             await _productTagService.InsertProductTag(productTag);
             //Act
-            var result = await _productTagService.GetProductCount(productTag.Id, "");
+            var result = await _productTagService.GetProductCount(productTag.Id);
 
             //Assert
             Assert.AreEqual(10, result);

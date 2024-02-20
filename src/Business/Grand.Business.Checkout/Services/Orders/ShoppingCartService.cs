@@ -106,8 +106,7 @@ namespace Grand.Business.Checkout.Services.Orders
             DateTime? rentalStartDate = null,
             DateTime? rentalEndDate = null)
         {
-            if (shoppingCart == null)
-                throw new ArgumentNullException(nameof(shoppingCart));
+            ArgumentNullException.ThrowIfNull(shoppingCart);
 
             foreach (var sci in shoppingCart.Where(a => a.ShoppingCartTypeId == shoppingCartType))
             {
@@ -193,8 +192,7 @@ namespace Grand.Business.Checkout.Services.Orders
             string reservationId = "", string parameter = "", string duration = "",
             ShoppingCartValidatorOptions validator = null)
         {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
+            ArgumentNullException.ThrowIfNull(customer);
 
             validator ??= new ShoppingCartValidatorOptions();
 
@@ -222,7 +220,6 @@ namespace Grand.Business.Checkout.Services.Orders
 
             if (update) shoppingCartItem.Quantity += quantity;
             else {
-                DateTime now = DateTime.UtcNow;
                 shoppingCartItem = new ShoppingCartItem {
                     ShoppingCartTypeId = shoppingCartType,
                     StoreId = storeId,
@@ -238,8 +235,7 @@ namespace Grand.Business.Checkout.Services.Orders
                     IsShipEnabled = product.IsShipEnabled,
                     IsTaxExempt = product.IsTaxExempt,
                     IsGiftVoucher = product.IsGiftVoucher,
-                    CreatedOnUtc = now,
-                    UpdatedOnUtc = now,
+                    CreatedOnUtc =  DateTime.UtcNow,
                     ReservationId = reservationId,
                     Parameter = parameter,
                     Duration = duration
@@ -252,13 +248,13 @@ namespace Grand.Business.Checkout.Services.Orders
             else shoppingCartItem = await InsertNewItem(customer, product, shoppingCartItem, automaticallyAddRequiredProductsIfEnabled);
 
             if (product.ProductTypeId == ProductType.Reservation)
-                await _mediator.Send(new AddCustomerReservationCommand() {
+                await _mediator.Send(new AddCustomerReservationCommand {
                     Customer = customer,
                     Product = product,
                     ShoppingCartItem = shoppingCartItem,
                     RentalStartDate = rentalStartDate,
                     RentalEndDate = rentalEndDate,
-                    ReservationId = reservationId,
+                    ReservationId = reservationId
                 });
             //reset checkout info
             await _customerService.ResetCheckoutData(customer, storeId);
@@ -288,7 +284,7 @@ namespace Grand.Business.Checkout.Services.Orders
             await _mediator.Publish(new AddToCartEvent(customer, shoppingCartItem, product));
             if (automaticallyAddRequiredProductsIfEnabled)
             {
-                await _mediator.Send(new AddRequiredProductsCommand() {
+                await _mediator.Send(new AddRequiredProductsCommand {
                     Customer = customer,
                     Product = product,
                     ShoppingCartType = shoppingCartItem.ShoppingCartTypeId,
@@ -320,8 +316,7 @@ namespace Grand.Business.Checkout.Services.Orders
             DateTime? rentalStartDate = null, DateTime? rentalEndDate = null,
             int quantity = 1, bool resetCheckoutData = true, string reservationId = "", string sciId = "")
         {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
+            ArgumentNullException.ThrowIfNull(customer);
 
             var warnings = new List<string>();
 
@@ -375,8 +370,7 @@ namespace Grand.Business.Checkout.Services.Orders
         public virtual async Task DeleteShoppingCartItem(Customer customer, ShoppingCartItem shoppingCartItem, bool resetCheckoutData = true,
             bool ensureOnlyActiveCheckoutAttributes = false)
         {
-            if (shoppingCartItem == null)
-                throw new ArgumentNullException(nameof(shoppingCartItem));
+            ArgumentNullException.ThrowIfNull(shoppingCartItem);
 
             //reset checkout data
             if (resetCheckoutData)
@@ -401,10 +395,8 @@ namespace Grand.Business.Checkout.Services.Orders
         /// <param name="includeCouponCodes">A value indicating whether to coupon codes (discount and gift voucher) should be also re-applied</param>
         public virtual async Task MigrateShoppingCart(Customer fromCustomer, Customer toCustomer, bool includeCouponCodes)
         {
-            if (fromCustomer == null)
-                throw new ArgumentNullException(nameof(fromCustomer));
-            if (toCustomer == null)
-                throw new ArgumentNullException(nameof(toCustomer));
+            ArgumentNullException.ThrowIfNull(fromCustomer);
+            ArgumentNullException.ThrowIfNull(toCustomer);
 
             if (fromCustomer.Id == toCustomer.Id)
                 return; //the same customer

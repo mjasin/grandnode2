@@ -1,27 +1,22 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Grand.Business.Catalog.Services.Directory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
-using Grand.Business.Core.Interfaces.Common.Logging;
+﻿using Grand.Business.Catalog.Services.Directory;
 using Grand.SharedKernel.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace Grand.Business.Catalog.Services.Directory.Tests
+namespace Grand.Business.Catalog.Tests.Services.Directory
 {
     [TestClass()]
     public class GeoLookupServiceTests
     {
-        private Mock<ILogger> _loggerMock;
+        private Mock<ILogger<GeoLookupService>> _loggerMock;
         private GeoLookupService _service;
         private string IPAddressUS = "142.250.203.206";
         [TestInitialize()]
         public void Init()
         {
             CommonPath.BaseDirectory = "../../../../../Web/Grand.Web/";
-            _loggerMock = new Mock<ILogger>();
+            _loggerMock = new Mock<ILogger<GeoLookupService>>();
             _service = new GeoLookupService(_loggerMock.Object);
         }
 

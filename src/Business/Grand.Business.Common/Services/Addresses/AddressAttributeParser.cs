@@ -1,6 +1,5 @@
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Addresses;
-using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Domain.Catalog;
 using Grand.Domain.Common;
 using Grand.Domain.Localization;
@@ -15,14 +14,11 @@ namespace Grand.Business.Common.Services.Addresses
     public class AddressAttributeParser : IAddressAttributeParser
     {
         private readonly IAddressAttributeService _addressAttributeService;
-        private readonly ITranslationService _translationService;
 
         public AddressAttributeParser(
-            IAddressAttributeService addressAttributeService,
-            ITranslationService translationService)
+            IAddressAttributeService addressAttributeService)
         {
             _addressAttributeService = addressAttributeService;
-            _translationService = translationService;
         }
 
         /// <summary>
@@ -115,8 +111,7 @@ namespace Grand.Business.Common.Services.Addresses
 
                 //if not found
                 if (found) continue;
-                var notFoundWarning = string.Format(_translationService.GetResource("ShoppingCart.SelectAttribute"), a2.GetTranslation(a => a.Name, ""));
-                warnings.Add(notFoundWarning);
+                warnings.Add("Selected attribute not found");
             }
 
             return warnings;
@@ -151,29 +146,32 @@ namespace Grand.Business.Common.Services.Addresses
                     var formattedAttribute = "";
                     if (!attribute.ShouldHaveValues())
                     {
-                        //no values
-                        if (attribute.AttributeControlType == AttributeControlType.MultilineTextbox)
+                        switch (attribute.AttributeControlType)
                         {
-                            //multiline text box
-                            var attributeName = attribute.GetTranslation(a => a.Name, language.Id);
-                            //encode (if required)
-                            if (htmlEncode)
-                                attributeName = WebUtility.HtmlEncode(attributeName);
-                            formattedAttribute = $"{attributeName}: {FormatText.ConvertText(valueStr)}";
-                            //we never encode multiline text box input
-                        }
-                        else if (attribute.AttributeControlType == AttributeControlType.FileUpload)
-                        {
-                            //file upload
-                            //not supported for address attributes
-                        }
-                        else
-                        {
-                            //other attributes (text box, datepicker)
-                            formattedAttribute = $"{attribute.GetTranslation(a => a.Name, language.Id)}: {valueStr}";
-                            //encode (if required)
-                            if (htmlEncode)
-                                formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
+                            //no values
+                            case AttributeControlType.MultilineTextbox:
+                            {
+                                //multiline text box
+                                var attributeName = attribute.GetTranslation(a => a.Name, language.Id);
+                                //encode (if required)
+                                if (htmlEncode)
+                                    attributeName = WebUtility.HtmlEncode(attributeName);
+                                formattedAttribute = $"{attributeName}: {FormatText.ConvertText(valueStr)}";
+                                break;
+                            }
+                            case AttributeControlType.FileUpload:
+                                //file upload
+                                //not supported for address attributes
+                                break;
+                            default:
+                            {
+                                //other attributes (text box, datepicker)
+                                formattedAttribute = $"{attribute.GetTranslation(a => a.Name, language.Id)}: {valueStr}";
+                                //encode (if required)
+                                if (htmlEncode)
+                                    formattedAttribute = WebUtility.HtmlEncode(formattedAttribute);
+                                break;
+                            }
                         }
                     }
                     else

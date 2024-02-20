@@ -1,16 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Grand.Business.Checkout.Commands.Handlers.Orders;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
 using Grand.Business.Core.Commands.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
-using Grand.Domain.Orders;
+using Grand.Business.Core.Interfaces.Checkout.Payments;
+using Grand.Business.Core.Queries.Checkout.Orders;
 using Grand.Domain.Payments;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Grand.Business.Core.Interfaces.Checkout.Payments;
-using Grand.Business.Core.Interfaces.Common.Logging;
-using Grand.Business.Core.Queries.Checkout.Orders;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class CaptureCommandHandlerTests
@@ -21,13 +20,13 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         private Mock<IPaymentTransactionService> _paymentTransactionMock;
         private Mock<IOrderService> _orderServiceMock;
         private Mock<IMediator> _mediatorMock;
-        private Mock<ILogger> _loggerMock;
+        private Mock<ILogger<CaptureCommandHandler>> _loggerMock;
 
         [TestInitialize]
         public void Init()
         {
             _mediatorMock = new Mock<IMediator>();
-            _loggerMock = new Mock<ILogger>();
+            _loggerMock = new Mock<ILogger<CaptureCommandHandler>>();
             _orderServiceMock = new Mock<IOrderService>();
             _paymentServiceMock = new Mock<IPaymentService>();
             _paymentTransactionMock = new Mock<IPaymentTransactionService>();
@@ -39,7 +38,7 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         public async Task HandleTest()
         {
             //Arrange
-            var command = new CaptureCommand() { PaymentTransaction = new PaymentTransaction() };
+            var command = new CaptureCommand { PaymentTransaction = new PaymentTransaction() };
             _mediatorMock.Setup(x => x.Send(It.IsAny<CanCaptureQuery>(), default))
                 .Returns(Task.FromResult(true));
 

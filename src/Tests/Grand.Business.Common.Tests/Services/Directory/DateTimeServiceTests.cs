@@ -1,7 +1,8 @@
-﻿using Grand.Domain.Directory;
+﻿using Grand.Business.Common.Services.Directory;
+using Grand.Domain.Directory;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Business.Common.Services.Directory.Tests
+namespace Grand.Business.Common.Tests.Services.Directory
 {
     [TestClass()]
     public class DateTimeServiceTests
@@ -15,8 +16,9 @@ namespace Grand.Business.Common.Services.Directory.Tests
 
             _timeZone = TimeZoneInfo.GetSystemTimeZones().FirstOrDefault(x => x.BaseUtcOffset.Hours == 1);
 
-            _dateTimeSettings = new DateTimeSettings();
-            _dateTimeSettings.DefaultStoreTimeZoneId = _timeZone.Id;
+            _dateTimeSettings = new DateTimeSettings {
+                DefaultStoreTimeZoneId = _timeZone.Id
+            };
             _dateTimeService = new DateTimeService(_dateTimeSettings);
         }
 

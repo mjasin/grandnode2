@@ -5,13 +5,12 @@
     /// </summary>
     /// <typeparam name="T">T</typeparam>
     [Serializable]
-    public partial class PagedList<T> : List<T>, IPagedList<T>
+    public class PagedList<T> : List<T>, IPagedList<T>
     {
 
         private void Initialize(IEnumerable<T> source, int pageIndex, int pageSize, int? totalCount = null)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
 
             if (pageSize <= 0)
                 pageSize = 1;
@@ -46,8 +45,7 @@
 
         private Task InitializeAsync(IQueryable<T> source, int pageIndex, int pageSize, int? totalCount = null)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ArgumentNullException.ThrowIfNull(source);
             if (pageSize <= 0)
                 pageSize = 1;
 
@@ -79,11 +77,8 @@
         public int TotalCount { get; protected set; }
         public int TotalPages { get; protected set; }
 
-        public bool HasPreviousPage {
-            get { return (PageIndex > 0); }
-        }
-        public bool HasNextPage {
-            get { return (PageIndex + 1 < TotalPages); }
-        }
+        public bool HasPreviousPage => PageIndex > 0;
+
+        public bool HasNextPage => PageIndex + 1 < TotalPages;
     }
 }

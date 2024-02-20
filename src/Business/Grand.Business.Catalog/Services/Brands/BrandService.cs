@@ -2,12 +2,12 @@ using Grand.Business.Core.Interfaces.Catalog.Brands;
 using Grand.Domain;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Catalog.Services.Brands
@@ -23,7 +23,8 @@ namespace Grand.Business.Catalog.Services.Brands
         private readonly IWorkContext _workContext;
         private readonly IMediator _mediator;
         private readonly ICacheBase _cacheBase;
-
+        private readonly AccessControlConfig _accessControlConfig;
+        
         #endregion
 
         #region Ctor
@@ -34,12 +35,13 @@ namespace Grand.Business.Catalog.Services.Brands
         public BrandService(ICacheBase cacheBase,
             IRepository<Brand> brandRepository,
             IWorkContext workContext,
-            IMediator mediator)
+            IMediator mediator, AccessControlConfig accessControlConfig)
         {
             _cacheBase = cacheBase;
             _brandRepository = brandRepository;
             _workContext = workContext;
             _mediator = mediator;
+            _accessControlConfig = accessControlConfig;
         }
         #endregion
 
@@ -68,9 +70,9 @@ namespace Grand.Business.Catalog.Services.Brands
             if (!string.IsNullOrWhiteSpace(brandName))
                 query = query.Where(m => m.Name != null && m.Name.ToLower().Contains(brandName.ToLower()));
 
-            if (!CommonHelper.IgnoreAcl || (!string.IsNullOrEmpty(storeId) && !CommonHelper.IgnoreStoreLimitations))
+            if (!_accessControlConfig.IgnoreAcl || (!string.IsNullOrEmpty(storeId) && !_accessControlConfig.IgnoreStoreLimitations))
             {
-                if (!showHidden && !CommonHelper.IgnoreAcl)
+                if (!showHidden && !_accessControlConfig.IgnoreAcl)
                 {
                     //Limited to customer groups rules
                     var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
@@ -79,7 +81,7 @@ namespace Grand.Business.Catalog.Services.Brands
                             select p;
 
                 }
-                if (!string.IsNullOrEmpty(storeId) && !CommonHelper.IgnoreStoreLimitations)
+                if (!string.IsNullOrEmpty(storeId) && !_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Limited to stores rules
                     query = from p in query
@@ -108,8 +110,7 @@ namespace Grand.Business.Catalog.Services.Brands
         /// <param name="brand">Brand</param>
         public virtual async Task InsertBrand(Brand brand)
         {
-            if (brand == null)
-                throw new ArgumentNullException(nameof(brand));
+            ArgumentNullException.ThrowIfNull(brand);
 
             await _brandRepository.InsertAsync(brand);
 
@@ -126,8 +127,7 @@ namespace Grand.Business.Catalog.Services.Brands
         /// <param name="brand">Brand</param>
         public virtual async Task UpdateBrand(Brand brand)
         {
-            if (brand == null)
-                throw new ArgumentNullException(nameof(brand));
+            ArgumentNullException.ThrowIfNull(brand);
 
             await _brandRepository.UpdateAsync(brand);
 
@@ -143,8 +143,7 @@ namespace Grand.Business.Catalog.Services.Brands
         /// <param name="brand">Brand</param>
         public virtual async Task DeleteBrand(Brand brand)
         {
-            if (brand == null)
-                throw new ArgumentNullException(nameof(brand));
+            ArgumentNullException.ThrowIfNull(brand);
 
             await _cacheBase.RemoveByPrefix(CacheKey.BRANDS_PATTERN_KEY);
 

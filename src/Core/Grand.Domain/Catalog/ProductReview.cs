@@ -3,7 +3,7 @@ namespace Grand.Domain.Catalog
     /// <summary>
     /// Represents a product review
     /// </summary>
-    public partial class ProductReview : BaseEntity
+    public class ProductReview : BaseEntity
     {
         private ICollection<ProductReviewHelpfulness> _productReviewHelpfulnessEntries;
 
@@ -65,24 +65,14 @@ namespace Grand.Domain.Catalog
         /// Review not helpful votes total
         /// </summary>
         public int HelpfulNoTotal { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time of instance creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time of instance updated
-        /// </summary>
-        public DateTime UpdatedOnUtc { get; set; }
-
+        
         /// <summary>
         /// Gets the entries of product review helpfulness
         /// </summary>
         public virtual ICollection<ProductReviewHelpfulness> ProductReviewHelpfulnessEntries
         {
-            get { return _productReviewHelpfulnessEntries ??= new List<ProductReviewHelpfulness>(); }
-            protected set { _productReviewHelpfulnessEntries = value; }
+            get => _productReviewHelpfulnessEntries ??= new List<ProductReviewHelpfulness>();
+            protected set => _productReviewHelpfulnessEntries = value;
         }
     }
 }

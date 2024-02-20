@@ -58,7 +58,10 @@ namespace Grand.Web.Admin.Controllers
         #region Methods
 
         //shopping carts
-        public IActionResult CurrentCarts() => View();
+        public IActionResult CurrentCarts()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> CurrentCarts(DataSourceRequest command)
@@ -104,7 +107,7 @@ namespace Grand.Web.Admin.Controllers
                     AttributeInfo = await _productAttributeFormatter.FormatAttributes(product, sci.Attributes, customer),
                     UnitPrice = _priceFormatter.FormatPrice((await _taxService.GetProductPrice(product, (await _pricingService.GetUnitPrice(sci, product)).unitprice)).productprice),
                     Total = _priceFormatter.FormatPrice((await _taxService.GetProductPrice(product, (await _pricingService.GetSubTotal(sci, product)).subTotal)).productprice),
-                    UpdatedOn = _dateTimeService.ConvertToUserTime(sci.UpdatedOnUtc, DateTimeKind.Utc)
+                    UpdatedOn = sci.UpdatedOnUtc.HasValue ? _dateTimeService.ConvertToUserTime(sci.UpdatedOnUtc.Value, DateTimeKind.Utc) : _dateTimeService.ConvertToUserTime(sci.CreatedOnUtc, DateTimeKind.Utc)
                 };
                 items.Add(sciModel);
             }
@@ -161,7 +164,7 @@ namespace Grand.Web.Admin.Controllers
                     AttributeInfo = await _productAttributeFormatter.FormatAttributes(product, sci.Attributes, customer),
                     UnitPrice = _priceFormatter.FormatPrice((await _taxService.GetProductPrice(product, (await _pricingService.GetUnitPrice(sci, product)).unitprice)).productprice),
                     Total = _priceFormatter.FormatPrice((await _taxService.GetProductPrice(product, (await _pricingService.GetSubTotal(sci, product)).subTotal)).productprice),
-                    UpdatedOn = _dateTimeService.ConvertToUserTime(sci.UpdatedOnUtc, DateTimeKind.Utc)
+                    UpdatedOn = sci.UpdatedOnUtc.HasValue ? _dateTimeService.ConvertToUserTime(sci.UpdatedOnUtc.Value, DateTimeKind.Utc) : _dateTimeService.ConvertToUserTime(sci.CreatedOnUtc, DateTimeKind.Utc)
                 };
                 items.Add(sciModel);
             }

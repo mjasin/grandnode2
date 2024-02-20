@@ -67,9 +67,15 @@ namespace Grand.Web.Admin.Controllers
 
         #region Blog posts
 
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
-        public IActionResult List() => View();
+        public IActionResult List()
+        {
+            return View();
+        }
 
         [PermissionAuthorizeAction(PermissionActionName.List)]
         [HttpPost]
@@ -106,7 +112,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
                 var blogPost = await _blogViewModelService.InsertBlogPostModel(model);
                 Success(_translationService.GetResource("Admin.Content.Blog.BlogPosts.Added"));
@@ -130,7 +136,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!blogPost.LimitedToStores || (blogPost.LimitedToStores && blogPost.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && blogPost.Stores.Count > 1))
-                    Warning(_translationService.GetResource("Admin.Content.Blog.BlogPosts.Permisions"));
+                    Warning(_translationService.GetResource("Admin.Content.Blog.BlogPosts.Permissions"));
                 else
                 {
                     if (!blogPost.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))
@@ -172,7 +178,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 blogPost = await _blogViewModelService.UpdateBlogPostModel(model, blogPost);
@@ -277,7 +283,10 @@ namespace Grand.Web.Admin.Controllers
         #endregion
 
         #region Categories
-        public IActionResult CategoryList() => View();
+        public IActionResult CategoryList()
+        {
+            return View();
+        }
 
         [PermissionAuthorizeAction(PermissionActionName.List)]
         [HttpPost]
@@ -311,7 +320,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 var blogCategory = model.ToEntity();
@@ -340,7 +349,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!blogCategory.LimitedToStores || (blogCategory.LimitedToStores && blogCategory.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && blogCategory.Stores.Count > 1))
-                    Warning(_translationService.GetResource("Admin.Content.Blog.BlogCategory.Permisions"));
+                    Warning(_translationService.GetResource("Admin.Content.Blog.BlogCategory.Permissions"));
                 else
                 {
                     if (!blogCategory.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))
@@ -377,7 +386,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 blogCategory = model.ToEntity(blogCategory);

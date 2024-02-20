@@ -7,7 +7,6 @@ using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Addresses;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Interfaces.Customers;
 using Grand.Business.Core.Interfaces.Marketing.Contacts;
@@ -24,7 +23,6 @@ using Grand.Domain.Orders;
 using Grand.Domain.Tax;
 using Grand.Infrastructure;
 using Grand.SharedKernel;
-using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Catalog;
@@ -34,6 +32,7 @@ using Grand.Web.Admin.Models.Messages;
 using Grand.Web.Admin.Models.ShoppingCart;
 using Grand.Web.Common.Extensions;
 using Grand.Web.Common.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
@@ -47,14 +46,12 @@ namespace Grand.Web.Admin.Services
         private readonly ICustomerProductService _customerProductService;
         private readonly INewsLetterSubscriptionService _newsLetterSubscriptionService;
         private readonly IUserFieldService _userFieldService;
-        private readonly ICustomerManagerService _customerManagerService;
         private readonly IDateTimeService _dateTimeService;
         private readonly ITranslationService _translationService;
         private readonly ILoyaltyPointsService _loyaltyPointsService;
         private readonly ICountryService _countryService;
         private readonly IWorkContext _workContext;
         private readonly IVendorService _vendorService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly IStoreService _storeService;
         private readonly ICustomerAttributeParser _customerAttributeParser;
         private readonly ICustomerAttributeService _customerAttributeService;
@@ -66,7 +63,7 @@ namespace Grand.Web.Admin.Services
         private readonly ISalesEmployeeService _salesEmployeeService;
         private readonly ICustomerNoteService _customerNoteService;
         private readonly IDownloadService _downloadService;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private readonly TaxSettings _taxSettings;
         private readonly LoyaltyPointsSettings _loyaltyPointsSettings;
@@ -80,14 +77,12 @@ namespace Grand.Web.Admin.Services
             ICustomerProductService customerProductService,
             INewsLetterSubscriptionService newsLetterSubscriptionService,
             IUserFieldService userFieldService,
-            ICustomerManagerService customerManagerService,
             IDateTimeService dateTimeService,
             ITranslationService translationService,
             ILoyaltyPointsService loyaltyPointsService,
             ICountryService countryService,
             IWorkContext workContext,
             IVendorService vendorService,
-            ICustomerActivityService customerActivityService,
             IStoreService storeService,
             ICustomerAttributeParser customerAttributeParser,
             ICustomerAttributeService customerAttributeService,
@@ -99,7 +94,7 @@ namespace Grand.Web.Admin.Services
             ISalesEmployeeService salesEmployeeService,
             ICustomerNoteService customerNoteService,
             IDownloadService downloadService,
-            IServiceProvider serviceProvider,
+            IHttpContextAccessor httpContextAccessor,
             CustomerSettings customerSettings,
             TaxSettings taxSettings,
             LoyaltyPointsSettings loyaltyPointsSettings,
@@ -111,7 +106,6 @@ namespace Grand.Web.Admin.Services
             _customerProductService = customerProductService;
             _newsLetterSubscriptionService = newsLetterSubscriptionService;
             _userFieldService = userFieldService;
-            _customerManagerService = customerManagerService;
             _dateTimeService = dateTimeService;
             _translationService = translationService;
             _loyaltyPointsService = loyaltyPointsService;
@@ -122,7 +116,6 @@ namespace Grand.Web.Admin.Services
             _commonSettings = commonSettings;
             _workContext = workContext;
             _vendorService = vendorService;
-            _customerActivityService = customerActivityService;
             _addressSettings = addressSettings;
             _storeService = storeService;
             _customerAttributeParser = customerAttributeParser;
@@ -135,7 +128,7 @@ namespace Grand.Web.Admin.Services
             _salesEmployeeService = salesEmployeeService;
             _customerNoteService = customerNoteService;
             _downloadService = downloadService;
-            _serviceProvider = serviceProvider;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #region Utilities
@@ -155,8 +148,7 @@ namespace Grand.Web.Admin.Services
 
         protected virtual async Task SaveCustomerTags(Customer customer, string[] customerTags)
         {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
+            ArgumentNullException.ThrowIfNull(customer);
 
             //product tags
             var existingCustomerTags = customer.CustomerTags.ToList();
@@ -219,9 +211,8 @@ namespace Grand.Web.Admin.Services
 
         protected virtual async Task<IList<CustomerModel.AssociatedExternalAuthModel>> GetAssociatedExternalAuthRecords(Customer customer)
         {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
-            var openAuthenticationService = _serviceProvider.GetRequiredService<IExternalAuthenticationService>();
+            ArgumentNullException.ThrowIfNull(customer);
+            var openAuthenticationService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IExternalAuthenticationService>();
             var result = new List<CustomerModel.AssociatedExternalAuthModel>();
             foreach (var record in await openAuthenticationService.GetExternalIdentifiers(customer))
             {
@@ -257,10 +248,9 @@ namespace Grand.Web.Admin.Services
             };
         }
 
-        protected virtual async Task PrepareSelesEmployeeModel(CustomerModel model)
+        protected virtual async Task PrepareSalesEmployeeModel(CustomerModel model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
 
             model.AvailableSalesEmployees.Add(new SelectListItem {
                 Text = _translationService.GetResource("Admin.Customers.Customers.Fields.SalesEmployee.None"),
@@ -279,8 +269,7 @@ namespace Grand.Web.Admin.Services
 
         protected virtual async Task PrepareStoresModel(CustomerModel model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
 
             model.AvailableStores.Add(new SelectListItem {
                 Text = _translationService.GetResource("Admin.Customers.Customers.Fields.StaffStore.None"),
@@ -512,20 +501,13 @@ namespace Grand.Web.Admin.Services
 
             model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
             model.AllowUsersToChangeUsernames = _customerSettings.AllowUsersToChangeUsernames;
-            if (customer != null)
-            {
-                model.DisplayVatNumber = _taxSettings.EuVatEnabled;
-            }
-            else
-            {
-                model.DisplayVatNumber = false;
-            }
+            model.DisplayVatNumber = customer != null && _taxSettings.EuVatEnabled;
 
             //stores
             await PrepareStoresModel(model);
 
             //employees
-            await PrepareSelesEmployeeModel(model);
+            await PrepareSalesEmployeeModel(model);
 
             //customer attributes
             await PrepareCustomerAttributeModel(model, customer);
@@ -618,32 +600,6 @@ namespace Grand.Web.Admin.Services
                 !customer.Active;
         }
 
-        public virtual async Task<string> ValidateCustomerGroups(IList<CustomerGroup> customerGroups)
-        {
-            if (customerGroups == null)
-                throw new ArgumentNullException(nameof(customerGroups));
-
-            //ensure a customer is not added to both 'Guests' and 'Registered' customer groups
-            //ensure that a customer is in at least one required role ('Guests' and 'Registered')
-            var isInGuestsGroup = customerGroups.FirstOrDefault(cr => cr.SystemName == SystemCustomerGroupNames.Guests) != null;
-            var isInRegisteredGroup = customerGroups.FirstOrDefault(cr => cr.SystemName == SystemCustomerGroupNames.Registered) != null;
-            var isAdminGroup = customerGroups.FirstOrDefault(cr => cr.SystemName == SystemCustomerGroupNames.Administrators) != null;
-
-            if (isInGuestsGroup && isInRegisteredGroup)
-                return "The customer cannot be in both 'Guests' and 'Registered' customer groups";
-
-            if (!isInGuestsGroup && !isInRegisteredGroup)
-                return "Add the customer to 'Guests' or 'Registered' customer group";
-
-            if (await _groupService.IsSalesManager(_workContext.CurrentCustomer) && (isInGuestsGroup || customerGroups.Count != 1))
-                return "Sales manager can assign role 'Registered' only";
-
-            if (!await _groupService.IsAdmin(_workContext.CurrentCustomer) && isAdminGroup)
-                return "Only administrators can assign role 'Administrators'";
-
-            //no errors
-            return "";
-        }
         public virtual async Task<Customer> InsertCustomerModel(CustomerModel model)
         {
             var ownerId = string.Empty;
@@ -669,7 +625,6 @@ namespace Grand.Web.Admin.Services
                 StoreId = _workContext.CurrentStore.Id,
                 OwnerId = ownerId,
                 Attributes = model.Attributes,
-                CreatedOnUtc = DateTime.UtcNow,
                 LastActivityDateUtc = DateTime.UtcNow
             };
 
@@ -722,8 +677,7 @@ namespace Grand.Web.Admin.Services
                                 CustomerId = customer.Id,
                                 Email = customer.Email,
                                 Active = true,
-                                StoreId = store.Id,
-                                CreatedOnUtc = DateTime.UtcNow
+                                StoreId = store.Id
                             });
                         }
                     }
@@ -750,51 +704,8 @@ namespace Grand.Web.Admin.Services
                 customer.Groups.Add(customerGroup.Id);
                 await _customerService.InsertCustomerGroupInCustomer(customerGroup, customer.Id);
             }
-
-
-            //ensure that a customer with a vendor associated is not in "Administrators" role
-            //otherwise, he won't be have access to the other functionality in admin area
-            if (await _groupService.IsAdmin(customer) && !string.IsNullOrEmpty(customer.VendorId))
-            {
-                customer.VendorId = "";
-                await _customerService.UpdateCustomerField(customer.Id, x => x.VendorId, customer.VendorId);
-            }
-
-            //ensure that a customer in the Vendors role has a vendor account associated.
-            //otherwise, he will have access to ALL products
-            if (await _groupService.IsVendor(customer) && string.IsNullOrEmpty(customer.VendorId))
-            {
-                var customerGroups = await _groupService.GetAllByIds(customer.Groups.ToArray());
-                var vendorGroup = customerGroups.FirstOrDefault(x => x.SystemName == SystemCustomerGroupNames.Vendors);
-                customer.Groups.Remove(vendorGroup.Id);
-                await _customerService.DeleteCustomerGroupInCustomer(vendorGroup, customer.Id);
-            }
-
-            //ensure that a customer in the Staff role has a staff account associated.
-            //otherwise, he will have access to ALL products
-            if (await _groupService.IsStaff(customer) && string.IsNullOrEmpty(customer.StaffStoreId))
-            {
-                var customerGroups = await _groupService.GetAllByIds(customer.Groups.ToArray());
-                var staffGroup = customerGroups.FirstOrDefault(x => x.SystemName == SystemCustomerGroupNames.Staff);
-                customer.Groups.Remove(staffGroup.Id);
-                await _customerService.DeleteCustomerGroupInCustomer(staffGroup, customer.Id);
-            }
-
-            //ensure that a customer in the Sales manager role has a staff employee associated.
-            //otherwise, he will have access to ALL customers
-            if (await _groupService.IsSalesManager(customer) && string.IsNullOrEmpty(customer.SeId))
-            {
-                var customerGroups = await _groupService.GetAllByIds(customer.Groups.ToArray());
-                var salesGroup = customerGroups.FirstOrDefault(x => x.SystemName == SystemCustomerGroupNames.SalesManager);
-                customer.Groups.Remove(salesGroup.Id);
-                await _customerService.DeleteCustomerGroupInCustomer(salesGroup, customer.Id);
-            }
-
             //tags
             await SaveCustomerTags(customer, ParseCustomerTags(model.CustomerTags));
-
-            //activity log
-            _ = _customerActivityService.InsertActivity("AddNewCustomer", customer.Id, _workContext.CurrentCustomer, "", _translationService.GetResource("ActivityLog.AddNewCustomer"),  customer.Id);
 
             return customer;
         }
@@ -810,31 +721,13 @@ namespace Grand.Web.Admin.Services
             if(!model.TwoFactorEnabled)
                 await _userFieldService.SaveField(customer, SystemCustomerFieldNames.TwoFactorEnabled, model.TwoFactorEnabled);
 
-            //email
-            if (!string.IsNullOrWhiteSpace(model.Email))
-            {
-                await _customerManagerService.SetEmail(customer, model.Email);
-            }
-            else
-            {
-                customer.Email = model.Email;
-            }
+            customer.Email = model.Email;
 
-            //username
-            if (_customerSettings.UsernamesEnabled && _customerSettings.AllowUsersToChangeUsernames)
-            {
-                if (!string.IsNullOrWhiteSpace(model.Username))
-                {
-                    await _customerManagerService.SetUsername(customer, model.Username);
-                }
-                else
-                {
-                    customer.Username = model.Username;
-                }
-            }
-
-            if (!_customerSettings.UsernamesEnabled)
-                customer.Username = model.Email;
+            customer.Username = _customerSettings.UsernamesEnabled switch {
+                true when _customerSettings.AllowUsersToChangeUsernames => model.Username.Trim(),
+                false => model.Email.Trim(),
+                _ => customer.Username
+            };
 
             if (!string.IsNullOrEmpty(model.Owner))
             {
@@ -858,7 +751,7 @@ namespace Grand.Web.Admin.Services
                 {
                     if (!model.VatNumber.Equals(prevVatNumber, StringComparison.OrdinalIgnoreCase))
                     {
-                        var checkVatService = _serviceProvider.GetRequiredService<IVatService>();
+                        var checkVatService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IVatService>();
                         await _userFieldService.SaveField(customer,
                             SystemCustomerFieldNames.VatNumberStatusId,
                             (int)(await checkVatService.GetVatNumberStatus(model.VatNumber)).status);
@@ -926,8 +819,7 @@ namespace Grand.Web.Admin.Services
                                 CustomerId = customer.Id,
                                 Email = customer.Email,
                                 Active = true,
-                                StoreId = store.Id,
-                                CreatedOnUtc = DateTime.UtcNow
+                                StoreId = store.Id
                             });
                         }
                     }
@@ -964,58 +856,9 @@ namespace Grand.Web.Admin.Services
             }
             await _customerService.UpdateCustomerInAdminPanel(customer);
 
-
-            //ensure that a customer with a vendor associated is not in "Administrators" role
-            //otherwise, he won't have access to the other functionality in admin area
-            if (await _groupService.IsAdmin(customer) && !string.IsNullOrEmpty(customer.VendorId))
-            {
-                customer.VendorId = "";
-                await _customerService.UpdateCustomerInAdminPanel(customer);
-            }
-
-            //ensure that a customer with a staff associated is not in "Administrators" role
-            //otherwise, he won't have access to the other functionality in admin area
-            if (await _groupService.IsAdmin(customer) && !string.IsNullOrEmpty(customer.StaffStoreId))
-            {
-                customer.StaffStoreId = "";
-                await _customerService.UpdateCustomerInAdminPanel(customer);
-            }
-
-            //ensure that a customer in the Vendors role has a vendor account associated.
-            //otherwise, he will have access to ALL products
-            if (await _groupService.IsVendor(customer) && string.IsNullOrEmpty(customer.VendorId))
-            {
-                var customerGroups = await _groupService.GetAllByIds(customer.Groups.ToArray());
-                var vendorGroup = customerGroups.FirstOrDefault(x => x.SystemName == SystemCustomerGroupNames.Vendors);
-                customer.Groups.Remove(vendorGroup.Id);
-                await _customerService.DeleteCustomerGroupInCustomer(vendorGroup, customer.Id);
-            }
-
-            //ensure that a customer in the Sales manager role has a staff employee associated.
-            //otherwise, he will have access to ALL customers
-            if (await _groupService.IsSalesManager(customer) && string.IsNullOrEmpty(customer.SeId))
-            {
-                var customerGroups = await _groupService.GetAllByIds(customer.Groups.ToArray());
-                var salesGroup = customerGroups.FirstOrDefault(x => x.SystemName == SystemCustomerGroupNames.SalesManager);
-                customer.Groups.Remove(salesGroup.Id);
-                await _customerService.DeleteCustomerGroupInCustomer(salesGroup, customer.Id);
-            }
-
-            //ensure that a customer in the Staff group has a staff account associated.
-            //otherwise, he will have access to ALL products
-            if (await _groupService.IsStaff(customer) && string.IsNullOrEmpty(customer.StaffStoreId))
-            {
-                var customerGroups = await _groupService.GetAllByIds(customer.Groups.ToArray());
-                var staffGroup = customerGroups.FirstOrDefault(x => x.SystemName == SystemCustomerGroupNames.Staff);
-                customer.Groups.Remove(staffGroup.Id);
-                await _customerService.DeleteCustomerGroupInCustomer(staffGroup, customer.Id);
-            }
-
             //tags
             await SaveCustomerTags(customer, ParseCustomerTags(model.CustomerTags));
 
-            //activity log
-            _ = _customerActivityService.InsertActivity("EditCustomer", customer.Id, _workContext.CurrentCustomer, "", _translationService.GetResource("ActivityLog.EditCustomer"), customer.Id);
             return customer;
         }
 
@@ -1030,32 +873,23 @@ namespace Grand.Web.Admin.Services
                 if (subscription != null)
                     await _newsLetterSubscriptionService.DeleteNewsLetterSubscription(subscription);
             }
-
-            //activity log
-            _ = _customerActivityService.InsertActivity("DeleteCustomer", customer.Id, _workContext.CurrentCustomer, "", _translationService.GetResource("ActivityLog.DeleteCustomer"), customer.Id);
         }
 
         public virtual async Task DeleteSelected(IEnumerable<string> selectedIds)
         {
             var customers = new List<Customer>();
             customers.AddRange(await _customerService.GetCustomersByIds(selectedIds.ToArray()));
-            for (var i = 0; i < customers.Count; i++)
+            foreach (var customer in customers.Where(customer => customer.Id != _workContext.CurrentCustomer.Id))
             {
-                var customer = customers[i];
-                if (customer.Id != _workContext.CurrentCustomer.Id)
-                {
-                    await _customerService.DeleteCustomer(customer);
-                }
-                //activity log
-                _ = _customerActivityService.InsertActivity("DeleteCustomer", customer.Id, _workContext.CurrentCustomer, "", _translationService.GetResource("ActivityLog.DeleteCustomer"), customer.Id);
+                await _customerService.DeleteCustomer(customer);
             }
         }
 
         public async Task SendEmail(Customer customer, CustomerModel.SendEmailModel model)
         {
-            var emailAccountService = _serviceProvider.GetRequiredService<IEmailAccountService>();
-            var emailAccountSettings = _serviceProvider.GetRequiredService<EmailAccountSettings>();
-            var queuedEmailService = _serviceProvider.GetRequiredService<IQueuedEmailService>();
+            var emailAccountService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IEmailAccountService>();
+            var emailAccountSettings = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<EmailAccountSettings>();
+            var queuedEmailService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IQueuedEmailService>();
 
             var emailAccount = await emailAccountService.GetEmailAccountById(emailAccountSettings.DefaultEmailAccountId) ??
                                (await emailAccountService.GetAllEmailAccounts()).FirstOrDefault();
@@ -1071,12 +905,10 @@ namespace Grand.Web.Admin.Services
                 To = customer.Email,
                 Subject = model.Subject,
                 Body = model.Body,
-                CreatedOnUtc = DateTime.UtcNow,
                 DontSendBeforeDateUtc = model.SendImmediately || !model.DontSendBeforeDate.HasValue ?
                         null : _dateTimeService.ConvertToUtcTime(model.DontSendBeforeDate.Value)
             };
             await queuedEmailService.InsertQueuedEmail(email);
-            _ = _customerActivityService.InsertActivity("CustomerAdmin.SendEmail", "", customer, "", _translationService.GetResource("ActivityLog.SendEmailfromAdminPanel"), model.Subject);
         }
 
         public virtual async Task<IEnumerable<CustomerModel.LoyaltyPointsHistoryModel>> PrepareLoyaltyPointsHistoryModel(string customerId)
@@ -1098,15 +930,12 @@ namespace Grand.Web.Admin.Services
 
         public virtual async Task<LoyaltyPointsHistory> InsertLoyaltyPointsHistory(Customer customer, string storeId, int addLoyaltyPointsValue, string addLoyaltyPointsMessage)
         {
-            //activity log
-            _ = _customerActivityService.InsertActivity("AddLoyaltyPoints", customer.Id, _workContext.CurrentCustomer, "", _translationService.GetResource("ActivityLog.AddNewLoyaltyPoints"), customer.Email, addLoyaltyPointsValue);
-
             return await _loyaltyPointsService.AddLoyaltyPointsHistory(customer.Id, addLoyaltyPointsValue, storeId, addLoyaltyPointsMessage);
         }
 
         public virtual async Task<IEnumerable<AddressModel>> PrepareAddressModel(Customer customer)
         {
-            var addresses = customer.Addresses.OrderByDescending(a => a.CreatedOnUtc).ThenByDescending(a => a.Id).ToList();
+            var addresses = customer.Addresses.ToList();
             var addressesListModel = new List<AddressModel>();
             foreach (var x in addresses)
             {
@@ -1148,7 +977,6 @@ namespace Grand.Web.Admin.Services
         {
             var address = model.Address.ToEntity();
             address.Attributes = customAttributes;
-            address.CreatedOnUtc = DateTime.UtcNow;
             customer.Addresses.Add(address);
             await _customerService.UpdateCustomerInAdminPanel(customer);
             return address;
@@ -1156,8 +984,7 @@ namespace Grand.Web.Admin.Services
 
         public virtual async Task PrepareAddressModel(CustomerAddressModel model, Address address, Customer customer, bool excludeProperties)
         {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
+            ArgumentNullException.ThrowIfNull(customer);
 
             model.CustomerId = customer.Id;
             if (address != null)
@@ -1168,8 +995,7 @@ namespace Grand.Web.Admin.Services
                 }
             }
 
-            if (model.Address == null)
-                model.Address = new AddressModel();
+            model.Address ??= new AddressModel();
 
             model.Address.NameEnabled = _addressSettings.NameEnabled;
             model.Address.FirstNameEnabled = true;
@@ -1230,10 +1056,10 @@ namespace Grand.Web.Admin.Services
             var items = new List<ShoppingCartItemModel>();
             if (cart.Any())
             {
-                var taxService = _serviceProvider.GetRequiredService<ITaxService>();
-                var priceCalculationService = _serviceProvider.GetRequiredService<IPricingService>();
-                var priceFormatter = _serviceProvider.GetRequiredService<IPriceFormatter>();
-
+                var taxService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<ITaxService>();
+                var priceCalculationService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IPricingService>();
+                var priceFormatter = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IPriceFormatter>();
+                var productAttributeFormatter = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IProductAttributeFormatter>();
                 foreach (var sci in cart)
                 {
                     var store = await _storeService.GetStoreById(sci.StoreId);
@@ -1247,11 +1073,11 @@ namespace Grand.Web.Admin.Services
                             ProductId = sci.ProductId,
                             Quantity = sci.Quantity,
                             ProductName = product.Name,
-                            AttributeInfo = await _serviceProvider.GetRequiredService<IProductAttributeFormatter>().FormatAttributes(product, sci.Attributes),
+                            AttributeInfo = await productAttributeFormatter.FormatAttributes(product, sci.Attributes),
                             UnitPrice = priceFormatter.FormatPrice(price),
                             UnitPriceValue = price,
                             Total = priceFormatter.FormatPrice((await taxService.GetProductPrice(product, (await priceCalculationService.GetSubTotal(sci, product)).subTotal)).productprice),
-                            UpdatedOn = _dateTimeService.ConvertToUserTime(sci.UpdatedOnUtc, DateTimeKind.Utc)
+                            UpdatedOn = sci.UpdatedOnUtc.HasValue ? _dateTimeService.ConvertToUserTime(sci.UpdatedOnUtc.Value, DateTimeKind.Utc) : _dateTimeService.ConvertToUserTime(sci.CreatedOnUtc, DateTimeKind.Utc)
                         };
                         items.Add(sciModel);
                     }
@@ -1264,7 +1090,7 @@ namespace Grand.Web.Admin.Services
             var cart = customer.ShoppingCartItems.FirstOrDefault(a => a.Id == id);
             if (cart != null)
             {
-                await _serviceProvider.GetRequiredService<IShoppingCartService>()
+                await _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IShoppingCartService>()
                     .DeleteShoppingCartItem(customer, cart, ensureOnlyActiveCheckoutAttributes: true);
                 await _customerService.UpdateCustomerInAdminPanel(customer);
             }
@@ -1275,11 +1101,7 @@ namespace Grand.Web.Admin.Services
             var cart = customer.ShoppingCartItems.FirstOrDefault(a => a.Id == shoppingCartId);
             if (cart != null)
             {
-                //activity log
-                _ = _customerActivityService.InsertActivity("CustomerAdmin.UpdateCartCustomer", customer.Id,_workContext.CurrentCustomer,"",
-                    _translationService.GetResource("ActivityLog.UpdateCartCustomer"), customer.Email, customer.Id, unitprice);
-
-                return await _serviceProvider.GetRequiredService<IShoppingCartService>()
+                return await _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IShoppingCartService>()
                     .UpdateShoppingCartItem(
                     customer,
                     shoppingCartId,
@@ -1351,7 +1173,7 @@ namespace Grand.Web.Admin.Services
         public virtual async Task<(IList<ProductModel> products, int totalCount)> PrepareProductModel(CustomerModel.AddProductModel model, int pageIndex, int pageSize)
         {
             var products = await _productService.PrepareProductList(model.SearchCategoryId, model.SearchBrandId, model.SearchCollectionId, model.SearchStoreId, model.SearchVendorId, model.SearchProductTypeId, model.SearchProductName, pageIndex, pageSize);
-            return (products.Select(x => x.ToModel(_dateTimeService)).ToList(), products.TotalCount);
+            return (products.Select(x => x.ToModel()).ToList(), products.TotalCount);
         }
 
         public virtual async Task InsertCustomerAddProductModel(string customerId, bool personalized, CustomerModel.AddProductModel model)
@@ -1413,27 +1235,10 @@ namespace Grand.Web.Admin.Services
 
             await _customerProductService.DeleteCustomerProduct(customerproduct);
         }
-        public virtual async Task<(IEnumerable<CustomerModel.ActivityLogModel> activityLogModels, int totalCount)> PrepareActivityLogModel(string customerId, int pageIndex, int pageSize)
+        public virtual async Task<(IEnumerable<ContactFormModel> contactFormModels, int totalCount)> PrepareContactFormModel(string customerId, int pageIndex, int pageSize)
         {
-            var activityLog = await _customerActivityService.GetAllActivities(null, null, null, customerId, "", null, pageIndex - 1, pageSize);
-            var items = new List<CustomerModel.ActivityLogModel>();
-            foreach (var x in activityLog)
-            {
-                var m = new CustomerModel.ActivityLogModel {
-                    Id = x.Id,
-                    ActivityLogTypeName = (await _customerActivityService.GetActivityTypeById(x.ActivityLogTypeId))?.Name,
-                    Comment = x.Comment,
-                    CreatedOn = _dateTimeService.ConvertToUserTime(x.CreatedOnUtc, DateTimeKind.Utc),
-                    IpAddress = x.IpAddress
-                };
-                items.Add(m);
-            }
-            return (items, activityLog.TotalCount);
-        }
-        public virtual async Task<(IEnumerable<ContactFormModel> contactFormModels, int totalCount)> PrepareContactFormModel(string customerId, string vendorId, int pageIndex, int pageSize)
-        {
-            var contactUsService = _serviceProvider.GetRequiredService<IContactUsService>();
-            var contactform = await contactUsService.GetAllContactUs(storeId: "", vendorId: vendorId, customerId: customerId, pageIndex: pageIndex - 1, pageSize: pageSize);
+            var contactUsService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IContactUsService>();
+            var contactform = await contactUsService.GetAllContactUs(storeId: "", vendorId: "", customerId: customerId, pageIndex: pageIndex - 1, pageSize: pageSize);
             var items = new List<ContactFormModel>();
             foreach (var x in contactform)
             {
@@ -1449,12 +1254,12 @@ namespace Grand.Web.Admin.Services
         }
         public virtual async Task<(IEnumerable<CustomerModel.OutOfStockSubscriptionModel> outOfStockSubscriptionModels, int totalCount)> PrepareOutOfStockSubscriptionModel(string customerId, int pageIndex, int pageSize)
         {
-            var outOfStockSubscriptionService = _serviceProvider.GetRequiredService<IOutOfStockSubscriptionService>();
+            var outOfStockSubscriptionService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IOutOfStockSubscriptionService>();
             var subscriptions = await outOfStockSubscriptionService.GetAllSubscriptionsByCustomerId(customerId, "", pageIndex - 1, pageSize);
             var items = new List<CustomerModel.OutOfStockSubscriptionModel>();
             if (subscriptions.Any())
             {
-                var productAttributeFormatter = _serviceProvider.GetRequiredService<IProductAttributeFormatter>();
+                var productAttributeFormatter = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IProductAttributeFormatter>();
                 foreach (var x in subscriptions)
                 {
                     var store = await _storeService.GetStoreById(x.StoreId);
@@ -1474,7 +1279,7 @@ namespace Grand.Web.Admin.Services
         }
         public virtual async Task<IList<CustomerModel.CustomerNote>> PrepareCustomerNoteList(string customerId)
         {
-            var downloadService = _serviceProvider.GetRequiredService<IDownloadService>();
+            var downloadService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IDownloadService>();
             var customerNoteModels = new List<CustomerModel.CustomerNote>();
             foreach (var customerNote in (await _customerNoteService.GetCustomerNotes(customerId))
                 .OrderByDescending(on => on.CreatedOnUtc))
@@ -1500,8 +1305,7 @@ namespace Grand.Web.Admin.Services
                 Title = title,
                 Note = message,
                 DownloadId = downloadId,
-                CustomerId = customerId,
-                CreatedOnUtc = DateTime.UtcNow
+                CustomerId = customerId
             };
             await _customerNoteService.InsertCustomerNote(customerNote);
 
@@ -1509,7 +1313,7 @@ namespace Grand.Web.Admin.Services
             if (displayToCustomer)
             {
                 //email
-                var messageProviderService = _serviceProvider.GetRequiredService<IMessageProviderService>();
+                var messageProviderService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IMessageProviderService>();
                 await messageProviderService.SendNewCustomerNoteMessage(customerNote,
                     await _customerService.GetCustomerById(customerId), _workContext.CurrentStore, _workContext.WorkingLanguage.Id);
 

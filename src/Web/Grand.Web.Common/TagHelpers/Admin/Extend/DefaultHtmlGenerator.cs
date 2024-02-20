@@ -1,12 +1,6 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +9,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
+using System.Collections;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+using System.Text.Encodings.Web;
 
-namespace Grand.Web.Common.TagHelpers.Admin
+namespace Grand.Web.Common.TagHelpers.Admin.Extend
 {
     public class DefaultHtmlGenerator : IHtmlGenerator
     {
@@ -26,11 +26,11 @@ namespace Grand.Web.Common.TagHelpers.Admin
 
         // See: (http://www.w3.org/TR/html5/forms.html#the-input-element)
         private static readonly string[] _placeholderInputTypes =
-            new[] { "text", "search", "url", "tel", "email", "password", "number" };
+            ["text", "search", "url", "tel", "email", "password", "number"];
 
         // See: (http://www.w3.org/TR/html5/sec-forms.html#apply)
         private static readonly string[] _maxLengthInputTypes =
-            new[] { "text", "search", "url", "tel", "email", "password" };
+            ["text", "search", "url", "tel", "email", "password"];
 
         private readonly IAntiforgery _antiforgery;
         private readonly IModelMetadataProvider _metadataProvider;
@@ -56,35 +56,12 @@ namespace Grand.Web.Common.TagHelpers.Admin
             HtmlEncoder htmlEncoder,
             ValidationHtmlAttributeProvider validationAttributeProvider)
         {
-            if (antiforgery == null)
-            {
-                throw new ArgumentNullException(nameof(antiforgery));
-            }
-
-            if (optionsAccessor == null)
-            {
-                throw new ArgumentNullException(nameof(optionsAccessor));
-            }
-
-            if (metadataProvider == null)
-            {
-                throw new ArgumentNullException(nameof(metadataProvider));
-            }
-
-            if (urlHelperFactory == null)
-            {
-                throw new ArgumentNullException(nameof(urlHelperFactory));
-            }
-
-            if (htmlEncoder == null)
-            {
-                throw new ArgumentNullException(nameof(htmlEncoder));
-            }
-
-            if (validationAttributeProvider == null)
-            {
-                throw new ArgumentNullException(nameof(validationAttributeProvider));
-            }
+            ArgumentNullException.ThrowIfNull(antiforgery);
+            ArgumentNullException.ThrowIfNull(optionsAccessor);
+            ArgumentNullException.ThrowIfNull(metadataProvider);
+            ArgumentNullException.ThrowIfNull(urlHelperFactory);
+            ArgumentNullException.ThrowIfNull(htmlEncoder);
+            ArgumentNullException.ThrowIfNull(validationAttributeProvider);
 
             _antiforgery = antiforgery;
             _metadataProvider = metadataProvider;
@@ -125,7 +102,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
         /// <inheritdoc />
         public string Encode(object value)
         {
-            return (value != null) ? _htmlEncoder.Encode(value.ToString()) : string.Empty;
+            return value != null ? _htmlEncoder.Encode(value.ToString()) : string.Empty;
         }
 
         /// <inheritdoc />
@@ -146,15 +123,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
             object routeValues,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
-
-            if (linkText == null)
-            {
-                throw new ArgumentNullException(nameof(linkText));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
+            ArgumentNullException.ThrowIfNull(linkText);
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(viewContext);
             var url = urlHelper.Action(actionName, controllerName, routeValues, protocol, hostname, fragment);
@@ -173,15 +143,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
             object routeValues,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
-
-            if (linkText == null)
-            {
-                throw new ArgumentNullException(nameof(linkText));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
+            ArgumentNullException.ThrowIfNull(linkText);
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(viewContext);
             var url = urlHelper.Page(pageName, pageHandler, routeValues, protocol, hostname, fragment);
@@ -191,10 +154,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
         /// <inheritdoc />
         public virtual IHtmlContent GenerateAntiforgery(ViewContext viewContext)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var formContext = viewContext.FormContext;
             if (formContext.CanRenderAtEndOfForm)
@@ -221,10 +181,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             bool? isChecked,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             if (modelExplorer != null)
             {
@@ -254,7 +211,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 modelExplorer,
                 expression,
                 value: "true",
-                useViewData: (modelExplorer == null && !isChecked.HasValue),
+                useViewData: modelExplorer == null && !isChecked.HasValue,
                 isChecked: isChecked ?? false,
                 setId: true,
                 isExplicitValue: false,
@@ -268,10 +225,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             ModelExplorer modelExplorer,
             string expression)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var tagBuilder = new TagBuilder("input");
             tagBuilder.MergeAttribute("type", GetInputTypeString(InputType.Hidden));
@@ -296,10 +250,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string method,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var defaultMethod = false;
             if (string.IsNullOrEmpty(method))
@@ -339,10 +290,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string method,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(viewContext);
             var action = urlHelper.Page(pageName, pageHandler, routeValues, protocol: null, host: null, fragment: fragment);
@@ -358,10 +306,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string method,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(viewContext);
             var action = urlHelper.RouteUrl(routeName, routeValues);
@@ -378,10 +323,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             bool useViewData,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             // Special-case opaque values and arbitrary binary data.
             if (value is byte[] byteArrayValue)
@@ -412,15 +354,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string labelText,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
-
-            if (modelExplorer == null)
-            {
-                throw new ArgumentNullException(nameof(modelExplorer));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
+            ArgumentNullException.ThrowIfNull(modelExplorer);
 
             var resolvedLabelText = labelText ??
                 modelExplorer.Metadata.DisplayName ??
@@ -428,15 +363,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
             if (resolvedLabelText == null && expression != null)
             {
                 var index = expression.LastIndexOf('.');
-                if (index == -1)
-                {
-                    // Expression does not contain a dot separator.
-                    resolvedLabelText = expression;
-                }
-                else
-                {
-                    resolvedLabelText = expression[(index + 1)..];
-                }
+                // Expression does not contain a dot separator.
+                resolvedLabelText = index == -1 ? expression : expression[(index + 1)..];
             }
 
             var tagBuilder = new TagBuilder("label");
@@ -457,10 +385,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             object value,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var htmlAttributeDictionary = GetHtmlAttributeDictionaryOrNull(htmlAttributes);
             return GenerateInput(
@@ -486,10 +411,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             bool? isChecked,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var htmlAttributeDictionary = GetHtmlAttributeDictionaryOrNull(htmlAttributes);
             if (modelExplorer == null)
@@ -557,15 +479,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
             object routeValues,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
-
-            if (linkText == null)
-            {
-                throw new ArgumentNullException(nameof(linkText));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
+            ArgumentNullException.ThrowIfNull(linkText);
 
             var urlHelper = _urlHelperFactory.GetUrlHelper(viewContext);
             var url = urlHelper.RouteUrl(routeName, routeValues, protocol, hostName, fragment);
@@ -582,10 +497,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             bool allowMultiple,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var currentValues = GetCurrentValues(viewContext, modelExplorer, expression, allowMultiple);
             return GenerateSelect(
@@ -610,10 +522,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             bool allowMultiple,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var fullName = NameAndIdProvider.GetFullHtmlFieldName(viewContext, expression);
             var htmlAttributeDictionary = GetHtmlAttributeDictionaryOrNull(htmlAttributes);
@@ -623,10 +532,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             }
 
             // If we got a null selectList, try to use ViewData to get the list of items.
-            if (selectList == null)
-            {
-                selectList = GetSelectListItems(viewContext, expression);
-            }
+            selectList ??= GetSelectListItems(viewContext, expression);
 
             modelExplorer = modelExplorer ??
                 ExpressionMetadataProvider.FromStringExpression(expression, viewContext.ViewData, _metadataProvider);
@@ -671,10 +577,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             int columns,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             if (rows < 0)
             {
@@ -683,7 +586,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
 
             if (columns < 0)
             {
-                throw new ArgumentOutOfRangeException($" nameof(columns) TextAreaParameterOutOfRange");
+                throw new ArgumentOutOfRangeException(" nameof(columns) TextAreaParameterOutOfRange");
             }
 
             var fullName = NameAndIdProvider.GetFullHtmlFieldName(viewContext, expression);
@@ -696,7 +599,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             viewContext.ViewData.ModelState.TryGetValue(fullName, out var entry);
 
             var value = string.Empty;
-            if (entry != null && entry.AttemptedValue != null)
+            if (entry is { AttemptedValue: not null })
             {
                 value = entry.AttemptedValue;
             }
@@ -731,7 +634,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             AddValidationAttributes(viewContext, tagBuilder, modelExplorer, expression);
 
             // If there are any errors for a named field, we add this CSS attribute.
-            if (entry != null && entry.Errors.Count > 0)
+            if (entry is { Errors.Count: > 0 })
             {
                 tagBuilder.AddCssClass(HtmlHelper.ValidationInputCssClassName);
             }
@@ -753,10 +656,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string format,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var htmlAttributeDictionary = GetHtmlAttributeDictionaryOrNull(htmlAttributes);
             return GenerateInput(
@@ -765,7 +665,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 modelExplorer,
                 expression,
                 value,
-                useViewData: (modelExplorer == null && value == null),
+                useViewData: modelExplorer == null && value == null,
                 isChecked: false,
                 setId: true,
                 isExplicitValue: true,
@@ -782,10 +682,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string tag,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var fullName = NameAndIdProvider.GetFullHtmlFieldName(viewContext, expression);
             var htmlAttributeDictionary = GetHtmlAttributeDictionaryOrNull(htmlAttributes);
@@ -826,7 +723,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
 
             // Only the style of the span is changed according to the errors if message is null or empty.
             // Otherwise the content and style is handled by the client-side validation.
-            var className = (modelError != null) ?
+            var className = modelError != null ?
                 HtmlHelper.ValidationMessageCssClassName :
                 HtmlHelper.ValidationMessageValidCssClassName;
             tagBuilder.AddCssClass(className);
@@ -868,10 +765,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string headerTag,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var viewData = viewContext.ViewData;
             if (!viewContext.ClientValidationEnabled && viewData.ModelState.IsValid)
@@ -937,14 +831,9 @@ namespace Grand.Web.Common.TagHelpers.Admin
             var tagBuilder = new TagBuilder("div");
             tagBuilder.MergeAttributes(GetHtmlAttributeDictionaryOrNull(htmlAttributes));
 
-            if (viewData.ModelState.IsValid)
-            {
-                tagBuilder.AddCssClass(HtmlHelper.ValidationSummaryValidCssClassName);
-            }
-            else
-            {
-                tagBuilder.AddCssClass(HtmlHelper.ValidationSummaryCssClassName);
-            }
+            tagBuilder.AddCssClass(viewData.ModelState.IsValid
+                ? HtmlHelper.ValidationSummaryValidCssClassName
+                : HtmlHelper.ValidationSummaryCssClassName);
 
             if (messageTag != null)
             {
@@ -969,10 +858,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string expression,
             bool allowMultiple)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var fullName = NameAndIdProvider.GetFullHtmlFieldName(viewContext, expression);
             var type = allowMultiple ? typeof(string[]) : typeof(string);
@@ -1040,7 +926,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             foreach (var value in rawValues)
             {
                 // Add original or converted string.
-                var stringValue = (value as string) ?? Convert.ToString(value, CultureInfo.CurrentCulture);
+                var stringValue = value as string ?? Convert.ToString(value, CultureInfo.CurrentCulture);
 
                 // Do not add simple names of enum properties here because whitespace isn't relevant for their binding.
                 // Will add matching names just below.
@@ -1064,7 +950,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
                     {
                         // E.g. got a string from ModelState.
                         var methodInfo = ConvertEnumFromStringMethod.MakeGenericMethod(innerType);
-                        enumValue = (Enum)methodInfo.Invoke(obj: null, parameters: new[] { stringValue });
+                        enumValue = (Enum)methodInfo.Invoke(obj: null, parameters: [stringValue]);
                     }
                 }
 
@@ -1158,10 +1044,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string method,
             object htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             var tagBuilder = new TagBuilder("form");
             tagBuilder.MergeAttributes(GetHtmlAttributeDictionaryOrNull(htmlAttributes));
@@ -1195,10 +1078,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string format,
             IDictionary<string, object> htmlAttributes)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             // Not valid to use TextBoxForModel() and so on in a top-level view; would end up with an unnamed input
             // elements. But we support the *ForModel() methods in any lower-level template, once HtmlFieldPrefix is
@@ -1211,7 +1091,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
 
             var inputTypeString = GetInputTypeString(inputType);
             var tagBuilder = new TagBuilder("input") {
-                TagRenderMode = TagRenderMode.SelfClosing,
+                TagRenderMode = TagRenderMode.SelfClosing
             };
 
             tagBuilder.MergeAttributes(htmlAttributes);
@@ -1279,11 +1159,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
 
                 case InputType.Text:
                 default:
-                    var attributeValue = (string)GetModelStateValue(viewContext, fullName, typeof(string));
-                    if (attributeValue == null)
-                    {
-                        attributeValue = useViewData ? EvalString(viewContext, expression, format) : valueParameter;
-                    }
+                    var attributeValue = (string)GetModelStateValue(viewContext, fullName, typeof(string)) ?? (useViewData ? EvalString(viewContext, expression, format) : valueParameter);
 
                     var addValue = true;
                     object typeAttributeValue;
@@ -1327,10 +1203,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             string url,
             object htmlAttributes)
         {
-            if (linkText == null)
-            {
-                throw new ArgumentNullException(nameof(linkText));
-            }
+            ArgumentNullException.ThrowIfNull(linkText);
 
             var tagBuilder = new TagBuilder("a");
             tagBuilder.InnerHtml.SetContent(linkText);
@@ -1470,11 +1343,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             IDictionary<string, object> htmlAttributeDictionary = null;
             if (htmlAttributes != null)
             {
-                htmlAttributeDictionary = htmlAttributes as IDictionary<string, object>;
-                if (htmlAttributeDictionary == null)
-                {
-                    htmlAttributeDictionary = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes);
-                }
+                htmlAttributeDictionary = htmlAttributes as IDictionary<string, object> ?? HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes);
             }
 
             return htmlAttributeDictionary;
@@ -1503,10 +1372,7 @@ namespace Grand.Web.Common.TagHelpers.Admin
             ViewContext viewContext,
             string expression)
         {
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
+            ArgumentNullException.ThrowIfNull(viewContext);
 
             // Method is called only if user did not pass a select list in. They must provide select list items in the
             // ViewData dictionary and definitely not as the Model. (Even if the Model datatype were correct, a
@@ -1593,10 +1459,10 @@ namespace Grand.Web.Common.TagHelpers.Admin
             if (optionLabel != null)
             {
                 listItemBuilder.AppendLine(GenerateOption(
-                    new SelectListItem() {
+                    new SelectListItem {
                         Text = optionLabel,
                         Value = string.Empty,
-                        Selected = false,
+                        Selected = false
                     },
                     currentValues: null));
             }

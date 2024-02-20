@@ -1,9 +1,9 @@
 using Grand.Business.Core.Interfaces.Cms;
 using Grand.Domain;
 using Grand.Domain.Blogs;
-using Grand.Domain.Data;
+using Grand.Data;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Cms.Services
@@ -19,6 +19,7 @@ namespace Grand.Business.Cms.Services
         private readonly IRepository<BlogComment> _blogCommentRepository;
         private readonly IRepository<BlogCategory> _blogCategoryRepository;
         private readonly IRepository<BlogProduct> _blogProductRepository;
+        private readonly AccessControlConfig _accessControlConfig;
         private readonly IMediator _mediator;
 
         #endregion
@@ -29,13 +30,14 @@ namespace Grand.Business.Cms.Services
             IRepository<BlogComment> blogCommentRepository,
             IRepository<BlogCategory> blogCategoryRepository,
             IRepository<BlogProduct> blogProductRepository,
-            IMediator mediator)
+            IMediator mediator, AccessControlConfig accessControlConfig)
         {
             _blogPostRepository = blogPostRepository;
             _blogCommentRepository = blogCommentRepository;
             _blogCategoryRepository = blogCategoryRepository;
             _blogProductRepository = blogProductRepository;
             _mediator = mediator;
+            _accessControlConfig = accessControlConfig;
         }
 
         #endregion
@@ -75,7 +77,7 @@ namespace Grand.Business.Cms.Services
 
             if (!string.IsNullOrEmpty(categoryId))
             {
-                var category = _blogCategoryRepository.Table.FirstOrDefault(x => x.Id == categoryId);
+                var category = await _blogCategoryRepository.GetOneAsync(x => x.Id == categoryId);
                 if (category != null)
                 {
                     var postsIds = category.BlogPosts.Select(x => x.BlogPostId);
@@ -101,7 +103,7 @@ namespace Grand.Business.Cms.Services
                 query = query.Where(b => !b.EndDateUtc.HasValue || b.EndDateUtc >= utcNow);
             }
 
-            if (!string.IsNullOrEmpty(storeId) && !CommonHelper.IgnoreStoreLimitations)
+            if (!string.IsNullOrEmpty(storeId) && !_accessControlConfig.IgnoreStoreLimitations)
             {
                 query = query.Where(b => b.Stores.Contains(storeId) || !b.LimitedToStores);
             }
@@ -180,8 +182,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogPost">Blog post</param>
         public virtual async Task InsertBlogPost(BlogPost blogPost)
         {
-            if (blogPost == null)
-                throw new ArgumentNullException(nameof(blogPost));
+            ArgumentNullException.ThrowIfNull(blogPost);
 
             await _blogPostRepository.InsertAsync(blogPost);
 
@@ -195,8 +196,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogPost">Blog post</param>
         public virtual async Task UpdateBlogPost(BlogPost blogPost)
         {
-            if (blogPost == null)
-                throw new ArgumentNullException(nameof(blogPost));
+            ArgumentNullException.ThrowIfNull(blogPost);
 
             await _blogPostRepository.UpdateAsync(blogPost);
 
@@ -209,8 +209,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogPost">Blog post</param>
         public virtual async Task DeleteBlogPost(BlogPost blogPost)
         {
-            if (blogPost == null)
-                throw new ArgumentNullException(nameof(blogPost));
+            ArgumentNullException.ThrowIfNull(blogPost);
 
             await _blogPostRepository.DeleteAsync(blogPost);
 
@@ -278,8 +277,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogComment">Blog post comment</param>
         public virtual async Task InsertBlogComment(BlogComment blogComment)
         {
-            if (blogComment == null)
-                throw new ArgumentNullException(nameof(blogComment));
+            ArgumentNullException.ThrowIfNull(blogComment);
 
             await _blogCommentRepository.InsertAsync(blogComment);
 
@@ -289,8 +287,7 @@ namespace Grand.Business.Cms.Services
 
         public virtual async Task DeleteBlogComment(BlogComment blogComment)
         {
-            if (blogComment == null)
-                throw new ArgumentNullException(nameof(blogComment));
+            ArgumentNullException.ThrowIfNull(blogComment);
 
             await _blogCommentRepository.DeleteAsync(blogComment);
         }
@@ -327,7 +324,7 @@ namespace Grand.Business.Cms.Services
             if (string.IsNullOrEmpty(blogCategorySeName))
                 throw new ArgumentNullException(nameof(blogCategorySeName));
 
-            return await Task.FromResult(_blogCategoryRepository.Table.FirstOrDefault(x => x.SeName == blogCategorySeName.ToLowerInvariant()));
+            return await _blogCategoryRepository.GetOneAsync(x => x.SeName == blogCategorySeName.ToLowerInvariant());
         }
 
         /// <summary>
@@ -339,7 +336,7 @@ namespace Grand.Business.Cms.Services
             var query = from c in _blogCategoryRepository.Table
                         select c;
 
-            if (!string.IsNullOrEmpty(storeId) && !CommonHelper.IgnoreStoreLimitations)
+            if (!string.IsNullOrEmpty(storeId) && !_accessControlConfig.IgnoreStoreLimitations)
             {
                 query = query.Where(b => b.Stores.Contains(storeId) || !b.LimitedToStores);
             }
@@ -353,8 +350,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogCategory">Blog category</param>
         public virtual async Task<BlogCategory> InsertBlogCategory(BlogCategory blogCategory)
         {
-            if (blogCategory == null)
-                throw new ArgumentNullException(nameof(blogCategory));
+            ArgumentNullException.ThrowIfNull(blogCategory);
 
             await _blogCategoryRepository.InsertAsync(blogCategory);
 
@@ -370,8 +366,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogCategory">Blog category</param>
         public virtual async Task<BlogCategory> UpdateBlogCategory(BlogCategory blogCategory)
         {
-            if (blogCategory == null)
-                throw new ArgumentNullException(nameof(blogCategory));
+            ArgumentNullException.ThrowIfNull(blogCategory);
 
             await _blogCategoryRepository.UpdateAsync(blogCategory);
 
@@ -387,8 +382,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogCategory">Blog category</param>
         public virtual async Task DeleteBlogCategory(BlogCategory blogCategory)
         {
-            if (blogCategory == null)
-                throw new ArgumentNullException(nameof(blogCategory));
+            ArgumentNullException.ThrowIfNull(blogCategory);
 
             await _blogCategoryRepository.DeleteAsync(blogCategory);
 
@@ -416,8 +410,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogProduct">Blog product</param>
         public virtual async Task InsertBlogProduct(BlogProduct blogProduct)
         {
-            if (blogProduct == null)
-                throw new ArgumentNullException(nameof(blogProduct));
+            ArgumentNullException.ThrowIfNull(blogProduct);
 
             await _blogProductRepository.InsertAsync(blogProduct);
 
@@ -432,8 +425,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogProduct">Blog product</param>
         public virtual async Task UpdateBlogProduct(BlogProduct blogProduct)
         {
-            if (blogProduct == null)
-                throw new ArgumentNullException(nameof(blogProduct));
+            ArgumentNullException.ThrowIfNull(blogProduct);
 
             await _blogProductRepository.UpdateAsync(blogProduct);
 
@@ -448,8 +440,7 @@ namespace Grand.Business.Cms.Services
         /// <param name="blogProduct">Blog product</param>
         public virtual async Task DeleteBlogProduct(BlogProduct blogProduct)
         {
-            if (blogProduct == null)
-                throw new ArgumentNullException(nameof(blogProduct));
+            ArgumentNullException.ThrowIfNull(blogProduct);
 
             await _blogProductRepository.DeleteAsync(blogProduct);
 

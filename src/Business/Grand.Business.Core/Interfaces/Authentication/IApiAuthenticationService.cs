@@ -1,4 +1,5 @@
 ﻿using Grand.Domain.Customers;
+using Microsoft.AspNetCore.Http;
 
 namespace Grand.Business.Core.Interfaces.Authentication
 {

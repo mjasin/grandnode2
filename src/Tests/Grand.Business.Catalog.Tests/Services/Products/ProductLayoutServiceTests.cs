@@ -1,13 +1,15 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Products;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class ProductLayoutServiceTests
@@ -23,7 +25,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             _repository = new MongoDBRepositoryTest<ProductLayout>();
             _mediatorMock = new Mock<IMediator>();
 
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _productLayoutService = new ProductLayoutService(_repository, _cacheBase, _mediatorMock.Object);
         }
 
@@ -47,7 +49,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetProductLayoutByIdTest()
         {
             //Arrange
-            var productLayout = new ProductLayout() {
+            var productLayout = new ProductLayout {
                 Name = "test"
             };
             await _productLayoutService.InsertProductLayout(productLayout);
@@ -73,7 +75,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UpdateProductLayoutTest()
         {
             //Arrange
-            var categoryLayout = new ProductLayout() {
+            var categoryLayout = new ProductLayout {
                 Name = "test"
             };
             await _productLayoutService.InsertProductLayout(categoryLayout);
@@ -90,11 +92,11 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task DeleteProductLayoutTest()
         {
             //Arrange
-            var productLayout1 = new ProductLayout() {
+            var productLayout1 = new ProductLayout {
                 Name = "test1"
             };
             await _productLayoutService.InsertProductLayout(productLayout1);
-            var productLayout2 = new ProductLayout() {
+            var productLayout2 = new ProductLayout {
                 Name = "test2"
             };
             await _productLayoutService.InsertProductLayout(productLayout2);

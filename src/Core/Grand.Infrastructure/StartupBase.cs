@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching.RabbitMq;
 using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
@@ -12,7 +12,6 @@ using Grand.Infrastructure.Validators;
 using Grand.SharedKernel;
 using Grand.SharedKernel.Extensions;
 using MassTransit;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -35,12 +34,12 @@ namespace Grand.Infrastructure
         /// </summary>
         private static void InitDatabase(IServiceCollection services, IConfiguration configuration)
         {
-            var advancedConfig = services.StartupConfig<AdvancedConfig>(configuration.GetSection("Advanced"));
-            if (!string.IsNullOrEmpty(advancedConfig.DbConnectionString))
+            var dbConfig = services.StartupConfig<DatabaseConfig>(configuration.GetSection("Database"));
+            if (!string.IsNullOrEmpty(dbConfig.ConnectionString))
             {
                 DataSettingsManager.LoadDataSettings(new DataSettings {
-                    ConnectionString = advancedConfig.DbConnectionString,
-                    DbProvider = (DbProvider)advancedConfig.DbProvider
+                    ConnectionString = dbConfig.ConnectionString,
+                    DbProvider = (DbProvider)dbConfig.DbProvider
                 });
             }
         }
@@ -107,11 +106,8 @@ namespace Grand.Infrastructure
         private static T StartupConfig<T>(this IServiceCollection services, IConfiguration configuration)
             where T : class, new()
         {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
-
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configuration);
 
             var config = new T();
             configuration.Bind(config);
@@ -197,24 +193,13 @@ namespace Grand.Infrastructure
         /// </summary>
         /// <param name="services">Collection of service descriptors</param>
         /// <param name="configuration">Configuration</param>
-        private static IMvcCoreBuilder RegisterApplication(IServiceCollection services, IConfiguration configuration)
+        /// <param name="typeSearcher">Type searcher</param>
+        private static IMvcCoreBuilder RegisterApplication(IServiceCollection services, IConfiguration configuration, ITypeSearcher typeSearcher)
         {
             //add accessor to HttpContext
             services.AddHttpContextAccessor();
-            //add AppConfig configuration parameters
-            services.StartupConfig<AppConfig>(configuration.GetSection("Application"));
-            var performanceConfig = services.StartupConfig<PerformanceConfig>(configuration.GetSection("Performance"));
-            var securityConfig = services.StartupConfig<SecurityConfig>(configuration.GetSection("Security"));
-            services.StartupConfig<ExtensionsConfig>(configuration.GetSection("Extensions"));
-            services.StartupConfig<UrlRewriteConfig>(configuration.GetSection("UrlRewrite"));
-            services.StartupConfig<RedisConfig>(configuration.GetSection("Redis"));
-            services.StartupConfig<RabbitConfig>(configuration.GetSection("Rabbit"));
-            services.StartupConfig<BackendAPIConfig>(configuration.GetSection("BackendAPI"));
-            services.StartupConfig<FrontendAPIConfig>(configuration.GetSection("FrontendAPI"));
-            services.StartupConfig<DatabaseConfig>(configuration.GetSection("Database"));
-            services.StartupConfig<AmazonConfig>(configuration.GetSection("Amazon"));
-            services.StartupConfig<AzureConfig>(configuration.GetSection("Azure"));
-            services.StartupConfig<ApplicationInsightsConfig>(configuration.GetSection("ApplicationInsights"));
+            
+            RegisterConfigurations(services, configuration);
 
             InitDatabase(services, configuration);
 
@@ -227,17 +212,10 @@ namespace Grand.Infrastructure
 
             CommonPath.WebHostEnvironment = hostingEnvironment.WebRootPath;
             CommonPath.BaseDirectory = hostingEnvironment.ContentRootPath;
-            CommonHelper.CacheTimeMinutes = performanceConfig.DefaultCacheTimeMinutes;
-            CommonHelper.CookieAuthExpires =
-                securityConfig.CookieAuthExpires > 0 ? securityConfig.CookieAuthExpires : 24 * 365;
-
-            CommonHelper.IgnoreAcl = performanceConfig.IgnoreAcl;
-            CommonHelper.IgnoreStoreLimitations = performanceConfig.IgnoreStoreLimitations;
-
-            services.AddTransient<FluentValidationFilter>();
+            services.AddTransient<ValidationFilter>();
             var mvcCoreBuilder = services.AddMvcCore(options =>
             {
-                options.Filters.AddService<FluentValidationFilter>();
+                options.Filters.AddService<ValidationFilter>();
                 var frontConfig = new FrontendAPIConfig();
                 configuration.GetSection("FrontendAPI").Bind(frontConfig);
                 if (frontConfig.JsonContentType)
@@ -246,8 +224,32 @@ namespace Grand.Infrastructure
                     options.UseJsonBodyModelBinderProviderInsteadOf<ComplexObjectModelBinderProvider>();
                 }
             });
-
+            
             return mvcCoreBuilder;
+        }
+
+        private static void RegisterConfigurations(IServiceCollection services, IConfiguration configuration)
+        {
+            var appConfiguration = configuration["Azure:AppConfiguration"];
+            if (!string.IsNullOrEmpty(appConfiguration))
+            {
+                ((ConfigurationManager)configuration).AddAzureAppConfiguration(appConfiguration);
+            }
+            services.StartupConfig<AppConfig>(configuration.GetSection("Application"));
+            services.StartupConfig<PerformanceConfig>(configuration.GetSection("Performance"));
+            services.StartupConfig<SecurityConfig>(configuration.GetSection("Security"));
+            services.StartupConfig<ExtensionsConfig>(configuration.GetSection("Extensions"));
+            services.StartupConfig<CacheConfig>(configuration.GetSection("Cache"));
+            services.StartupConfig<AccessControlConfig>(configuration.GetSection("AccessControl"));
+            services.StartupConfig<UrlRewriteConfig>(configuration.GetSection("UrlRewrite"));
+            services.StartupConfig<RedisConfig>(configuration.GetSection("Redis"));
+            services.StartupConfig<RabbitConfig>(configuration.GetSection("Rabbit"));
+            services.StartupConfig<BackendAPIConfig>(configuration.GetSection("BackendAPI"));
+            services.StartupConfig<FrontendAPIConfig>(configuration.GetSection("FrontendAPI"));
+            services.StartupConfig<DatabaseConfig>(configuration.GetSection("Database"));
+            services.StartupConfig<AmazonConfig>(configuration.GetSection("Amazon"));
+            services.StartupConfig<AzureConfig>(configuration.GetSection("Azure"));
+            services.StartupConfig<ApplicationInsightsConfig>(configuration.GetSection("ApplicationInsights"));
         }
 
         #endregion
@@ -261,15 +263,15 @@ namespace Grand.Infrastructure
         /// <param name="configuration">Configuration root of the application</param>
         public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            //register application
-            var mvcBuilder = RegisterApplication(services, configuration);
-
-            //register extensions 
-            RegisterExtensions(mvcBuilder, configuration);
-
             //find startup configurations provided by other assemblies
             var typeSearcher = new TypeSearcher();
             services.AddSingleton<ITypeSearcher>(typeSearcher);
+
+            //register application
+            var mvcBuilder = RegisterApplication(services, configuration, typeSearcher);
+
+            //register extensions 
+            RegisterExtensions(mvcBuilder, configuration);
 
             var startupConfigurations = typeSearcher.ClassesOfType<IStartupApplication>();
 

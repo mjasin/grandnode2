@@ -1,8 +1,10 @@
 using elFinder.Net.AspNetCore.Extensions;
 using elFinder.Net.Drivers.FileSystem.Extensions;
 using Grand.Infrastructure;
+using Grand.Web.Admin.Infrastructure;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Services;
+using Grand.Web.Common.View;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +22,6 @@ namespace Grand.Web.Admin.Startup
             
             #endregion
 
-            services.AddScoped<IActivityLogViewModelService, ActivityLogViewModelService>();
             services.AddScoped<IAddressAttributeViewModelService, AddressAttributeViewModelService>();
             services.AddScoped<IAffiliateViewModelService, AffiliateViewModelService>();
             services.AddScoped<IBlogViewModelService, BlogViewModelService>();
@@ -43,7 +44,6 @@ namespace Grand.Web.Admin.Startup
             services.AddScoped<IGiftVoucherViewModelService, GiftVoucherViewModelService>();
             services.AddScoped<IKnowledgebaseViewModelService, KnowledgebaseViewModelService>();
             services.AddScoped<ILanguageViewModelService, LanguageViewModelService>();
-            services.AddScoped<ILogViewModelService, LogViewModelService>();
             services.AddScoped<ICollectionViewModelService, CollectionViewModelService>();
             services.AddScoped<INewsViewModelService, NewsViewModelService>();
             services.AddScoped<IOrderViewModelService, OrderViewModelService>();
@@ -57,6 +57,10 @@ namespace Grand.Web.Admin.Startup
             services.AddScoped<IProductViewModelService, ProductViewModelService>();
             services.AddScoped<IPictureViewModelService, PictureViewModelService>();
             services.AddScoped<IElFinderViewModelService, ElFinderViewModelService>();
+            services.AddScoped<IMenuViewModelService, MenuViewModelService>();
+
+            services.AddScoped<IAreaViewFactory, AdminAreaViewFactory>();
+
         }
         public void Configure(IApplicationBuilder application, IWebHostEnvironment webHostEnvironment)
         {

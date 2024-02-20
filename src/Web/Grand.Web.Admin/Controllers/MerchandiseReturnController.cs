@@ -53,7 +53,10 @@ namespace Grand.Web.Admin.Controllers
         #region Methods
 
         //list
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
         public IActionResult List()
         {
@@ -137,11 +140,6 @@ namespace Grand.Web.Admin.Controllers
             {
                 return RedirectToAction("List", "MerchandiseReturn");
             }
-
-            //a vendor should have access only to his merchandise return
-            if (_workContext.CurrentVendor != null && merchandiseReturn.VendorId != _workContext.CurrentVendor.Id)
-                return RedirectToAction("List", "MerchandiseReturn");
-
             var model = new MerchandiseReturnModel();
             await _merchandiseReturnViewModelService.PrepareMerchandiseReturnModel(model, merchandiseReturn, false);
             return View(model);
@@ -165,10 +163,6 @@ namespace Grand.Web.Admin.Controllers
                 return RedirectToAction("List", "MerchandiseReturn");
             }
 
-            //a vendor should have access only to his merchandise return
-            if (_workContext.CurrentVendor != null && merchandiseReturn.VendorId != _workContext.CurrentVendor.Id)
-                return RedirectToAction("List", "MerchandiseReturn");
-            
             if (ModelState.IsValid)
             {
                 var customAddressAttributes = new List<CustomAttribute>();
@@ -201,11 +195,6 @@ namespace Grand.Web.Admin.Controllers
             {
                 return RedirectToAction("List", "MerchandiseReturn");
             }
-
-            //a vendor can't delete merchandise return
-            if (_workContext.CurrentVendor != null)
-                return RedirectToAction("List", "MerchandiseReturn");
-
             if (ModelState.IsValid)
             {
                 await _merchandiseReturnViewModelService.DeleteMerchandiseReturn(merchandiseReturn);
@@ -232,10 +221,6 @@ namespace Grand.Web.Admin.Controllers
             {
                 return Content("");
             }
-            //a vendor should have access only to his merchandise return
-            if (_workContext.CurrentVendor != null && merchandiseReturn.VendorId != _workContext.CurrentVendor.Id)
-                return Content("");
-
             //merchandise return notes
             var merchandiseReturnNoteModels = await _merchandiseReturnViewModelService.PrepareMerchandiseReturnNotes(merchandiseReturn);
             var gridModel = new DataSourceResult
@@ -261,11 +246,6 @@ namespace Grand.Web.Admin.Controllers
             {
                 return Json(new { Result = false });
             }
-
-            //a vendor should have access only to his merchandise return
-            if (_workContext.CurrentVendor != null && merchandiseReturn.VendorId != _workContext.CurrentVendor.Id)
-                return Json(new { Result = false });
-
             await _merchandiseReturnViewModelService.InsertMerchandiseReturnNote(merchandiseReturn, order, downloadId, displayToCustomer, message);
 
             return Json(new { Result = true });
@@ -278,10 +258,6 @@ namespace Grand.Web.Admin.Controllers
             var merchandiseReturn = await _merchandiseReturnService.GetMerchandiseReturnById(merchandiseReturnId);
             if (merchandiseReturn == null)
                 throw new ArgumentException("No merchandise return found with the specified id");
-
-            //a vendor does not have access to this functionality
-            if (_workContext.CurrentVendor != null && !await _groupService.IsStaff(_workContext.CurrentCustomer))
-                return Json(new { Result = false });
 
             if (await _groupService.IsStaff(_workContext.CurrentCustomer) && merchandiseReturn.StoreId != _workContext.CurrentCustomer.StaffStoreId)
             {

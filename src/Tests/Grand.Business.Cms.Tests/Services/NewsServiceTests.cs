@@ -1,13 +1,15 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Cms.Services;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.News;
 using Grand.Infrastructure;
+using Grand.Infrastructure.Configuration;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Cms.Services.Tests
+namespace Grand.Business.Cms.Tests.Services
 {
     [TestClass()]
     public class NewsServiceTests
@@ -26,10 +28,10 @@ namespace Grand.Business.Cms.Services.Tests
             _mediatorMock = new Mock<IMediator>();
             _workContextMock = new Mock<IWorkContext>();
 
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "", Name = "test store" });
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "", Name = "test store" });
             _workContextMock.Setup(c => c.CurrentCustomer).Returns(() => new Customer());
 
-            _newsService = new NewsService(_repository, _mediatorMock.Object, _workContextMock.Object);
+            _newsService = new NewsService(_repository, _mediatorMock.Object, _workContextMock.Object, new AccessControlConfig());
         }
 
         [TestMethod()]
@@ -48,7 +50,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetAllNewsTest()
         {
             //Arrange
-            var newsItem = new NewsItem() { Published = true };
+            var newsItem = new NewsItem { Published = true };
             await _repository.InsertAsync(newsItem);
             //Act
             var result = await _newsService.GetAllNews();
@@ -71,7 +73,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task UpdateNewsTest()
         {
             //Arrange
-            var newsItem = new NewsItem() { Published = true };
+            var newsItem = new NewsItem { Published = true };
             await _repository.InsertAsync(newsItem);
             //Act
             newsItem.Title = "test";
@@ -84,7 +86,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task DeleteNewsTest()
         {
             //Arrange
-            var newsItem = new NewsItem() { Published = true };
+            var newsItem = new NewsItem { Published = true };
             await _repository.InsertAsync(newsItem);
             //Act
             await _newsService.DeleteNews(newsItem);
@@ -96,8 +98,8 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetAllCommentsTest()
         {
             //Arrange
-            var newsItem = new NewsItem() { Published = true };
-            newsItem.NewsComments.Add(new NewsComment() { CustomerId = "1" });
+            var newsItem = new NewsItem { Published = true };
+            newsItem.NewsComments.Add(new NewsComment { CustomerId = "1" });
             await _repository.InsertAsync(newsItem);
             //Act
             var result = await _newsService.GetAllComments("1");

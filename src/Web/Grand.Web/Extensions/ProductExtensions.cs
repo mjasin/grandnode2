@@ -3,6 +3,7 @@ using Grand.Business.Core.Interfaces.Storage;
 using Grand.Domain.Catalog;
 using Grand.Domain.Common;
 using Grand.Domain.Media;
+using Grand.SharedKernel;
 
 namespace Grand.Web.Extensions
 {
@@ -19,10 +20,8 @@ namespace Grand.Web.Extensions
         public static async Task<Picture> GetProductPicture(this Product product, IList<CustomAttribute> attributes,
             IProductService productService, IPictureService pictureService)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
-            if (pictureService == null)
-                throw new ArgumentNullException(nameof(pictureService));            
+            ArgumentNullException.ThrowIfNull(product);
+            ArgumentNullException.ThrowIfNull(pictureService);
 
             Picture picture = null;
 
@@ -73,5 +72,26 @@ namespace Grand.Web.Extensions
 
             return picture;
         }
+        
+        /// <summary>
+        /// Resource name of rental product (rental period)
+        /// </summary>
+        /// <param name="product">Product</param>
+        /// <returns>Rental product price with period</returns>
+        public static string ResourceReservationProductPeriod(this Product product)
+        {
+            if (product.ProductTypeId != ProductType.Reservation)
+                return string.Empty;
+
+            var result = product.IntervalUnitId switch {
+                IntervalUnit.Day => "Products.Price.Reservation.Days",
+                IntervalUnit.Hour => "Products.Price.Reservation.Hour",
+                IntervalUnit.Minute => "Products.Price.Reservation.Minute",
+                _ => throw new GrandException("Not supported reservation period")
+            };
+
+            return result;
+        }
+
     }
 }

@@ -1,9 +1,6 @@
 ﻿using FluentValidation;
-using Grand.Business.Core.Events.Customers;
-using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Customers;
-using Grand.Domain.Customers;
 using Grand.Infrastructure.Models;
 using Grand.Infrastructure.Validators;
 using Grand.Web.Common.Security.Captcha;
@@ -47,7 +44,7 @@ namespace Grand.Web.Validators.Customer
             });
             if (captchaSettings.Enabled && captchaSettings.ShowOnPasswordRecoveryPage)
             {
-                RuleFor(x => x.Captcha).NotNull().WithMessage(translationService.GetResource("Account.Captcha.Required"));;
+                RuleFor(x => x.Captcha).NotNull().WithMessage(translationService.GetResource("Account.Captcha.Required"));
                 RuleFor(x => x.Captcha).SetValidator(new CaptchaValidator(validatorsCaptcha, contextAccessor, googleReCaptchaValidator));
             }
         }}

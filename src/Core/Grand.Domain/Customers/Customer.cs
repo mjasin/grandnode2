@@ -6,7 +6,7 @@ namespace Grand.Domain.Customers
     /// <summary>
     /// Represents a customer
     /// </summary>
-    public partial class Customer : BaseEntity
+    public class Customer : BaseEntity
     {
         private ICollection<ShoppingCartItem> _shoppingCartItems;
         private ICollection<Address> _addresses;
@@ -141,11 +141,6 @@ namespace Grand.Domain.Customers
         public string LastIpAddress { get; set; }
 
         /// <summary>
-        /// Gets or sets the date and time of entity creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
-
-        /// <summary>
         /// Gets or sets the date and time of last login
         /// </summary>
         public DateTime? LastLoginDateUtc { get; set; }
@@ -182,8 +177,8 @@ namespace Grand.Domain.Customers
         /// </summary>
         public virtual ICollection<string> Groups
         {
-            get { return _groups ??= new List<string>(); }
-            protected set { _groups = value; }
+            get => _groups ??= new List<string>();
+            protected set => _groups = value;
         }
 
         /// <summary>
@@ -191,8 +186,8 @@ namespace Grand.Domain.Customers
         /// </summary>
         public virtual ICollection<ShoppingCartItem> ShoppingCartItems
         {
-            get { return _shoppingCartItems ??= new List<ShoppingCartItem>(); }
-            protected set { _shoppingCartItems = value; }            
+            get => _shoppingCartItems ??= new List<ShoppingCartItem>();
+            protected set => _shoppingCartItems = value;
         }
 
         /// <summary>
@@ -215,8 +210,8 @@ namespace Grand.Domain.Customers
         /// </summary>
         public virtual ICollection<Address> Addresses
         {
-            get { return _addresses ??= new List<Address>(); }
-            protected set { _addresses = value; }            
+            get => _addresses ??= new List<Address>();
+            protected set => _addresses = value;
         }
 
         /// <summary>
@@ -224,8 +219,8 @@ namespace Grand.Domain.Customers
         /// </summary>
         public virtual ICollection<string> CustomerTags
         {
-            get { return _customerTags ??= new List<string>(); }
-            protected set { _customerTags = value; }
+            get => _customerTags ??= new List<string>();
+            protected set => _customerTags = value;
         }
         #endregion
     }

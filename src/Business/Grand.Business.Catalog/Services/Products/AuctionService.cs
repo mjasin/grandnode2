@@ -6,7 +6,7 @@ using Grand.Infrastructure.Extensions;
 using Grand.Domain;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Localization;
 using Grand.Domain.Stores;
 using MediatR;
@@ -63,8 +63,7 @@ namespace Grand.Business.Catalog.Services.Products
 
         public virtual async Task InsertBid(Bid bid)
         {
-            if (bid == null)
-                throw new ArgumentNullException(nameof(bid));
+            ArgumentNullException.ThrowIfNull(bid);
 
             await _bidRepository.InsertAsync(bid);
             await _mediator.EntityInserted(bid);
@@ -72,16 +71,14 @@ namespace Grand.Business.Catalog.Services.Products
 
         public virtual async Task UpdateBid(Bid bid)
         {
-            if (bid == null)
-                throw new ArgumentNullException(nameof(bid));
+            ArgumentNullException.ThrowIfNull(bid);
 
             await _bidRepository.UpdateAsync(bid);
             await _mediator.EntityUpdated(bid);
         }
         public virtual async Task DeleteBid(Bid bid)
         {
-            if (bid == null)
-                throw new ArgumentNullException(nameof(bid));
+            ArgumentNullException.ThrowIfNull(bid);
 
             await _bidRepository.DeleteAsync(bid);
             await _mediator.EntityDeleted(bid);
@@ -98,8 +95,6 @@ namespace Grand.Business.Catalog.Services.Products
         {
             product.HighestBid = bid;
             product.HighestBidder = highestBidder;
-            product.UpdatedOnUtc = DateTime.UtcNow;
-
             await _productRepository.UpdateAsync(product);
 
             await _cacheBase.RemoveAsync(string.Format(CacheKey.PRODUCTS_BY_ID_KEY, product.Id));
@@ -117,7 +112,6 @@ namespace Grand.Business.Catalog.Services.Products
         public virtual async Task UpdateAuctionEnded(Product product, bool ended, bool endDate = false)
         {
             product.AuctionEnded = ended;
-            product.UpdatedOnUtc = DateTime.UtcNow;
             if (endDate)
                 product.AvailableEndDateTimeUtc = DateTime.UtcNow;
 
@@ -146,15 +140,14 @@ namespace Grand.Business.Catalog.Services.Products
                 CustomerId = customer.Id,
                 ProductId = product.Id,
                 StoreId = store.Id,
-                WarehouseId = warehouseId,
+                WarehouseId = warehouseId
             });
 
             if (latest != null)
             {
                 if (latest.CustomerId != customer.Id)
                 {
-                    await _mediator.Send(new SendOutBidCustomerCommand()
-                    {
+                    await _mediator.Send(new SendOutBidCustomerCommand {
                         Product = product,
                         Bid = latest,
                         Language = language
@@ -171,7 +164,7 @@ namespace Grand.Business.Catalog.Services.Products
         /// <param name="orderId">OrderId</param>
         public virtual async Task CancelBidByOrder(string orderId)
         {
-            var bid = _bidRepository.Table.FirstOrDefault(x => x.OrderId == orderId);
+            var bid = await _bidRepository.GetOneAsync(x => x.OrderId == orderId);
             if (bid != null)
             {
                 await _bidRepository.DeleteAsync(bid);

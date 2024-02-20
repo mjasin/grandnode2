@@ -1,7 +1,6 @@
 ﻿using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Stores;
-using Grand.Business.Core.Interfaces.Customers;
 using Grand.Business.Core.Interfaces.Marketing.Campaigns;
 using Grand.Business.Core.Interfaces.Marketing.Customers;
 using Grand.Business.Core.Interfaces.Marketing.Newsletters;
@@ -18,7 +17,6 @@ namespace Grand.Web.Admin.Services
     {
 
         private readonly ICampaignService _campaignService;
-        private readonly ICustomerService _customerService;
         private readonly IGroupService _groupService;
         private readonly IDateTimeService _dateTimeService;
         private readonly IEmailAccountService _emailAccountService;
@@ -29,7 +27,6 @@ namespace Grand.Web.Admin.Services
         private readonly INewsletterCategoryService _newsletterCategoryService;
 
         public CampaignViewModelService(ICampaignService campaignService,
-            ICustomerService customerService,
             IGroupService groupService,
             IDateTimeService dateTimeService,
             IEmailAccountService emailAccountService,
@@ -40,7 +37,6 @@ namespace Grand.Web.Admin.Services
             INewsletterCategoryService newsletterCategoryService)
         {
             _campaignService = campaignService;
-            _customerService = customerService;
             _groupService = groupService;
             _dateTimeService = dateTimeService;
             _emailAccountService = emailAccountService;
@@ -53,8 +49,7 @@ namespace Grand.Web.Admin.Services
 
         protected virtual async Task PrepareStoresModel(CampaignModel model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
 
             var stores = await _storeService.GetAllStores();
             foreach (var store in stores)
@@ -69,8 +64,7 @@ namespace Grand.Web.Admin.Services
 
         protected virtual async Task PrepareLanguagesModel(CampaignModel model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
 
             var languages = await _languageService.GetAllLanguages();
             foreach (var lang in languages)
@@ -85,24 +79,21 @@ namespace Grand.Web.Admin.Services
 
         protected virtual async Task PrepareCustomerTagsModel(CampaignModel model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
             model.AvailableCustomerTags = (await _customerTagService.GetAllCustomerTags()).Select(ct => new SelectListItem { Text = ct.Name, Value = ct.Id, Selected = model.CustomerTags.Contains(ct.Id) }).ToList();
             model.CustomerTags ??= new List<string>();
         }
 
         protected virtual async Task PrepareCustomerGroupsModel(CampaignModel model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
             model.AvailableCustomerGroups = (await _groupService.GetAllCustomerGroups()).Select(ct => new SelectListItem { Text = ct.Name, Value = ct.Id, Selected = model.CustomerGroups.Contains(ct.Id) }).ToList();
             model.CustomerGroups ??= new List<string>();
         }
 
         protected virtual async Task PrepareNewsletterCategoriesModel(CampaignModel model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
+            ArgumentNullException.ThrowIfNull(model);
             model.AvailableNewsletterCategories = (await _newsletterCategoryService.GetAllNewsletterCategory()).Select(ct => new SelectListItem { Text = ct.Name, Value = ct.Id, Selected = model.NewsletterCategories.Contains(ct.Id) }).ToList();
             model.NewsletterCategories ??= new List<string>();
         }
@@ -176,7 +167,6 @@ namespace Grand.Web.Admin.Services
         public virtual async Task<Campaign> InsertCampaignModel(CampaignModel model)
         {
             var campaign = model.ToEntity();
-            campaign.CreatedOnUtc = DateTime.UtcNow;
             await _campaignService.InsertCampaign(campaign);
             return campaign;
         }

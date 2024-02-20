@@ -1,6 +1,5 @@
-﻿using Grand.Business.Core.Commands.Messages;
-using Grand.Business.Core.Commands.Messages.Common;
-using Grand.Domain.Data;
+﻿using Grand.Business.Core.Commands.Messages.Common;
+using Grand.Data;
 using Grand.Domain.Messages;
 using MediatR;
 
@@ -19,7 +18,6 @@ namespace Grand.Business.Messages.Commands.Handlers.Common
         public async Task<bool> Handle(InsertContactUsCommand request, CancellationToken cancellationToken)
         {
             var contactus = new ContactUs {
-                CreatedOnUtc = DateTime.UtcNow,
                 CustomerId = request.CustomerId,
                 StoreId = request.StoreId,
                 VendorId = request.VendorId,

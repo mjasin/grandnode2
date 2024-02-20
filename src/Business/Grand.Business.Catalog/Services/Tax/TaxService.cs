@@ -1,9 +1,7 @@
 using Grand.Business.Core.Interfaces.Catalog.Directory;
 using Grand.Business.Core.Interfaces.Catalog.Tax;
 using Grand.Business.Core.Utilities.Catalog;
-using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Domain.Catalog;
 using Grand.Domain.Common;
 using Grand.Domain.Customers;
@@ -12,6 +10,7 @@ using Grand.Domain.Orders;
 using Grand.Domain.Tax;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Grand.Business.Catalog.Services.Tax
 {
@@ -27,7 +26,7 @@ namespace Grand.Business.Catalog.Services.Tax
         private readonly IGeoLookupService _geoLookupService;
         private readonly ICountryService _countryService;
         private readonly IEnumerable<ITaxProvider> _taxProviders;
-        private readonly ILogger _logger;
+        private readonly ILogger<TaxService> _logger;
         private readonly TaxSettings _taxSettings;
         private readonly TaxProviderSettings _taxProviderSettings;
         private readonly CustomerSettings _customerSettings;
@@ -43,7 +42,7 @@ namespace Grand.Business.Catalog.Services.Tax
             IGeoLookupService geoLookupService,
             ICountryService countryService,
             IEnumerable<ITaxProvider> taxProviders,
-            ILogger logger,
+            ILogger<TaxService> logger,
             TaxSettings taxSettings,
             TaxProviderSettings taxProviderSettings,
             CustomerSettings customerSettings,
@@ -72,8 +71,7 @@ namespace Grand.Business.Catalog.Services.Tax
         /// <returns>Result</returns>
         protected virtual async Task<bool> IsEuConsumer(Customer customer)
         {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
+            ArgumentNullException.ThrowIfNull(customer);
 
             Country country = null;
 
@@ -117,8 +115,7 @@ namespace Grand.Business.Catalog.Services.Tax
         protected virtual async Task<TaxRequest> CreateCalculateTaxRequest(Product product,
             string taxCategoryId, Customer customer, double price)
         {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
+            ArgumentNullException.ThrowIfNull(customer);
 
             var calculateTaxRequest = new TaxRequest {
                 Customer = customer,
@@ -249,7 +246,7 @@ namespace Grand.Business.Catalog.Services.Tax
             {
                 foreach (var error in calculateTaxResult.Errors)
                 {
-                    _ = _logger.Error($"{activeTaxProvider.FriendlyName} - {error}", null, customer);
+                    _logger.LogError("{FriendlyName} - {Error}", activeTaxProvider.FriendlyName, error);
                 }
             }
             return (taxRate, isTaxable);
@@ -599,11 +596,8 @@ namespace Grand.Business.Catalog.Services.Tax
         /// <returns>Price</returns>
         public virtual async Task<(double checkoutPrice, double taxRate)> GetCheckoutAttributePrice(CheckoutAttribute ca, CheckoutAttributeValue cav, bool includingTax, Customer customer)
         {
-            if (ca == null)
-                throw new ArgumentNullException(nameof(ca));
-
-            if (cav == null)
-                throw new ArgumentNullException(nameof(cav));
+            ArgumentNullException.ThrowIfNull(ca);
+            ArgumentNullException.ThrowIfNull(cav);
 
             var price = cav.PriceAdjustment;
             if (ca.IsTaxExempt)

@@ -5,7 +5,7 @@ namespace Grand.Domain.Messages
     /// <summary>
     /// Represents NewsLetterSubscription entity
     /// </summary>
-    public partial class NewsLetterSubscription : BaseEntity, IHistory
+    public class NewsLetterSubscription : BaseEntity, IHistory
     {
         private ICollection<string> _categories;
 
@@ -35,17 +35,12 @@ namespace Grand.Domain.Messages
         public string StoreId { get; set; }
 
         /// <summary>
-        /// Gets or sets the date and time when subscription was created
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
-
-        /// <summary>
         /// Gets or sets the categories
         /// </summary>
         public virtual ICollection<string> Categories
         {
-            get { return _categories ??= new List<string>(); }
-            protected set { _categories = value; }
+            get => _categories ??= new List<string>();
+            protected set => _categories = value;
         }
     }
 }

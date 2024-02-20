@@ -58,8 +58,7 @@ namespace Shipping.ShippingPoint
         /// <returns>Represents a response of getting shipping rate options</returns>
         public async Task<GetShippingOptionResponse> GetShippingOptions(GetShippingOptionRequest getShippingOptionRequest)
         {
-            if (getShippingOptionRequest == null)
-                throw new ArgumentNullException(nameof(getShippingOptionRequest));
+            ArgumentNullException.ThrowIfNull(getShippingOptionRequest);
 
             var response = new GetShippingOptionResponse();
 
@@ -93,7 +92,7 @@ namespace Shipping.ShippingPoint
         {
             data.TryGetValue("selectedShippingOption", out var shippingOptionId);
             
-            var shippingMethodName = shippingOption?.Split(new[] { ':' })[0];
+            var shippingMethodName = shippingOption?.Split([':'])[0];
 
             if (string.IsNullOrEmpty(shippingOptionId))
                 return new List<string> { _translationService.GetResource("Shipping.ShippingPoint.SelectBeforeProceed") };

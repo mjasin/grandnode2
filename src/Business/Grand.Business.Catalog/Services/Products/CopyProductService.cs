@@ -48,8 +48,7 @@ namespace Grand.Business.Catalog.Services.Products
         public virtual async Task<Product> CopyProduct(Product product, string newName,
             bool isPublished = true, bool copyAssociatedProducts = true)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             if (string.IsNullOrEmpty(newName))
                 newName = $"{product.Name} - CopyProduct";
@@ -147,8 +146,6 @@ namespace Grand.Business.Catalog.Services.Products
                 AvailableEndDateTimeUtc = product.AvailableEndDateTimeUtc,
                 DisplayOrder = product.DisplayOrder,
                 Published = isPublished,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 Locales = product.Locales,
                 CustomerGroups = product.CustomerGroups,
                 Stores = product.Stores

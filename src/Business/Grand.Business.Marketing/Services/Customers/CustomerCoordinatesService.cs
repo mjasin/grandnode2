@@ -2,7 +2,7 @@
 using Grand.Business.Core.Events.Marketing;
 using Grand.Infrastructure;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using MediatR;
 
 namespace Grand.Business.Marketing.Services.Customers
@@ -30,8 +30,7 @@ namespace Grand.Business.Marketing.Services.Customers
 
         public async Task<(double longitude, double latitude)> GetGeoCoordinate(Customer customer)
         {
-            if (customer == null)
-                throw new ArgumentNullException(nameof(customer));
+            ArgumentNullException.ThrowIfNull(customer);
 
             if (customer.Coordinates == null)
                 await Task.FromResult((0, 0));

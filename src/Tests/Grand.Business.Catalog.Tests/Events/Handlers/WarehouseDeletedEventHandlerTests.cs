@@ -1,11 +1,11 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Events.Handlers;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Shipping;
-using Grand.Domain.Tax;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Business.Catalog.Events.Handlers.Tests
+namespace Grand.Business.Catalog.Tests.Events.Handlers
 {
     [TestClass()]
     public class WarehouseDeletedEventHandlerTests
@@ -25,14 +25,17 @@ namespace Grand.Business.Catalog.Events.Handlers.Tests
         {
             //Arrange
             var warehouse = new Warehouse();
-            var product = new Product();
-            product.WarehouseId = warehouse.Id;
+            var product = new Product {
+                WarehouseId = warehouse.Id
+            };
             await _repository.InsertAsync(product);
-            var product2 = new Product();
-            product2.WarehouseId = warehouse.Id;
+            var product2 = new Product {
+                WarehouseId = warehouse.Id
+            };
             await _repository.InsertAsync(product2);
-            var product3 = new Product();
-            product3.WarehouseId = "1";
+            var product3 = new Product {
+                WarehouseId = "1"
+            };
             await _repository.InsertAsync(product3);
 
             //Act

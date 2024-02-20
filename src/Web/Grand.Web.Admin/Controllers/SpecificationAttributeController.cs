@@ -2,8 +2,6 @@
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
-using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Filters;
@@ -25,21 +23,18 @@ namespace Grand.Web.Admin.Controllers
         private readonly IProductService _productService;
         private readonly ILanguageService _languageService;
         private readonly ITranslationService _translationService;
-        private readonly ICustomerActivityService _customerActivityService;
-        private readonly IStoreService _storeService;
         private readonly IWorkContext _workContext;
         private readonly IGroupService _groupService;
         private readonly SeoSettings _seoSettings;
 
-        #endregion Fields
+        #endregion Fields
 
         #region Constructors
 
-        public SpecificationAttributeController(ISpecificationAttributeService specificationAttributeService,
+        public SpecificationAttributeController(
+            ISpecificationAttributeService specificationAttributeService,
             ILanguageService languageService,
             ITranslationService translationService,
-            ICustomerActivityService customerActivityService,
-            IStoreService storeService,
             IWorkContext workContext,
             IGroupService groupService,
             IProductService productService,
@@ -48,8 +43,6 @@ namespace Grand.Web.Admin.Controllers
             _specificationAttributeService = specificationAttributeService;
             _languageService = languageService;
             _translationService = translationService;
-            _customerActivityService = customerActivityService;
-            _storeService = storeService;
             _workContext = workContext;
             _groupService = groupService;
             _productService = productService;
@@ -61,9 +54,15 @@ namespace Grand.Web.Admin.Controllers
         #region Specification attributes
 
         //list
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
-        public IActionResult List() => View();
+        public IActionResult List()
+        {
+            return View();
+        }
 
         [HttpPost]
         [PermissionAuthorizeAction(PermissionActionName.List)]
@@ -100,13 +99,10 @@ namespace Grand.Web.Admin.Controllers
                 specificationAttribute.SeName = SeoExtensions.GetSeName(string.IsNullOrEmpty(specificationAttribute.SeName) ? specificationAttribute.Name : specificationAttribute.SeName, _seoSettings.ConvertNonWesternChars, _seoSettings.AllowUnicodeCharsInUrls, _seoSettings.SeoCharConversion);
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
                 await _specificationAttributeService.InsertSpecificationAttribute(specificationAttribute);
-                //activity log
-                _ = _customerActivityService.InsertActivity("AddNewSpecAttribute", specificationAttribute.Id,
-                    _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                    _translationService.GetResource("ActivityLog.AddNewSpecAttribute"), specificationAttribute.Name);
+
                 Success(_translationService.GetResource("Admin.Catalog.Attributes.SpecificationAttributes.Added"));
                 return continueEditing ? RedirectToAction("Edit", new { id = specificationAttribute.Id }) : RedirectToAction("List");
             }
@@ -149,13 +145,9 @@ namespace Grand.Web.Admin.Controllers
                 specificationAttribute.SeName = SeoExtensions.GetSeName(string.IsNullOrEmpty(specificationAttribute.SeName) ? specificationAttribute.Name : specificationAttribute.SeName, _seoSettings.ConvertNonWesternChars, _seoSettings.AllowUnicodeCharsInUrls, _seoSettings.SeoCharConversion);
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
                 await _specificationAttributeService.UpdateSpecificationAttribute(specificationAttribute);
-                //activity log
-                _ = _customerActivityService.InsertActivity("EditSpecAttribute", specificationAttribute.Id,
-                    _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                    _translationService.GetResource("ActivityLog.EditSpecAttribute"), specificationAttribute.Name);
 
                 Success(_translationService.GetResource("Admin.Catalog.Attributes.SpecificationAttributes.Updated"));
 
@@ -190,11 +182,6 @@ namespace Grand.Web.Admin.Controllers
             if (ModelState.IsValid)
             {
                 await _specificationAttributeService.DeleteSpecificationAttribute(specificationAttribute);
-
-                //activity log
-                _ = _customerActivityService.InsertActivity("DeleteSpecAttribute", specificationAttribute.Id,
-                    _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                    _translationService.GetResource("ActivityLog.DeleteSpecAttribute"), specificationAttribute.Name);
 
                 Success(_translationService.GetResource("Admin.Catalog.Attributes.SpecificationAttributes.Deleted"));
                 return RedirectToAction("List");
@@ -350,13 +337,6 @@ namespace Grand.Web.Admin.Controllers
             if (!string.IsNullOrEmpty(_workContext.CurrentCustomer.StaffStoreId))
                 searchStoreId = _workContext.CurrentCustomer.StaffStoreId;
 
-            var searchVendorId = string.Empty;
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null)
-            {
-                searchVendorId = _workContext.CurrentVendor.Id;
-            }
-
             var specificationProducts = new List<SpecificationAttributeModel.UsedByProductModel>();
             var total = 0;
 
@@ -365,7 +345,6 @@ namespace Grand.Web.Admin.Controllers
             {
                 var products = (await _productService.SearchProducts(
                     storeId: searchStoreId,
-                    vendorId: searchVendorId,
                     specificationOptions: searchspecificationOptions,
                     pageIndex: command.Page - 1,
                     pageSize: command.PageSize,

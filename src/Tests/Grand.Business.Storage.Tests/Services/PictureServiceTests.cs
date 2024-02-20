@@ -1,13 +1,13 @@
-﻿using Grand.Business.Core.Interfaces.Common.Logging;
-using Grand.Business.Core.Interfaces.Storage;
+﻿using Grand.Business.Core.Interfaces.Storage;
 using Grand.Business.Storage.Services;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Media;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Events;
 using MediatR;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -17,7 +17,7 @@ namespace Grand.Business.Storage.Tests.Services
     public class PictureServiceTests
     {
         private Mock<IRepository<Picture>> _repoMock;
-        private Mock<ILogger> _logerMock;
+        private Mock<ILogger<PictureService>> _logerMock;
         private Mock<IMediator> _mediatorMock;
         private Mock<IWebHostEnvironment> _webHostMock;
         private Mock<IWorkContext> _workContextMock;
@@ -33,15 +33,14 @@ namespace Grand.Business.Storage.Tests.Services
         {
             _webHostMock = new Mock<IWebHostEnvironment>();
             _repoMock = new Mock<IRepository<Picture>>();
-            _logerMock = new Mock<ILogger>();
+            _logerMock = new Mock<ILogger<PictureService>>();
             _mediatorMock = new Mock<IMediator>();
             _workContextMock = new Mock<IWorkContext>();
             _cacheMock = new Mock<ICacheBase>();
             _mediaFileStoreMock = new Mock<IMediaFileStore>();
             _settings = new MediaSettings();
             _storagesettings = new StorageSettings();
-            _service = new PictureService(_repoMock.Object, _logerMock.Object, _mediatorMock.Object, _workContextMock.Object
-                , _cacheMock.Object, _mediaFileStoreMock.Object, _settings, _storagesettings);
+            _service = new PictureService(_repoMock.Object, _logerMock.Object, _mediatorMock.Object, _cacheMock.Object, _mediaFileStoreMock.Object, _settings, _storagesettings);
         }
         [TestMethod]
         public async Task GetPictureById_InvokeExpectedMethods()
@@ -53,7 +52,9 @@ namespace Grand.Business.Storage.Tests.Services
         public async Task LoadPictureBinary_FromDb()
         {
             _storagesettings.PictureStoreInDb = true;
-            _repoMock.Setup(c => c.GetByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Picture() { PictureBinary = new byte[] { } }));
+            _repoMock.Setup(c => c.GetByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Picture { PictureBinary =
+                []
+            }));
             await _service.LoadPictureBinary(new Picture());
             _repoMock.Verify(c => c.GetByIdAsync(It.IsAny<string>()), Times.Once);
         }
@@ -61,7 +62,9 @@ namespace Grand.Business.Storage.Tests.Services
         [TestMethod]
         public async Task LoadPictureBinary_FromDb_InvokeRepository()
         {
-            _repoMock.Setup(c => c.GetByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Picture() { PictureBinary = new byte[] { } }));
+            _repoMock.Setup(c => c.GetByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Picture { PictureBinary =
+                []
+            }));
             await _service.LoadPictureBinary(new Picture(), true);
             _repoMock.Verify(c => c.GetByIdAsync(It.IsAny<string>()), Times.Once);
         }
@@ -71,7 +74,7 @@ namespace Grand.Business.Storage.Tests.Services
         public async Task LoadPictureBinary_FromFile_ReturnEmptyBytes()
         {
             _webHostMock.Setup(c => c.WebRootPath).Returns("~root/");
-            var result = await _service.LoadPictureBinary(new Picture() { Id = "id", MimeType = "image/jpeg" }, false);
+            var result = await _service.LoadPictureBinary(new Picture { Id = "id", MimeType = "image/jpeg" }, false);
             //we can't mock static class like File.Exist so, should return empty array
             Assert.IsTrue(result.Length == 0);
         }
@@ -87,7 +90,7 @@ namespace Grand.Business.Storage.Tests.Services
         public async Task InsertPicture_InvokeExpectedMethods()
         {
             _storagesettings.PictureStoreInDb = true;
-            await _service.InsertPicture(new byte[] { }, "image/jpeg", "image", validateBinary: false);
+            await _service.InsertPicture([], "image/jpeg", "image", validateBinary: false);
             _repoMock.Verify(c => c.InsertAsync(It.IsAny<Picture>()), Times.Once);
             _mediatorMock.Verify(c => c.Publish(It.IsAny<EntityInserted<Picture>>(), default), Times.Once);
         }
@@ -96,8 +99,10 @@ namespace Grand.Business.Storage.Tests.Services
         {
             _storagesettings.PictureStoreInDb = true;
             _cacheMock.Setup(c => c.GetAsync<Picture>(It.IsAny<string>(), It.IsAny<Func<Task<Picture>>>())).Returns(Task.FromResult(new Picture()));
-            _repoMock.Setup(c => c.GetByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Picture() { PictureBinary = new byte[] { } }));
-            await _service.UpdatePicture("1", new byte[] { }, "image/jpeg", "image", validateBinary: false);
+            _repoMock.Setup(c => c.GetByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(new Picture { PictureBinary =
+                []
+            }));
+            await _service.UpdatePicture("1", [], "image/jpeg", "image", validateBinary: false);
             _mediatorMock.Verify(c => c.Publish(It.IsAny<EntityUpdated<Picture>>(), default), Times.Once);
         }
         [TestMethod]

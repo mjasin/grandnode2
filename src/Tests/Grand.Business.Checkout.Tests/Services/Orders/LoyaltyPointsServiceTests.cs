@@ -1,12 +1,12 @@
-﻿using Grand.Data.Tests.MongoDb;
-using Grand.Domain.Data;
+﻿using Grand.Business.Checkout.Services.Orders;
+using Grand.Data.Tests.MongoDb;
+using Grand.Data;
 using Grand.Domain.Orders;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-
-namespace Grand.Business.Checkout.Services.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Services.Orders
 {
     [TestClass()]
     public class LoyaltyPointsServiceTests
@@ -21,16 +21,16 @@ namespace Grand.Business.Checkout.Services.Orders.Tests
             _repository = new MongoDBRepositoryTest<LoyaltyPointsHistory>();
             _mediatorMock = new Mock<IMediator>();
 
-            _loyaltyPointsService = new LoyaltyPointsService(_repository, new LoyaltyPointsSettings() { }, _mediatorMock.Object);
+            _loyaltyPointsService = new LoyaltyPointsService(_repository, new LoyaltyPointsSettings { }, _mediatorMock.Object);
         }
 
         [TestMethod()]
         public async Task GetLoyaltyPointsBalanceTest()
         {
             //Assert
-            await _repository.InsertAsync(new LoyaltyPointsHistory() { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 10, CreatedOnUtc = DateTime.UtcNow.AddDays(-3) });
-            await _repository.InsertAsync(new LoyaltyPointsHistory() { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 20, CreatedOnUtc = DateTime.UtcNow.AddDays(-2) });
-            await _repository.InsertAsync(new LoyaltyPointsHistory() { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 30, CreatedOnUtc = DateTime.UtcNow.AddDays(-1) });
+            await _repository.InsertAsync(new LoyaltyPointsHistory { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 10 });
+            await _repository.InsertAsync(new LoyaltyPointsHistory { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 20 });
+            await _repository.InsertAsync(new LoyaltyPointsHistory { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 30 });
             //Act
             var result = await _loyaltyPointsService.GetLoyaltyPointsBalance("1", "");
             //Assert
@@ -53,9 +53,9 @@ namespace Grand.Business.Checkout.Services.Orders.Tests
         public async Task GetLoyaltyPointsHistoryTest()
         {
             //Assert
-            await _repository.InsertAsync(new LoyaltyPointsHistory() { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 10, CreatedOnUtc = DateTime.UtcNow.AddDays(-3) });
-            await _repository.InsertAsync(new LoyaltyPointsHistory() { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 20, CreatedOnUtc = DateTime.UtcNow.AddDays(-2) });
-            await _repository.InsertAsync(new LoyaltyPointsHistory() { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 30, CreatedOnUtc = DateTime.UtcNow.AddDays(-1) });
+            await _repository.InsertAsync(new LoyaltyPointsHistory { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 10 });
+            await _repository.InsertAsync(new LoyaltyPointsHistory { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 20 });
+            await _repository.InsertAsync(new LoyaltyPointsHistory { CustomerId = "1", StoreId = "", Points = 10, PointsBalance = 30 });
             //Act
             var result = await _loyaltyPointsService.GetLoyaltyPointsHistory("1");
             //Assert

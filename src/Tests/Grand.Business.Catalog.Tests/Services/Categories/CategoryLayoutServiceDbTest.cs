@@ -1,8 +1,9 @@
 ﻿using Grand.Business.Catalog.Services.Categories;
 using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -24,7 +25,7 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
             _repository = new MongoDBRepositoryTest<CategoryLayout>();
             _mediatorMock = new Mock<IMediator>();
 
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _categoryLayoutService = new CategoryLayoutService(_repository, _cacheBase, _mediatorMock.Object);
         }
 
@@ -32,7 +33,7 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
         public async Task GetCategoryLayoutById()
         {
             //Arrange
-            var categoryLayout1 = new CategoryLayout() {
+            var categoryLayout1 = new CategoryLayout {
                 Name = "test1"
             };
             await _categoryLayoutService.InsertCategoryLayout(categoryLayout1);
@@ -63,11 +64,11 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
         public async Task DeleteCategoryLayout()
         {
             //Arrange
-            var categoryLayout1 = new CategoryLayout() {
+            var categoryLayout1 = new CategoryLayout {
                 Name = "test1"
             };
             await _categoryLayoutService.InsertCategoryLayout(categoryLayout1);
-            var categoryLayout2 = new CategoryLayout() {
+            var categoryLayout2 = new CategoryLayout {
                 Name = "test2"
             };
             await _categoryLayoutService.InsertCategoryLayout(categoryLayout2);
@@ -94,7 +95,7 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
         public async Task UpdateCategoryLayout_IsNotNull()
         {
             //Arrange
-            var categoryLayout = new CategoryLayout() {
+            var categoryLayout = new CategoryLayout {
                 Name = "test"
             };
             await _categoryLayoutService.InsertCategoryLayout(categoryLayout);
@@ -111,7 +112,7 @@ namespace Grand.Business.Catalog.Tests.Services.Categories
         public async Task UpdateCategoryLayout_IsNull()
         {
             //Arrange
-            var categoryLayout = new CategoryLayout() {
+            var categoryLayout = new CategoryLayout {
                 Name = "test"
             };
             await _categoryLayoutService.InsertCategoryLayout(categoryLayout);

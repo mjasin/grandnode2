@@ -1,19 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Grand.Business.Checkout.Events.Shipping;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Grand.Business.Core.Interfaces.Customers;
-using Moq;
+﻿using Grand.Business.Checkout.Events.Shipping;
+using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Shipping;
-using Grand.Business.Core.Interfaces.Catalog.Products;
-using Grand.Domain.Shipping;
 using Grand.Domain.Orders;
+using Grand.Domain.Shipping;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace Grand.Business.Checkout.Events.Shipping.Tests
+namespace Grand.Business.Checkout.Tests.Events.Shipping
 {
     [TestClass()]
     public class ShipmentDeletedEventHandlerTests
@@ -40,7 +34,7 @@ namespace Grand.Business.Checkout.Events.Shipping.Tests
             _orderServiceMock.Setup(x => x.GetOrderById(It.IsAny<string>())).Returns(Task.FromResult(order));
 
             var shipment = new Shipment();
-            shipment.ShipmentItems.Add(new ShipmentItem() { OrderItemId = "!" });
+            shipment.ShipmentItems.Add(new ShipmentItem { OrderItemId = "!" });
             var notification = new Infrastructure.Events.EntityDeleted<Shipment>(shipment);
             //Act
             await _shipmentDeletedEventHandler.Handle(notification, CancellationToken.None);

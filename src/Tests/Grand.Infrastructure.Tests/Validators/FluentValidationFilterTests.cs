@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Grand.Infrastructure.Tests.Validators;
+using Grand.Infrastructure.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -9,10 +9,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Infrastructure.Validators.Tests
+namespace Grand.Infrastructure.Tests.Validators
 {
     [TestClass()]
-    public class FluentValidationFilterTests
+    public class ValidationFilterTests
     {
         [TestMethod()]
         public async Task OnActionExecutionAsyncTest_ValidModel()
@@ -23,10 +23,13 @@ namespace Grand.Infrastructure.Validators.Tests
             services.AddScoped<IValidator<SourceTest>, SourceTestValidator>();
             var serviceProvider = services.BuildServiceProvider();
 
-            var actionFilter = new FluentValidationFilter(serviceProvider);
+            var actionFilter = new ValidationFilter(serviceProvider);
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Method = "POST";
+            var httpContext = new DefaultHttpContext {
+                Request = {
+                    Method = "POST"
+                }
+            };
 
             var actionContext = new ActionContext(httpContext,
                 new RouteData(),
@@ -44,7 +47,7 @@ namespace Grand.Infrastructure.Validators.Tests
 
             var source = new SourceTest {
                 FirstName = "ABCD",
-                LastName = "ABCD",
+                LastName = "ABCD"
 
             };
             actionExecutingContext.ActionArguments["model"] = source;
@@ -66,10 +69,13 @@ namespace Grand.Infrastructure.Validators.Tests
             services.AddScoped<IValidator<SourceTest>, SourceTestValidator>();
             var serviceProvider = services.BuildServiceProvider();
 
-            var actionFilter = new FluentValidationFilter(serviceProvider);
+            var actionFilter = new ValidationFilter(serviceProvider);
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Method = "POST";
+            var httpContext = new DefaultHttpContext {
+                Request = {
+                    Method = "POST"
+                }
+            };
 
             var actionContext = new ActionContext(httpContext,
                 new RouteData(),
@@ -86,7 +92,7 @@ namespace Grand.Infrastructure.Validators.Tests
                controller: null);
 
             var source = new SourceTest {
-                FirstName = "ABCD",
+                FirstName = "ABCD"
             };
             actionExecutingContext.ActionArguments["model"] = source;
 
@@ -103,7 +109,7 @@ namespace Grand.Infrastructure.Validators.Tests
         private static ActionExecutedContext CreateActionExecutedContext(ActionExecutingContext context)
         {
             return new ActionExecutedContext(context, context.Filters, context.Controller) {
-                Result = context.Result,
+                Result = context.Result
             };
         }
     }

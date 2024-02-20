@@ -6,29 +6,12 @@ using Grand.Infrastructure.Models;
 using Grand.Web.Admin.Models.Discounts;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using Grand.Web.Common.Validators;
 
 namespace Grand.Web.Admin.Models.Catalog
 {
     public class ProductModel : BaseEntityModel, ILocalizedModel<ProductLocalizedModel>, IGroupLinkModel, IStoreLinkModel
     {
-        public ProductModel()
-        {
-            Locales = new List<ProductLocalizedModel>();
-            ProductPictureModels = new List<ProductPictureModel>();
-            CopyProductModel = new CopyProductModel();
-            AvailableBasepriceUnits = new List<SelectListItem>();
-            AvailableBasepriceBaseUnits = new List<SelectListItem>();
-            AvailableProductLayouts = new List<SelectListItem>();
-            AvailableTaxCategories = new List<SelectListItem>();
-            AvailableDeliveryDates = new List<SelectListItem>();
-            AvailableWarehouses = new List<SelectListItem>();
-            AvailableProductAttributes = new List<SelectListItem>();
-            AvailableUnits = new List<SelectListItem>();
-            AddPictureModel = new ProductPictureModel();
-            ProductWarehouseInventoryModels = new List<ProductWarehouseInventoryModel>();
-            CalendarModel = new GenerateCalendarModel();
-        }
-
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.ID")]
         public override string Id { get; set; }
 
@@ -52,20 +35,23 @@ namespace Grand.Web.Admin.Models.Catalog
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.ProductLayout")]
         public string ProductLayoutId { get; set; }
-        public IList<SelectListItem> AvailableProductLayouts { get; set; }
+        public IList<SelectListItem> AvailableProductLayouts { get; set; } = new List<SelectListItem>();
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.Name")]
         public string Name { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.ShortDescription")]
         public string ShortDescription { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.FullDescription")]
         public string FullDescription { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.Flag")]
         public string Flag { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.AdminComment")]
         public string AdminComment { get; set; }
 
@@ -83,20 +69,19 @@ namespace Grand.Web.Admin.Models.Catalog
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.BestSeller")]
         public bool BestSeller { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.MetaKeywords")]
-
         public string MetaKeywords { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.MetaDescription")]
-
         public string MetaDescription { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.MetaTitle")]
-
         public string MetaTitle { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.SeName")]
-
         public string SeName { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.AllowCustomerReviews")]
@@ -104,17 +89,14 @@ namespace Grand.Web.Admin.Models.Catalog
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.ProductTags")]
         public string ProductTags { get; set; }
-
+        
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.Sku")]
-
         public string Sku { get; set; }
-
+        
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.Mpn")]
-
         public string Mpn { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.GTIN")]
-
         public virtual string Gtin { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.IsGiftVoucher")]
@@ -166,8 +148,8 @@ namespace Grand.Web.Admin.Models.Catalog
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.HasUserAgreement")]
         public bool HasUserAgreement { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.UserAgreementText")]
-
         public string UserAgreementText { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.IsRecurring")]
@@ -183,7 +165,7 @@ namespace Grand.Web.Admin.Models.Catalog
         public int RecurringTotalCycles { get; set; }
 
         //calendar
-        public GenerateCalendarModel CalendarModel { get; set; }
+        public GenerateCalendarModel CalendarModel { get; set; } = new();
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.IsShipEnabled")]
         public bool IsShipEnabled { get; set; }
@@ -199,14 +181,14 @@ namespace Grand.Web.Admin.Models.Catalog
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.DeliveryDate")]
         public string DeliveryDateId { get; set; }
-        public IList<SelectListItem> AvailableDeliveryDates { get; set; }
+        public IList<SelectListItem> AvailableDeliveryDates { get; set; } = new List<SelectListItem>();
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.IsTaxExempt")]
         public bool IsTaxExempt { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.TaxCategory")]
         public string TaxCategoryId { get; set; }
-        public IList<SelectListItem> AvailableTaxCategories { get; set; }
+        public IList<SelectListItem> AvailableTaxCategories { get; set; } = new List<SelectListItem>();
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.IsTelecommunicationsOrBroadcastingOrElectronicServices")]
         public bool IsTele { get; set; }
@@ -219,7 +201,7 @@ namespace Grand.Web.Admin.Models.Catalog
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.Warehouse")]
         public string WarehouseId { get; set; }
-        public IList<SelectListItem> AvailableWarehouses { get; set; }
+        public IList<SelectListItem> AvailableWarehouses { get; set; } = new List<SelectListItem>();
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.StockQuantity")]
         public int StockQuantity { get; set; }
@@ -308,12 +290,13 @@ namespace Grand.Web.Admin.Models.Catalog
         public double BasepriceAmount { get; set; }
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.BasepriceUnit")]
         public string BasepriceUnitId { get; set; }
-        public IList<SelectListItem> AvailableBasepriceUnits { get; set; }
+        public IList<SelectListItem> AvailableBasepriceUnits { get; set; } = new List<SelectListItem>();
+
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.BasepriceBaseAmount")]
         public double BasepriceBaseAmount { get; set; }
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.BasepriceBaseUnit")]
         public string BasepriceBaseUnitId { get; set; }
-        public IList<SelectListItem> AvailableBasepriceBaseUnits { get; set; }
+        public IList<SelectListItem> AvailableBasepriceBaseUnits { get; set; } = new List<SelectListItem>();
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.MarkAsNew")]
         public bool MarkAsNew { get; set; }
@@ -326,7 +309,7 @@ namespace Grand.Web.Admin.Models.Catalog
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.Unit")]
         public string UnitId { get; set; }
-        public IList<SelectListItem> AvailableUnits { get; set; }
+        public IList<SelectListItem> AvailableUnits { get; set; } = new List<SelectListItem>();
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.Weight")]
         public double Weight { get; set; }
@@ -376,7 +359,7 @@ namespace Grand.Web.Admin.Models.Catalog
         public string BaseDimensionIn { get; set; }
         public string BaseWeightIn { get; set; }
 
-        public IList<ProductLocalizedModel> Locales { get; set; }
+        public IList<ProductLocalizedModel> Locales { get; set; } = new List<ProductLocalizedModel>();
 
         //ACL (customer groups)
         [UIHint("CustomerGroups")]
@@ -388,15 +371,12 @@ namespace Grand.Web.Admin.Models.Catalog
         [UIHint("Stores")]
         public string[] Stores { get; set; }
 
-        //vendor
-        public bool IsLoggedInAsVendor { get; set; }
-
         //product attributes
-        public IList<SelectListItem> AvailableProductAttributes { get; set; }
+        public IList<SelectListItem> AvailableProductAttributes { get; set; } = new List<SelectListItem>();
 
         //pictures
-        public ProductPictureModel AddPictureModel { get; set; }
-        public IList<ProductPictureModel> ProductPictureModels { get; set; }
+        public ProductPictureModel AddPictureModel { get; set; } = new();
+        public IList<ProductPictureModel> ProductPictureModels { get; set; } = new List<ProductPictureModel>();
 
         //discounts
         public List<DiscountModel> AvailableDiscounts { get; set; }
@@ -404,22 +384,15 @@ namespace Grand.Web.Admin.Models.Catalog
 
         //multiple warehouses
         [GrandResourceDisplayName("Admin.Catalog.Products.ProductWarehouseInventory")]
-        public IList<ProductWarehouseInventoryModel> ProductWarehouseInventoryModels { get; set; }
+        public IList<ProductWarehouseInventoryModel> ProductWarehouseInventoryModels { get; set; } = new List<ProductWarehouseInventoryModel>();
 
         //copy product
-        public CopyProductModel CopyProductModel { get; set; }
+        public CopyProductModel CopyProductModel { get; set; } = new();
 
         #region Nested classes
 
         public class AddProductModel : BaseModel
         {
-            public AddProductModel()
-            {
-                AvailableStores = new List<SelectListItem>();
-                AvailableVendors = new List<SelectListItem>();
-                AvailableProductTypes = new List<SelectListItem>();
-            }
-
             [GrandResourceDisplayName("Admin.Catalog.Products.List.SearchProductName")]
 
             public string SearchProductName { get; set; }
@@ -439,15 +412,10 @@ namespace Grand.Web.Admin.Models.Catalog
             [GrandResourceDisplayName("Admin.Catalog.Products.List.SearchProductType")]
             public int SearchProductTypeId { get; set; }
 
-            public IList<SelectListItem> AvailableStores { get; set; }
-            public IList<SelectListItem> AvailableVendors { get; set; }
-            public IList<SelectListItem> AvailableProductTypes { get; set; }
-
-            //vendor
-            public bool IsLoggedInAsVendor { get; set; }
+            public IList<SelectListItem> AvailableStores { get; set; } = new List<SelectListItem>();
+            public IList<SelectListItem> AvailableVendors { get; set; } = new List<SelectListItem>();
+            public IList<SelectListItem> AvailableProductTypes { get; set; } = new List<SelectListItem>();
         }
-
-
         public class AddRequiredProductModel : AddProductModel 
         {
             
@@ -455,12 +423,6 @@ namespace Grand.Web.Admin.Models.Catalog
 
         public class AddProductSpecificationAttributeModel : BaseModel
         {
-            public AddProductSpecificationAttributeModel()
-            {
-                AvailableAttributes = new List<SelectListItem>();
-                AvailableOptions = new List<SelectListItem>();
-            }
-
             public string Id { get; set; }
 
             [GrandResourceDisplayName("Admin.Catalog.Products.SpecificationAttributes.Fields.SpecificationAttribute")]
@@ -488,17 +450,12 @@ namespace Grand.Web.Admin.Models.Catalog
             public int DisplayOrder { get; set; }
 
             public string ProductId { get; set; }
-            public IList<SelectListItem> AvailableAttributes { get; set; }
-            public IList<SelectListItem> AvailableOptions { get; set; }
+            public IList<SelectListItem> AvailableAttributes { get; set; } = new List<SelectListItem>();
+            public IList<SelectListItem> AvailableOptions { get; set; } = new List<SelectListItem>();
         }
 
         public class ProductPictureModel : BaseEntityModel, ILocalizedModel<ProductPictureModel.ProductPictureLocalizedModel>
         {
-            public ProductPictureModel()
-            {
-                Locales = new List<ProductPictureLocalizedModel>();
-            }
-
             public string ProductId { get; set; }
 
             [UIHint("MultiPicture")]
@@ -523,7 +480,7 @@ namespace Grand.Web.Admin.Models.Catalog
             [GrandResourceDisplayName("Admin.Catalog.Products.Pictures.Fields.ExtraField")]
             public string ExtraField { get; set; }
 
-            public IList<ProductPictureLocalizedModel> Locales { get; set; }
+            public IList<ProductPictureLocalizedModel> Locales { get; set; } = new List<ProductPictureLocalizedModel>();
 
             public class ProductPictureLocalizedModel : ILocalizedModelLocal
             {
@@ -683,28 +640,21 @@ namespace Grand.Web.Admin.Models.Catalog
 
         public class TierPriceModel : BaseEntityModel
         {
-
-            public TierPriceModel()
-            {
-                AvailableStores = new List<SelectListItem>();
-                AvailableCustomerGroups = new List<SelectListItem>();
-                AvailableCurrencies = new List<SelectListItem>();
-            }
             public string ProductId { get; set; }
 
             [GrandResourceDisplayName("Admin.Catalog.Products.TierPrices.Fields.CustomerGroup")]
             public string CustomerGroupId { get; set; }
-            public IList<SelectListItem> AvailableCustomerGroups { get; set; }
+            public IList<SelectListItem> AvailableCustomerGroups { get; set; } = new List<SelectListItem>();
             public string CustomerGroup { get; set; }
 
             [GrandResourceDisplayName("Admin.Catalog.Products.TierPrices.Fields.Store")]
             public string StoreId { get; set; }
-            public IList<SelectListItem> AvailableStores { get; set; }
+            public IList<SelectListItem> AvailableStores { get; set; } = new List<SelectListItem>();
             public string Store { get; set; }
 
             [GrandResourceDisplayName("Admin.Catalog.Products.TierPrices.Fields.CurrencyCode")]
             public string CurrencyCode { get; set; }
-            public IList<SelectListItem> AvailableCurrencies { get; set; }
+            public IList<SelectListItem> AvailableCurrencies { get; set; } = new List<SelectListItem>();
 
             [GrandResourceDisplayName("Admin.Catalog.Products.TierPrices.Fields.Quantity")]
             public int Quantity { get; set; }
@@ -721,6 +671,8 @@ namespace Grand.Web.Admin.Models.Catalog
             public DateTime? EndDateTime { get; set; }
 
         }
+
+        public record TierPriceDeleteModel(string Id, string ProductId);
 
         public class ProductWarehouseInventoryModel : BaseModel
         {
@@ -826,16 +778,12 @@ namespace Grand.Web.Admin.Models.Catalog
 
         public class ProductAttributeMappingModel : BaseEntityModel
         {
-            public ProductAttributeMappingModel()
-            {
-                AvailableProductAttribute = new List<SelectListItem>();
-            }
             public string ProductId { get; set; }
 
             public string ProductAttributeId { get; set; }
             [GrandResourceDisplayName("Admin.Catalog.Products.ProductAttributes.Attributes.Fields.Attribute")]
             public string ProductAttribute { get; set; }
-            public IList<SelectListItem> AvailableProductAttribute { get; set; }
+            public IList<SelectListItem> AvailableProductAttribute { get; set; } = new List<SelectListItem>();
 
             [GrandResourceDisplayName("Admin.Catalog.Products.ProductAttributes.Attributes.Fields.TextPrompt")]
             public string TextPrompt { get; set; }
@@ -900,12 +848,6 @@ namespace Grand.Web.Admin.Models.Catalog
 
         public class ProductAttributeValueModel : BaseEntityModel, ILocalizedModel<ProductAttributeValueLocalizedModel>
         {
-            public ProductAttributeValueModel()
-            {
-                ProductPictureModels = new List<ProductPictureModel>();
-                Locales = new List<ProductAttributeValueLocalizedModel>();
-            }
-
             public string ProductAttributeMappingId { get; set; }
             public string ProductId { get; set; }
 
@@ -965,8 +907,8 @@ namespace Grand.Web.Admin.Models.Catalog
             [GrandResourceDisplayName("Admin.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Picture")]
             public string PictureThumbnailUrl { get; set; }
 
-            public IList<ProductPictureModel> ProductPictureModels { get; set; }
-            public IList<ProductAttributeValueLocalizedModel> Locales { get; set; }
+            public IList<ProductPictureModel> ProductPictureModels { get; set; } = new List<ProductPictureModel>();
+            public IList<ProductAttributeValueLocalizedModel> Locales { get; set; } = new List<ProductAttributeValueLocalizedModel>();
 
             #region Nested classes
 
@@ -977,18 +919,6 @@ namespace Grand.Web.Admin.Models.Catalog
 
 
             #endregion
-        }
-        public class ActivityLogModel : BaseEntityModel
-        {
-            [GrandResourceDisplayName("Admin.Catalog.Products.ActivityLog.ActivityLogType")]
-            public string ActivityLogTypeName { get; set; }
-            [GrandResourceDisplayName("Admin.Catalog.Products.ActivityLog.Comment")]
-            public string Comment { get; set; }
-            [GrandResourceDisplayName("Admin.Catalog.Products.ActivityLog.CreatedOn")]
-            public DateTime CreatedOn { get; set; }
-            [GrandResourceDisplayName("Admin.Catalog.Products.ActivityLog.Customer")]
-            public string CustomerId { get; set; }
-            public string CustomerEmail { get; set; }
         }
         public class ProductAttributeValueLocalizedModel : ILocalizedModelLocal
         {
@@ -1060,31 +990,29 @@ namespace Grand.Web.Admin.Models.Catalog
         public string LanguageId { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.Name")]
-
         public string Name { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.ShortDescription")]
-
         public string ShortDescription { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.FullDescription")]
-
         public string FullDescription { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.MetaKeywords")]
-
         public string MetaKeywords { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.MetaDescription")]
-
         public string MetaDescription { get; set; }
 
+        [NoScripts]
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.MetaTitle")]
-
         public string MetaTitle { get; set; }
 
         [GrandResourceDisplayName("Admin.Catalog.Products.Fields.SeName")]
-
         public string SeName { get; set; }
     }
 }

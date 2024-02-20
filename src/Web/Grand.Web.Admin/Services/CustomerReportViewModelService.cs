@@ -23,12 +23,12 @@ namespace Grand.Web.Admin.Services
         private readonly IDateTimeService _dateTimeService;
         private readonly IPriceFormatter _priceFormatter;
         private readonly IOrderStatusService _orderStatusService;
-
+        private readonly ICurrencyService _currencyService;
         public CustomerReportViewModelService(IWorkContext workContext,
             ICustomerService customerService,
             ITranslationService translationService, ICustomerReportService customerReportService,
             IDateTimeService dateTimeService, IPriceFormatter priceFormatter,
-            IOrderStatusService orderStatusService)
+            IOrderStatusService orderStatusService, ICurrencyService currencyService)
         {
             _workContext = workContext;
             _customerService = customerService;
@@ -37,6 +37,7 @@ namespace Grand.Web.Admin.Services
             _dateTimeService = dateTimeService;
             _priceFormatter = priceFormatter;
             _orderStatusService = orderStatusService;
+            _currencyService = currencyService;
         }
 
         public virtual async Task<CustomerReportsModel> PrepareCustomerReportsModel()
@@ -110,15 +111,23 @@ namespace Grand.Web.Admin.Services
             PaymentStatus? paymentStatus = model.PaymentStatusId > 0 ? (PaymentStatus?)model.PaymentStatusId : null;
             ShippingStatus? shippingStatus = model.ShippingStatusId > 0 ? (ShippingStatus?)model.ShippingStatusId : null;
 
-            var items = _customerReportService.GetBestCustomersReport(model.StoreId, startDateValue, endDateValue,
-                orderStatus, paymentStatus, shippingStatus, 2, pageIndex - 1, pageSize);
+            var items = _customerReportService.GetBestCustomersReport(
+                storeId: model.StoreId, 
+                createdFromUtc: startDateValue, 
+                createdToUtc: endDateValue,
+                os: orderStatus, 
+                ps: paymentStatus, 
+                ss: shippingStatus,
+                orderBy: 2, 
+                pageIndex: pageIndex - 1, 
+                pageSize: pageSize);
 
             var report = new List<BestCustomerReportLineModel>();
             foreach (var x in items)
             {
                 var m = new BestCustomerReportLineModel {
                     CustomerId = x.CustomerId,
-                    OrderTotal = _priceFormatter.FormatPrice(x.OrderTotal, false),
+                    OrderTotal = _priceFormatter.FormatPrice(x.OrderTotal, await _currencyService.GetPrimaryStoreCurrency()),
                     OrderCount = x.OrderCount
                 };
                 var customer = await _customerService.GetCustomerById(x.CustomerId);

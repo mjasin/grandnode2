@@ -29,42 +29,19 @@ namespace Grand.Business.Core.Utilities.Messages.DotLiquidDrops
             AdditionalTokens = new Dictionary<string, string>();
         }
 
-        public string AttributeDescription
-        {
-            get
-            {
-                return _attributeDescription;
-            }
-        }
+        public string AttributeDescription => _attributeDescription;
 
-        public string PictureUrl
-        {
-            get
-            {
-                return _pictureUrl;
-            }
-        }
+        public string PictureUrl => _pictureUrl;
 
-        public int Quantity
-        {
-            get
-            {
-                return _shoppingCartItem.Quantity;
-            }
-        }
-        public ShoppingCartType ShoppingCartType
-        {
-            get
-            {
-                return _shoppingCartItem.ShoppingCartTypeId;
-            }
-        }
+        public int Quantity => _shoppingCartItem.Quantity;
+
+        public ShoppingCartType ShoppingCartType => _shoppingCartItem.ShoppingCartTypeId;
 
         public string ProductName
         {
             get
             {
-                string name = "";
+                var name = "";
 
                 if (_product != null)
                     name = WebUtility.HtmlEncode(_product.GetTranslation(x => x.Name, _language.Id));
@@ -77,7 +54,7 @@ namespace Grand.Business.Core.Utilities.Messages.DotLiquidDrops
         {
             get
             {
-                string name = "";
+                var name = "";
 
                 if (_product != null)
                     name = _product.GetTranslation(x => x.SeName, _language.Id);
@@ -88,7 +65,7 @@ namespace Grand.Business.Core.Utilities.Messages.DotLiquidDrops
         {
             get
             {
-                string desc = "";
+                var desc = "";
 
                 if (_product != null)
                     desc = WebUtility.HtmlEncode(_product.GetTranslation(x => x.ShortDescription, _language.Id));
@@ -101,7 +78,7 @@ namespace Grand.Business.Core.Utilities.Messages.DotLiquidDrops
         {
             get
             {
-                string desc = "";
+                var desc = "";
 
                 if (_product != null)
                     desc = WebUtility.HtmlDecode(_product.GetTranslation(x => x.FullDescription, _language.Id));

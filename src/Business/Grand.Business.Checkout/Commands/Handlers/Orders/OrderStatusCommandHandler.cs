@@ -56,8 +56,7 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders
             await _orderService.InsertOrderNote(new OrderNote {
                 Note = $"Order status has been changed to {request.Os.ToString()}",
                 DisplayToCustomer = false,
-                OrderId = request.Order.Id,
-                CreatedOnUtc = DateTime.UtcNow
+                OrderId = request.Order.Id
             });
 
             var customer = await _customerService.GetCustomerById(request.Order.CustomerId);
@@ -73,8 +72,10 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders
                 var orderCompletedAttachmentFileName = _orderSettings.AttachPdfInvoiceToOrderCompletedEmail ?
                     "order.pdf" : null;
 
-                var orderCompletedAttachments = _orderSettings.AttachPdfInvoiceToOrderCompletedEmail && _orderSettings.AttachPdfInvoiceToBinary ?
-                    new List<string> { await _pdfService.SaveOrderToBinary(request.Order, "") } : new List<string>();
+                var orderCompletedAttachments = _orderSettings.AttachPdfInvoiceToOrderCompletedEmail && _orderSettings.AttachPdfInvoiceToBinary ? [
+                        await _pdfService.SaveOrderToBinary(request.Order, "")
+                    ]
+                    : new List<string>();
 
                 await _messageProviderService
                     .SendOrderCompletedCustomerMessage(request.Order, customer, request.Order.CustomerLanguageId, orderCompletedAttachmentFilePath,
@@ -103,7 +104,6 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders
                     await _orderService.InsertOrderNote(new OrderNote {
                         Note = "\"Order cancelled\" by customer.",
                         DisplayToCustomer = true,
-                        CreatedOnUtc = DateTime.UtcNow,
                         OrderId = request.Order.Id
                     });
                 }

@@ -21,13 +21,14 @@
     {
         <validation-observer v-slot="{ handleSubmit }">
             <form asp-route="ApplyVendorAccount" method="post" enctype="multipart/form-data" ref="form" v-on:submit.prevent="handleSubmit(formSubmit)">
-                <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                <div asp-validation-summary="All" class="message-error"></div>
                 <div class="form-fields">
                     <div class="form-group">
                         <validation-provider tag="div" rules="required" name="Name" v-slot="{ errors, classes }">
                             <label asp-for="Name" class="col-form-label">@Loc["Vendors.ApplyAccount.Name"]:</label>
                             <span class="required">*</span>
-                            <input asp-for="Name" v-model="applyvendor.Name" placeholder="@Loc["Vendors.ApplyAccount.Name.Hint"]" v-bind:class="[classes , 'form-control']" />
+                            <input asp-for="Name" v-model="applyvendor.Name" placeholder="@Loc["Vendors.ApplyAccount.Name.Hint"]" v-bind:class="[classes , 'form-control']" 
+                                    data-val-required=@Loc["Vendors.ApplyAccount.Name.Required"] />
                             <span class="field-validation-error">{{ errors[0] }}</span>
                             <span asp-validation-for="Name"></span>
                         </validation-provider>
@@ -36,7 +37,8 @@
                         <validation-provider tag="div" rules="required|email" name="Email" v-slot="{ errors, classes }">
                             <label asp-for="Email" class="col-form-label">@Loc["Vendors.ApplyAccount.Email"]:</label>
                             <span class="required">*</span>
-                            <input asp-for="Email" v-model="applyvendor.Email" placeholder="@Loc["Vendors.ApplyAccount.Email.Hint"]" v-bind:class="[classes , 'form-control']" />
+                            <input asp-for="Email" v-model="applyvendor.Email" placeholder="@Loc["Vendors.ApplyAccount.Email.Hint"]" v-bind:class="[classes , 'form-control']" 
+                                   data-val-email=@Loc["Common.WrongEmail"] data-val-required=@Loc["Account.ApplyAccount.Email.Required"] />
                             <span class="field-validation-error">{{ errors[0] }}</span>
                             <span asp-validation-for="Email"></span>
                         </validation-provider>
@@ -45,22 +47,13 @@
                         <label asp-for="Description" class="col-form-label">@Loc["Vendors.ApplyAccount.Description"]:</label>
                         <textarea asp-for="Description" class="form-control description"></textarea>
                     </div>
-                    @if (Model.AllowToUploadFile)
-                    {
-                        <div class="form-group">
-                            <label class="col-form-label">@Loc["Vendors.ApplyAccount.Picture"]:</label>
-                            <div class="custom-file">
-                                <b-form-file id="uploadedFile" name="uploadedFile" accept="image/*"></b-form-file>
-                            </div>
-                        </div>
-                    }
                     @if (Model.DisplayCaptcha)
                     {
                         <div class="captcha-box">
                             <captcha />
                         </div>
                     }
-                    <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                    <div asp-validation-summary="All" class="message-error"></div>
                     @{
                         var dataDictAddress = new ViewDataDictionary(ViewData)
                         {
@@ -97,11 +90,11 @@
                                     </label>
                                     @if (Model.TermsOfServicePopup)
                                     {
-                                        <b-link class="read mx-2" onclick="window.open('@Url.RouteUrl("PagePopup", new { SystemName = PageSeNameConstants.VendorTermsOfService })', 450, 500, true)">@Loc["Vendors.ApplyAccount.AcceptTermsOfService.Read"]</b-link>
+                                        <b-link class="read mx-2" onclick="window.open('@Url.RouteUrl("PagePopup", new { SystemName = "VendorTermsOfService" })', 450, 500, true)">@Loc["Vendors.ApplyAccount.AcceptTermsOfService.Read"]</b-link>
                                     }
                                     else
                                     {
-                                        <a class="read" id="read-acceptterms" href="@Url.RouteUrl("Page", new {SeName = PageSeNameConstants.VendorTermsOfService })">@Loc["Vendors.ApplyAccount.AcceptTermsOfService.Read"]</a>
+                                        <a class="read" id="read-acceptterms" href="@Url.RouteUrl("Page", new {SeName = "VendorTermsOfService" })">@Loc["Vendors.ApplyAccount.AcceptTermsOfService.Read"]</a>
                                     }
                                 </div>
                                 <span class="field-validation-error d-flex w-100">{{ errors[0] }}</span>

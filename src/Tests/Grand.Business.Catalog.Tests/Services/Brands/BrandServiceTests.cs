@@ -1,16 +1,18 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Brands;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using Grand.SharedKernel.Extensions;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Brands.Tests
+namespace Grand.Business.Catalog.Tests.Services.Brands
 {
     [TestClass()]
     public class BrandServiceTests
@@ -28,11 +30,11 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
 
             _repository = new MongoDBRepositoryTest<Brand>();
             _workContextMock = new Mock<IWorkContext>();
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "" });
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "" });
             _workContextMock.Setup(c => c.CurrentCustomer).Returns(() => new Customer());
             _mediatorMock = new Mock<IMediator>();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
-            _brandService = new BrandService(_cacheBase, _repository, _workContextMock.Object, _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
+            _brandService = new BrandService(_cacheBase, _repository, _workContextMock.Object, _mediatorMock.Object, new AccessControlConfig());
         }
 
 
@@ -40,9 +42,9 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
         public async Task GetAllBrandsTest()
         {
             //Arrange
-            await _brandService.InsertBrand(new Brand() { Published = true });
-            await _brandService.InsertBrand(new Brand() { Published = true });
-            await _brandService.InsertBrand(new Brand() { Published = true });
+            await _brandService.InsertBrand(new Brand { Published = true });
+            await _brandService.InsertBrand(new Brand { Published = true });
+            await _brandService.InsertBrand(new Brand { Published = true });
 
             //Act
             var brand = await _brandService.GetAllBrands();
@@ -55,7 +57,7 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
         public async Task GetBrandByIdTest()
         {
             //Arrange
-            var brand = new Brand() {
+            var brand = new Brand {
                 Name = "test"
             };
             await _brandService.InsertBrand(brand);
@@ -81,7 +83,7 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
         public async Task UpdateBrandTest()
         {
             //Arrange
-            var brand = new Brand() {
+            var brand = new Brand {
                 Name = "test"
             };
             await _brandService.InsertBrand(brand);
@@ -98,11 +100,11 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
         public async Task DeleteBrandTest()
         {
             //Arrange
-            var brand1 = new Brand() {
+            var brand1 = new Brand {
                 Name = "test1"
             };
             await _brandService.InsertBrand(brand1);
-            var brand2 = new Brand() {
+            var brand2 = new Brand {
                 Name = "test2"
             };
             await _brandService.InsertBrand(brand2);
@@ -119,11 +121,11 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
         public async Task GetAllBrandsByDiscountTest()
         {
             //Arrange
-            var brand1 = new Brand() {
+            var brand1 = new Brand {
                 Name = "test1"
             };
             await _brandService.InsertBrand(brand1);
-            var brand2 = new Brand() {
+            var brand2 = new Brand {
                 Name = "test2"
             };
             brand2.AppliedDiscounts.Add("disc1");
@@ -135,7 +137,7 @@ namespace Grand.Business.Catalog.Services.Brands.Tests
 
             //Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(1, result.Count());
+            Assert.AreEqual(1, result.Count);
         }
     }
 }

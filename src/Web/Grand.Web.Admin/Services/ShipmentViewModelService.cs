@@ -5,17 +5,14 @@ using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Shipping;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Domain.Catalog;
 using Grand.Domain.Directory;
 using Grand.Domain.Orders;
 using Grand.Domain.Shipping;
 using Grand.Infrastructure;
-using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Orders;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Grand.Web.Admin.Services
@@ -24,19 +21,16 @@ namespace Grand.Web.Admin.Services
     {
         private readonly IOrderService _orderService;
         private readonly IWorkContext _workContext;
-        private readonly IGroupService _groupService;
         private readonly IProductService _productService;
         private readonly IShipmentService _shipmentService;
         private readonly IWarehouseService _warehouseService;
         private readonly IMeasureService _measureService;
         private readonly IDateTimeService _dateTimeService;
         private readonly ICountryService _countryService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly ITranslationService _translationService;
         private readonly IDownloadService _downloadService;
         private readonly IShippingService _shippingService;
         private readonly IStockQuantityService _stockQuantityService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly MeasureSettings _measureSettings;
         private readonly ShippingSettings _shippingSettings;
         private readonly ShippingProviderSettings _shippingProviderSettings;
@@ -44,38 +38,32 @@ namespace Grand.Web.Admin.Services
         public ShipmentViewModelService(
             IOrderService orderService,
             IWorkContext workContext,
-            IGroupService groupService,
             IProductService productService,
             IShipmentService shipmentService,
             IWarehouseService warehouseService,
             IMeasureService measureService,
             IDateTimeService dateTimeService,
             ICountryService countryService,
-            ICustomerActivityService customerActivityService,
             ITranslationService translationService,
             IDownloadService downloadService,
             IShippingService shippingService,
             IStockQuantityService stockQuantityService,
-            IHttpContextAccessor httpContextAccessor,
             MeasureSettings measureSettings,
             ShippingSettings shippingSettings,
             ShippingProviderSettings shippingProviderSettings)
         {
             _orderService = orderService;
             _workContext = workContext;
-            _groupService = groupService;
             _productService = productService;
             _shipmentService = shipmentService;
             _warehouseService = warehouseService;
             _measureService = measureService;
             _dateTimeService = dateTimeService;
             _countryService = countryService;
-            _customerActivityService = customerActivityService;
             _translationService = translationService;
             _downloadService = downloadService;
             _shippingService = shippingService;
             _stockQuantityService = stockQuantityService;
-            _httpContextAccessor = httpContextAccessor;
             _measureSettings = measureSettings;
             _shippingSettings = shippingSettings;
             _shippingProviderSettings = shippingProviderSettings;
@@ -120,10 +108,6 @@ namespace Grand.Web.Admin.Services
                     var orderItem = order.OrderItems.FirstOrDefault(x => x.Id == shipmentItem.OrderItemId);
                     if (orderItem == null)
                         continue;
-
-                    if (_workContext.CurrentVendor != null)
-                        if (orderItem.VendorId != _workContext.CurrentVendor.Id)
-                            continue;
 
                     //quantities
                     var qtyInThisShipment = shipmentItem.Quantity;
@@ -271,8 +255,7 @@ namespace Grand.Web.Admin.Services
                 DisplayToCustomer = displayToCustomer,
                 Note = message,
                 DownloadId = downloadId,
-                ShipmentId = shipment.Id,
-                CreatedOnUtc = DateTime.UtcNow
+                ShipmentId = shipment.Id
             };
             await _shipmentService.InsertShipmentNote(shipmentNote);
 
@@ -296,14 +279,6 @@ namespace Grand.Web.Admin.Services
                 if (attachment != null)
                     await _downloadService.DeleteDownload(attachment);
             }
-        }
-
-        public virtual Task LogShipment(string shipmentId, string message)
-        {
-            _ = _customerActivityService.InsertActivity("EditShipment", shipmentId,
-                _workContext.CurrentCustomer, _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString(),
-                message);
-            return Task.CompletedTask;
         }
 
         public virtual async Task<(IEnumerable<Shipment> shipments, int totalCount)> PrepareShipments(
@@ -367,14 +342,7 @@ namespace Grand.Web.Admin.Services
             var baseDimension = await _measureService.GetMeasureDimensionById(_measureSettings.BaseDimensionId);
             var baseDimensionIn = baseDimension != null ? baseDimension.Name : "";
 
-            var orderItems = order.OrderItems;
-            //a vendor should have access only to his products
-            if (_workContext.CurrentVendor != null && !await _groupService.IsStaff(_workContext.CurrentCustomer))
-            {
-                orderItems = orderItems.Where(_workContext.HasAccessToOrderItem).ToList();
-            }
-
-            foreach (var orderItem in orderItems)
+            foreach (var orderItem in order.OrderItems)
             {
                 var product = await _productService.GetProductByIdIncludeArch(orderItem.ProductId);
                 //we can ship only shippable products
@@ -408,9 +376,9 @@ namespace Grand.Web.Admin.Services
                     QuantityToAdd = maxQtyToAdd
                 };
 
-                if (product.ManageInventoryMethodId == ManageInventoryMethod.ManageStock)
+                switch (product.ManageInventoryMethodId)
                 {
-                    if (product.UseMultipleWarehouses)
+                    case ManageInventoryMethod.ManageStock when product.UseMultipleWarehouses:
                     {
                         //multiple warehouses supported
                         shipmentItemModel.AllowToChooseWarehouse = true;
@@ -430,8 +398,10 @@ namespace Grand.Web.Admin.Services
                                     });
                             }
                         }
+
+                        break;
                     }
-                    else
+                    case ManageInventoryMethod.ManageStock:
                     {
                         //multiple warehouses are not supported
                         var warehouse = await _warehouseService.GetWarehouseById(product.WarehouseId);
@@ -444,12 +414,10 @@ namespace Grand.Web.Admin.Services
                                 StockQuantity = product.StockQuantity
                             });
                         }
-                    }
-                }
 
-                if (product.ManageInventoryMethodId == ManageInventoryMethod.ManageStockByAttributes)
-                {
-                    if (product.UseMultipleWarehouses)
+                        break;
+                    }
+                    case ManageInventoryMethod.ManageStockByAttributes when product.UseMultipleWarehouses:
                     {
                         //multiple warehouses supported
                         shipmentItemModel.AllowToChooseWarehouse = true;
@@ -473,8 +441,10 @@ namespace Grand.Web.Admin.Services
                                 }
                             }
                         }
+
+                        break;
                     }
-                    else
+                    case ManageInventoryMethod.ManageStockByAttributes:
                     {
                         //multiple warehouses are not supported
                         var warehouse = await _warehouseService.GetWarehouseById(product.WarehouseId);
@@ -487,6 +457,8 @@ namespace Grand.Web.Admin.Services
                                 StockQuantity = product.StockQuantity
                             });
                         }
+
+                        break;
                     }
                 }
 
@@ -538,24 +510,28 @@ namespace Grand.Web.Admin.Services
             foreach (var item in shipment.ShipmentItems)
             {
                 var product = await _productService.GetProductById(item.ProductId);
-                if (product.ManageInventoryMethodId == ManageInventoryMethod.ManageStock)
+                switch (product.ManageInventoryMethodId)
                 {
-                    var stock = _stockQuantityService.GetTotalStockQuantity(product, useReservedQuantity: false,
-                        warehouseId: item.WarehouseId);
-                    if (stock - item.Quantity < 0)
-                        return (false, $"Out of stock for product {product.Name}");
-                }
+                    case ManageInventoryMethod.ManageStock:
+                    {
+                        var stock = _stockQuantityService.GetTotalStockQuantity(product, useReservedQuantity: false,
+                            warehouseId: item.WarehouseId);
+                        if (stock - item.Quantity < 0)
+                            return (false, $"Out of stock for product {product.Name}");
+                        break;
+                    }
+                    case ManageInventoryMethod.ManageStockByAttributes:
+                    {
+                        var combination = product.FindProductAttributeCombination(item.Attributes);
+                        if (combination == null)
+                            return (false, $"Can't find combination for product {product.Name}");
 
-                if (product.ManageInventoryMethodId == ManageInventoryMethod.ManageStockByAttributes)
-                {
-                    var combination = product.FindProductAttributeCombination(item.Attributes);
-                    if (combination == null)
-                        return (false, $"Can't find combination for product {product.Name}");
-
-                    var stock = _stockQuantityService.GetTotalStockQuantityForCombination(product, combination,
-                        useReservedQuantity: false, warehouseId: item.WarehouseId);
-                    if (stock - item.Quantity < 0)
-                        return (false, $"Out of stock for product {product.Name}");
+                        var stock = _stockQuantityService.GetTotalStockQuantityForCombination(product, combination,
+                            useReservedQuantity: false, warehouseId: item.WarehouseId);
+                        if (stock - item.Quantity < 0)
+                            return (false, $"Out of stock for product {product.Name}");
+                        break;
+                    }
                 }
             }
 
@@ -624,13 +600,8 @@ namespace Grand.Web.Admin.Services
                         ShippedDateUtc = null,
                         DeliveryDateUtc = null,
                         AdminComment = adminComment,
-                        CreatedOnUtc = DateTime.UtcNow,
                         StoreId = order.StoreId
                     };
-                    if (_workContext.CurrentVendor != null)
-                    {
-                        shipment.VendorId = _workContext.CurrentVendor.Id;
-                    }
                 }
 
                 //create a shipment item

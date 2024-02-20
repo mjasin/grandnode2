@@ -1,16 +1,13 @@
 ﻿using Grand.Domain.Security;
+using Grand.Infrastructure.TypeConverters.Converter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Infrastructure.TypeConverters.Converter.Tests
+namespace Grand.Infrastructure.Tests.TypeConverters.Converter
 {
     [TestClass()]
     public class RefreshTokenTypeConverterTests
     {
-        RefreshTokenTypeConverter refreshTokenTypeConverter;
-        public RefreshTokenTypeConverterTests()
-        {
-            refreshTokenTypeConverter = new RefreshTokenTypeConverter();
-        }
+        RefreshTokenTypeConverter refreshTokenTypeConverter = new();
 
         [TestMethod()]
         public void CanConvertFromTest_string()
@@ -40,11 +37,12 @@ namespace Grand.Infrastructure.TypeConverters.Converter.Tests
         [TestMethod()]
         public void ConvertToTest_NotNull()
         {
-            var refreshToken = new RefreshToken();
-            refreshToken.RefreshId = Guid.NewGuid().ToString();
-            refreshToken.Token = Guid.NewGuid().ToString();
-            refreshToken.IsActive = true;
-            refreshToken.ValidTo = DateTime.UtcNow.AddDays(1);
+            var refreshToken = new RefreshToken {
+                RefreshId = Guid.NewGuid().ToString(),
+                Token = Guid.NewGuid().ToString(),
+                IsActive = true,
+                ValidTo = DateTime.UtcNow.AddDays(1)
+            };
             var str = refreshTokenTypeConverter.ConvertTo(refreshToken, typeof(string));
             Assert.IsNotNull(str);
             Assert.IsInstanceOfType(str, typeof(string));
@@ -52,11 +50,12 @@ namespace Grand.Infrastructure.TypeConverters.Converter.Tests
         [TestMethod()]
         public void ConvertToTest_decimal_Exception()
         {
-            var refreshToken = new RefreshToken();
-            refreshToken.RefreshId = Guid.NewGuid().ToString();
-            refreshToken.Token = Guid.NewGuid().ToString();
-            refreshToken.IsActive = true;
-            refreshToken.ValidTo = DateTime.UtcNow.AddDays(1);
+            var refreshToken = new RefreshToken {
+                RefreshId = Guid.NewGuid().ToString(),
+                Token = Guid.NewGuid().ToString(),
+                IsActive = true,
+                ValidTo = DateTime.UtcNow.AddDays(1)
+            };
 
             Assert.ThrowsException<NotSupportedException>(() => _ = refreshTokenTypeConverter.ConvertTo(refreshToken, typeof(decimal)));
         }

@@ -1,16 +1,18 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Products;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using Grand.SharedKernel.Extensions;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
     [TestClass()]
     public class AuctionServiceTests
@@ -30,10 +32,10 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             _repository = new MongoDBRepositoryTest<Bid>();
             _productrepository = new MongoDBRepositoryTest<Product>();
             _workContextMock = new Mock<IWorkContext>();
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "" });
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "" });
             _workContextMock.Setup(c => c.CurrentCustomer).Returns(() => new Customer());
             _mediatorMock = new Mock<IMediator>();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _auctionService = new AuctionService(_repository, _productrepository, _cacheBase, _mediatorMock.Object);
         }
 
@@ -41,7 +43,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetBidTest()
         {
             //Arrange
-            var bid = new Bid() {
+            var bid = new Bid {
                 Amount = 10
             };
             await _auctionService.InsertBid(bid);
@@ -58,13 +60,13 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetLatestBidTest()
         {
             //Arrange
-            var bid1 = new Bid() {
+            var bid1 = new Bid {
                 Amount = 10,
                 ProductId = "1",
                 Date = DateTime.UtcNow.AddDays(-1)
             };
             await _auctionService.InsertBid(bid1);
-            var bid2 = new Bid() {
+            var bid2 = new Bid {
                 Amount = 12,
                 ProductId = "1",
                 Date = DateTime.UtcNow
@@ -83,13 +85,13 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetBidsByProductIdTest()
         {
             //Arrange
-            var bid1 = new Bid() {
+            var bid1 = new Bid {
                 Amount = 10,
                 ProductId = "1",
                 Date = DateTime.UtcNow.AddDays(-1)
             };
             await _auctionService.InsertBid(bid1);
-            var bid2 = new Bid() {
+            var bid2 = new Bid {
                 Amount = 12,
                 ProductId = "1",
                 Date = DateTime.UtcNow
@@ -108,14 +110,14 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetBidsByCustomerIdTest()
         {
             //Arrange
-            var bid1 = new Bid() {
+            var bid1 = new Bid {
                 Amount = 10,
                 ProductId = "1",
                 CustomerId = "1",
                 Date = DateTime.UtcNow.AddDays(-1)
             };
             await _auctionService.InsertBid(bid1);
-            var bid2 = new Bid() {
+            var bid2 = new Bid {
                 Amount = 12,
                 ProductId = "1",
                 CustomerId = "2",
@@ -135,7 +137,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task InsertBidTest()
         {
             //Arrange
-            var bid1 = new Bid() {
+            var bid1 = new Bid {
                 Amount = 10,
                 ProductId = "1",
                 CustomerId = "1",
@@ -152,7 +154,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UpdateBidTest()
         {
             //Arrange
-            var bid1 = new Bid() {
+            var bid1 = new Bid {
                 Amount = 10,
                 ProductId = "1",
                 CustomerId = "1",
@@ -170,7 +172,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task DeleteBidTest()
         {
             //Arrange
-            var bid1 = new Bid() {
+            var bid1 = new Bid {
                 Amount = 10,
                 ProductId = "1",
                 CustomerId = "1",
@@ -201,14 +203,14 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task GetAuctionsToEndTest()
         {
             //Arrange
-            var product1 = new Product() {
+            var product1 = new Product {
                 ProductTypeId = ProductType.Auction,
-                AvailableEndDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                AvailableEndDateTimeUtc = DateTime.UtcNow.AddDays(1)
             };
             _productrepository.Insert(product1);
-            var product2 = new Product() {
+            var product2 = new Product {
                 ProductTypeId = ProductType.Auction,
-                AvailableEndDateTimeUtc = DateTime.UtcNow.AddDays(-1),
+                AvailableEndDateTimeUtc = DateTime.UtcNow.AddDays(-1)
             };
             _productrepository.Insert(product2);
 
@@ -223,9 +225,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UpdateAuctionEndedTest()
         {
             //Arrange
-            var product1 = new Product() {
+            var product1 = new Product {
                 ProductTypeId = ProductType.Auction,
-                AvailableEndDateTimeUtc = DateTime.UtcNow.AddDays(1),
+                AvailableEndDateTimeUtc = DateTime.UtcNow.AddDays(1)
             };
             _productrepository.Insert(product1);
 
@@ -240,7 +242,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task NewBidTest()
         {
             //Arrange
-            var bid1 = new Bid() {
+            var bid1 = new Bid {
                 Amount = 10,
                 ProductId = "1",
                 CustomerId = "1",
@@ -248,7 +250,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             };
             await _auctionService.InsertBid(bid1);
             //Act
-            await _auctionService.NewBid(new Customer() { Id = "1" }, new Product() { Id = "1" }, new Domain.Stores.Store(), new Domain.Localization.Language(), "", 12);
+            await _auctionService.NewBid(new Customer { Id = "1" }, new Product { Id = "1" }, new Domain.Stores.Store(), new Domain.Localization.Language(), "", 12);
             //Assert
             Assert.AreEqual(12, _repository.Table.Where(x => x.ProductId == "1").Max(x => x.Amount));
         }
@@ -257,7 +259,7 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task CancelBidByOrderTest()
         {
             //Arrange
-            var bid1 = new Bid() {
+            var bid1 = new Bid {
                 Amount = 10,
                 ProductId = "1",
                 CustomerId = "1",

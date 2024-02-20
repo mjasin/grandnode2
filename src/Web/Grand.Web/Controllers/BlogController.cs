@@ -1,5 +1,4 @@
-﻿using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Cms;
+﻿using Grand.Business.Core.Interfaces.Cms;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Security;
@@ -10,7 +9,6 @@ using Grand.Infrastructure;
 using Grand.Web.Commands.Models.Blogs;
 using Grand.Web.Common.Controllers;
 using Grand.Web.Common.Filters;
-using Grand.Web.Common.Security.Captcha;
 using Grand.Web.Events;
 using Grand.Web.Features.Models.Blogs;
 using Grand.Web.Models.Blogs;
@@ -125,7 +123,7 @@ namespace Grand.Web.Controllers
             var model = await _mediator.Send(new GetBlogPost { BlogPost = blogPost });
 
             //display "edit" (manage) link
-            if (await permissionService.Authorize(StandardPermission.AccessAdminPanel) && await permissionService.Authorize(StandardPermission.ManageBlog))
+            if (await permissionService.Authorize(StandardPermission.ManageAccessAdminPanel) && await permissionService.Authorize(StandardPermission.ManageBlog))
                 DisplayEditLink(Url.Action("Edit", "Blog", new { id = blogPost.Id, area = "Admin" }));
 
             return View(model);

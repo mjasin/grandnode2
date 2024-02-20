@@ -8,7 +8,7 @@ using Grand.Web.Common.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.FixedRateShipping.Models;
 
-namespace Shipping.FixedRateShipping.Controllers
+namespace Shipping.FixedRateShipping.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AuthorizeAdmin]
@@ -65,8 +65,7 @@ namespace Shipping.FixedRateShipping.Controllers
                 return Content("Access denied");
 
             var shippingMethodId = model.ShippingMethodId;
-            var rate = new FixedShippingRate()
-            {
+            var rate = new FixedShippingRate {
                 Rate = model.Rate
             };
 

@@ -23,16 +23,13 @@ namespace Grand.Business.Core.Utilities.Messages.DotLiquidDrops
             AdditionalTokens = new Dictionary<string, string>();
         }
 
-        public string Email
-        {
-            get { return _subscription.Email; }
-        }
+        public string Email => _subscription.Email;
 
         public string ActivationUrl
         {
             get
             {
-                string urlFormat = "{0}/newsletter/subscriptionactivation/{1}/{2}";
+                var urlFormat = "{0}/newsletter/subscriptionactivation/{1}/{2}";
                 var activationUrl = String.Format(urlFormat, url, _subscription.NewsLetterSubscriptionGuid, "true");
                 return activationUrl;
             }
@@ -42,7 +39,7 @@ namespace Grand.Business.Core.Utilities.Messages.DotLiquidDrops
         {
             get
             {
-                string urlFormat = "{0}/newsletter/subscriptionactivation/{1}/{2}";
+                var urlFormat = "{0}/newsletter/subscriptionactivation/{1}/{2}";
                 var deActivationUrl = String.Format(urlFormat, url, _subscription.NewsLetterSubscriptionGuid, "false");
                 return deActivationUrl;
             }

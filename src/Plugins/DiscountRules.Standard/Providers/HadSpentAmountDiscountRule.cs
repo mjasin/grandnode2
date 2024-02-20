@@ -1,10 +1,10 @@
 using Grand.Business.Core.Interfaces.Catalog.Discounts;
-using Grand.Business.Core.Utilities.Catalog;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Common.Localization;
+using Grand.Business.Core.Utilities.Catalog;
 using Grand.Domain.Orders;
 
-namespace DiscountRules.Provider
+namespace DiscountRules.Standard.Providers
 {
     public class HadSpentAmountDiscountRule : IDiscountRule
     {
@@ -24,8 +24,7 @@ namespace DiscountRules.Provider
         /// <returns>true - requirement is met; otherwise, false</returns>
         public async Task<DiscountRuleValidationResult> CheckRequirement(DiscountRuleValidationRequest request)
         {
-            if (request == null)
-                throw new ArgumentNullException(nameof(request));
+            ArgumentNullException.ThrowIfNull(request);
 
             //invalid by default
             var result = new DiscountRuleValidationResult();

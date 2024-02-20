@@ -1,6 +1,6 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 	<PropertyGroup>
 		<Product>grandnode</Product>
@@ -34,4 +34,9 @@
 	<ItemGroup Condition="'$(GitBranch)'!=''">
 		<AssemblyMetadata Include="GitBranch" Value="$(GitBranch)" />
 	</ItemGroup>
+	<Target Name="SetVersion" BeforeTargets="PrepareForBuild">
+		<PropertyGroup>
+			<Version>2.2.0-develop</Version>
+		</PropertyGroup>
+	</Target>
 </Project>

@@ -1,11 +1,10 @@
-﻿using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Tasks;
+﻿using Grand.Domain.Tasks;
 
 namespace Grand.Business.System.Services.Installation
 {
     public partial class InstallationService
     {
-        protected virtual async Task InstallScheduleTasks()
+        protected virtual Task InstallScheduleTasks()
         {
             //these tasks are default - they are created in order to insert them into database
             //and nothing above it
@@ -75,9 +74,10 @@ namespace Grand.Business.System.Services.Installation
                     Enabled = false,
                     StopOnError = false,
                     TimeInterval = 1440
-                },
+                }
             };
-            await _scheduleTaskRepository.InsertAsync(tasks);
+            tasks.ForEach(x=>_scheduleTaskRepository.Insert(x));
+            return Task.CompletedTask;
         }
     }
 }

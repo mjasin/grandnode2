@@ -38,7 +38,7 @@ namespace Shipping.ShippingPoint.Controllers
             var shippingPoint = await _shippingPointService.GetStoreShippingPointById(shippingOptionId);
             if (shippingPoint == null) return Content("ShippingPointController: given Shipping Option doesn't exist");
             var rateBase = await _currencyService.ConvertFromPrimaryStoreCurrency(shippingPoint.PickupFee, _workContext.WorkingCurrency);
-            var fee = _priceFormatter.FormatShippingPrice(rateBase);
+            var fee = _priceFormatter.FormatPrice(rateBase, _workContext.WorkingCurrency);
 
             var viewModel = new PointModel {
                 ShippingPointName = shippingPoint.ShippingPointName,
@@ -55,7 +55,7 @@ namespace Shipping.ShippingPoint.Controllers
 
         public async Task<IActionResult> Points(string shippingOption)
         {
-            var parameter = shippingOption.Split(new[] { ":" }, StringSplitOptions.RemoveEmptyEntries)[0];
+            var parameter = shippingOption.Split([":"], StringSplitOptions.RemoveEmptyEntries)[0];
 
             if (parameter != _translationService.GetResource("Shipping.ShippingPoint.PluginName"))
                 return Content("ShippingPointController: given Shipping Option doesn't exist");

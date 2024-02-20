@@ -1,6 +1,6 @@
 using Grand.Business.Core.Interfaces.Catalog.Brands;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
 using Grand.Infrastructure.Extensions;
@@ -74,8 +74,7 @@ namespace Grand.Business.Catalog.Services.Brands
         /// <param name="brandLayout">Brand layout</param>
         public virtual async Task InsertBrandLayout(BrandLayout brandLayout)
         {
-            if (brandLayout == null)
-                throw new ArgumentNullException(nameof(brandLayout));
+            ArgumentNullException.ThrowIfNull(brandLayout);
 
             await _brandLayoutRepository.InsertAsync(brandLayout);
 
@@ -92,8 +91,7 @@ namespace Grand.Business.Catalog.Services.Brands
         /// <param name="brandLayout">Brand layout</param>
         public virtual async Task UpdateBrandLayout(BrandLayout brandLayout)
         {
-            if (brandLayout == null)
-                throw new ArgumentNullException(nameof(brandLayout));
+            ArgumentNullException.ThrowIfNull(brandLayout);
 
             await _brandLayoutRepository.UpdateAsync(brandLayout);
 
@@ -110,8 +108,7 @@ namespace Grand.Business.Catalog.Services.Brands
         /// <param name="brandLayout">Brand layout</param>
         public virtual async Task DeleteBrandLayout(BrandLayout brandLayout)
         {
-            if (brandLayout == null)
-                throw new ArgumentNullException(nameof(brandLayout));
+            ArgumentNullException.ThrowIfNull(brandLayout);
 
             await _brandLayoutRepository.DeleteAsync(brandLayout);
 

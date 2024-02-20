@@ -1,12 +1,12 @@
 using Grand.Business.Core.Interfaces.Checkout.CheckoutAttributes;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Orders;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Checkout.Services.CheckoutAttributes
@@ -22,7 +22,8 @@ namespace Grand.Business.Checkout.Services.CheckoutAttributes
         private readonly IMediator _mediator;
         private readonly ICacheBase _cacheBase;
         private readonly IWorkContext _workContext;
-
+        private readonly AccessControlConfig _accessControlConfig;
+        
         #endregion
 
         #region Ctor
@@ -34,12 +35,13 @@ namespace Grand.Business.Checkout.Services.CheckoutAttributes
             ICacheBase cacheBase,
             IRepository<CheckoutAttribute> checkoutAttributeRepository,
             IMediator mediator,
-            IWorkContext workContext)
+            IWorkContext workContext, AccessControlConfig accessControlConfig)
         {
             _cacheBase = cacheBase;
             _checkoutAttributeRepository = checkoutAttributeRepository;
             _mediator = mediator;
             _workContext = workContext;
+            _accessControlConfig = accessControlConfig;
         }
 
         #endregion
@@ -63,10 +65,10 @@ namespace Grand.Business.Checkout.Services.CheckoutAttributes
 
                 query = query.OrderBy(c => c.DisplayOrder);
 
-                if ((!string.IsNullOrEmpty(storeId) && !CommonHelper.IgnoreStoreLimitations) ||
-                    (!ignoreAcl && !CommonHelper.IgnoreAcl))
+                if ((!string.IsNullOrEmpty(storeId) && !_accessControlConfig.IgnoreStoreLimitations) ||
+                    (!ignoreAcl && !_accessControlConfig.IgnoreAcl))
                 {
-                    if (!ignoreAcl && !CommonHelper.IgnoreAcl)
+                    if (!ignoreAcl && !_accessControlConfig.IgnoreAcl)
                     {
                         var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
                         query = from p in query
@@ -74,7 +76,7 @@ namespace Grand.Business.Checkout.Services.CheckoutAttributes
                                 select p;
                     }
                     //Store acl
-                    if (!string.IsNullOrEmpty(storeId) && !CommonHelper.IgnoreStoreLimitations)
+                    if (!string.IsNullOrEmpty(storeId) && !_accessControlConfig.IgnoreStoreLimitations)
                     {
                         query = from p in query
                                 where !p.LimitedToStores || p.Stores.Contains(storeId)
@@ -107,8 +109,7 @@ namespace Grand.Business.Checkout.Services.CheckoutAttributes
         /// <param name="checkoutAttribute">Checkout attribute</param>
         public virtual async Task InsertCheckoutAttribute(CheckoutAttribute checkoutAttribute)
         {
-            if (checkoutAttribute == null)
-                throw new ArgumentNullException(nameof(checkoutAttribute));
+            ArgumentNullException.ThrowIfNull(checkoutAttribute);
 
             await _checkoutAttributeRepository.InsertAsync(checkoutAttribute);
 
@@ -125,8 +126,7 @@ namespace Grand.Business.Checkout.Services.CheckoutAttributes
         /// <param name="checkoutAttribute">Checkout attribute</param>
         public virtual async Task UpdateCheckoutAttribute(CheckoutAttribute checkoutAttribute)
         {
-            if (checkoutAttribute == null)
-                throw new ArgumentNullException(nameof(checkoutAttribute));
+            ArgumentNullException.ThrowIfNull(checkoutAttribute);
 
             await _checkoutAttributeRepository.UpdateAsync(checkoutAttribute);
 
@@ -142,8 +142,7 @@ namespace Grand.Business.Checkout.Services.CheckoutAttributes
         /// <param name="checkoutAttribute">Checkout attribute</param>
         public virtual async Task DeleteCheckoutAttribute(CheckoutAttribute checkoutAttribute)
         {
-            if (checkoutAttribute == null)
-                throw new ArgumentNullException(nameof(checkoutAttribute));
+            ArgumentNullException.ThrowIfNull(checkoutAttribute);
 
             await _checkoutAttributeRepository.DeleteAsync(checkoutAttribute);
 

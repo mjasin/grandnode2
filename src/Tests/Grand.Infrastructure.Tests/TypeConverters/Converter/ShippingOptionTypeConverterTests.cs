@@ -1,17 +1,13 @@
 ﻿using Grand.Domain.Shipping;
+using Grand.Infrastructure.TypeConverters.Converter;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Infrastructure.TypeConverters.Converter.Tests
+namespace Grand.Infrastructure.Tests.TypeConverters.Converter
 {
     [TestClass()]
     public class ShippingOptionTypeConverterTests
     {
-        ShippingOptionTypeConverter _converter;
-
-        public ShippingOptionTypeConverterTests()
-        {
-            _converter = new ShippingOptionTypeConverter();
-        }
+        ShippingOptionTypeConverter _converter = new();
 
         [TestMethod()]
         public void CanConvertFromTest()
@@ -30,10 +26,11 @@ namespace Grand.Infrastructure.TypeConverters.Converter.Tests
         [TestMethod()]
         public void ConvertToTest_NotNull()
         {
-            ShippingOption shippingOption = new ShippingOption();
-            shippingOption.ShippingRateProviderSystemName = "Ground";
-            shippingOption.Name = "sample";
-            shippingOption.Rate = 10;
+            ShippingOption shippingOption = new ShippingOption {
+                ShippingRateProviderSystemName = "Ground",
+                Name = "sample",
+                Rate = 10
+            };
             var result = _converter.ConvertTo(shippingOption, typeof(string));
             Assert.IsNotNull(result);
         }

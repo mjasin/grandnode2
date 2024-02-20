@@ -1,12 +1,13 @@
-﻿using Grand.Business.Core.Interfaces.Checkout.Shipping;
-using Grand.Domain.Data;
+﻿using Grand.Business.Checkout.Services.Shipping;
+using Grand.Business.Core.Interfaces.Checkout.Shipping;
+using Grand.Data;
 using Grand.Domain.Shipping;
 using Grand.Infrastructure.Events;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Checkout.Services.Shipping.Tests
+namespace Grand.Business.Checkout.Tests.Services.Shipping
 {
     [TestClass()]
     public class ShipmentServiceTests

@@ -1,16 +1,16 @@
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
-using Grand.Business.Marketing.Extensions;
 using Grand.Business.Core.Interfaces.Marketing.Newsletters;
-using Grand.Infrastructure.Extensions;
+using Grand.Business.Marketing.Extensions;
 using Grand.Domain;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Messages;
+using Grand.Infrastructure.Extensions;
+using Grand.SharedKernel;
 using Grand.SharedKernel.Extensions;
 using MediatR;
-using Grand.SharedKernel;
 
-namespace Grand.Business.Marketing.Services.Newsteletters
+namespace Grand.Business.Marketing.Services.Newsletters
 {
     /// <summary>
     /// Newsletter subscription service
@@ -72,10 +72,7 @@ namespace Grand.Business.Marketing.Services.Newsteletters
         /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
         public virtual async Task InsertNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
         {
-            if (newsLetterSubscription == null)
-            {
-                throw new ArgumentNullException(nameof(newsLetterSubscription));
-            }
+            ArgumentNullException.ThrowIfNull(newsLetterSubscription);
 
             //Handle e-mail
             newsLetterSubscription.Email = CommonHelper.EnsureSubscriberEmailOrThrow(newsLetterSubscription.Email);
@@ -103,10 +100,7 @@ namespace Grand.Business.Marketing.Services.Newsteletters
         /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
         public virtual async Task UpdateNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
         {
-            if (newsLetterSubscription == null)
-            {
-                throw new ArgumentNullException(nameof(newsLetterSubscription));
-            }
+            ArgumentNullException.ThrowIfNull(newsLetterSubscription);
 
             //Handle e-mail
             newsLetterSubscription.Email = CommonHelper.EnsureSubscriberEmailOrThrow(newsLetterSubscription.Email);
@@ -144,8 +138,7 @@ namespace Grand.Business.Marketing.Services.Newsteletters
         /// <param name="publishSubscriptionEvents">if set to <c>true</c> [publish subscription events].</param>
         public virtual async Task DeleteNewsLetterSubscription(NewsLetterSubscription newsLetterSubscription, bool publishSubscriptionEvents = true)
         {
-            if (newsLetterSubscription == null) 
-                throw new ArgumentNullException(nameof(newsLetterSubscription));
+            ArgumentNullException.ThrowIfNull(newsLetterSubscription);
 
             await _subscriptionRepository.DeleteAsync(newsLetterSubscription);
 
@@ -257,8 +250,7 @@ namespace Grand.Business.Marketing.Services.Newsteletters
         /// <returns>Result in TXT (string) format</returns>
         public virtual string ExportNewsletterSubscribersToTxt(IList<NewsLetterSubscription> subscriptions)
         {
-            if (subscriptions == null)
-                throw new ArgumentNullException(nameof(subscriptions));
+            ArgumentNullException.ThrowIfNull(subscriptions);
 
             const char separator = ',';
             var sb = new StringBuilder();
@@ -295,7 +287,7 @@ namespace Grand.Business.Marketing.Services.Newsteletters
                     continue;
                 var tmp = line.Split(',');
 
-                var email = "";
+                string email;
                 var isActive = true;
                 var categories = new List<string>();
                 var isCategories = false;
@@ -368,7 +360,6 @@ namespace Grand.Business.Marketing.Services.Newsteletters
             {
                 subscription = new NewsLetterSubscription {
                     Active = isActive,
-                    CreatedOnUtc = DateTime.UtcNow,
                     Email = email,
                     StoreId = storeId,
                     NewsLetterSubscriptionGuid = Guid.NewGuid()

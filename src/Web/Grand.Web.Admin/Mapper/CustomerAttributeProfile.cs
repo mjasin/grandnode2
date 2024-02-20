@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Grand.Domain.Customers;
 using Grand.Infrastructure.Mapper;
-using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Models.Customers;
+using Grand.Web.Common.Extensions;
 
 namespace Grand.Web.Admin.Mapper
 {

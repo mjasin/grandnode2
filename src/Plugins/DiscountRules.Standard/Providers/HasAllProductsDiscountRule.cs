@@ -2,7 +2,7 @@ using Grand.Business.Core.Interfaces.Catalog.Discounts;
 using Grand.Business.Core.Utilities.Catalog;
 using Grand.Domain.Orders;
 
-namespace DiscountRules.Provider
+namespace DiscountRules.Standard.Providers
 {
     public class HasAllProductsDiscountRule : IDiscountRule
     {
@@ -20,13 +20,12 @@ namespace DiscountRules.Provider
         /// <returns>true - requirement is met; otherwise, false</returns>
         public async Task<DiscountRuleValidationResult> CheckRequirement(DiscountRuleValidationRequest request)
         {
-            if (request == null)
-                throw new ArgumentNullException(nameof(request));
+            ArgumentNullException.ThrowIfNull(request);
 
             //invalid by default
             var result = new DiscountRuleValidationResult();
 
-            var restrictedProductIds = string.IsNullOrEmpty(request.DiscountRule.Metadata) ? new List<string>() : request.DiscountRule.Metadata.Split(',').ToList();
+            var restrictedProductIds = string.IsNullOrEmpty(request.DiscountRule.Metadata) ? [] : request.DiscountRule.Metadata.Split(',').ToList();
 
             if (!restrictedProductIds.Any())
             {
@@ -63,11 +62,11 @@ namespace DiscountRules.Provider
                         {
                             //the third way (the quantity rage specified)
                             //{Product ID}:{Min quantity}-{Max quantity}. For example, 77:1-3, 123:2-5, 156:3-8
-                            var restrictedProductId = restrictedProduct.Split(new[] { ':' })[0];
-                            if (!int.TryParse(restrictedProduct.Split(new[] { ':' })[1].Split(new[] { '-' })[0], out var quantityMin))
+                            var restrictedProductId = restrictedProduct.Split([':'])[0];
+                            if (!int.TryParse(restrictedProduct.Split([':'])[1].Split(['-'])[0], out var quantityMin))
                                 //parsing error; exit;
                                 return result;
-                            if (!int.TryParse(restrictedProduct.Split(new[] { ':' })[1].Split(new[] { '-' })[1], out var quantityMax))
+                            if (!int.TryParse(restrictedProduct.Split([':'])[1].Split(['-'])[1], out var quantityMax))
                                 //parsing error; exit;
                                 return result;
 
@@ -80,8 +79,8 @@ namespace DiscountRules.Provider
                         {
                             //the second way (the quantity specified)
                             //{Product ID}:{Quantity}. For example, 77:1, 123:2, 156:3
-                            var restrictedProductId = restrictedProduct.Split(new[] { ':' })[0];
-                            if (!int.TryParse(restrictedProduct.Split(new[] { ':' })[1], out var quantity))
+                            var restrictedProductId = restrictedProduct.Split([':'])[0];
+                            if (!int.TryParse(restrictedProduct.Split([':'])[1], out var quantity))
                                 //parsing error; exit;
                                 return result;
 

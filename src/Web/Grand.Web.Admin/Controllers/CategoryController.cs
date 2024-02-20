@@ -1,4 +1,4 @@
-﻿using Grand.Business.Catalog.Services.ExportImport.Dto;
+﻿using Grand.Business.Core.Dto;
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Catalog.Categories;
 using Grand.Business.Core.Interfaces.Common.Directory;
@@ -76,7 +76,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region List 
 
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
         public async Task<IActionResult> List()
         {
@@ -123,7 +126,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 var category = await _categoryViewModelService.InsertCategoryModel(model);
@@ -148,7 +151,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!category.LimitedToStores || (category.LimitedToStores && category.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && category.Stores.Count > 1))
-                    Warning(_translationService.GetResource("Admin.Catalog.Categories.Permisions"));
+                    Warning(_translationService.GetResource("Admin.Catalog.Categories.Permissions"));
                 else
                 {
                     if (!category.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))
@@ -193,7 +196,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 category = await _categoryViewModelService.UpdateCategoryModel(category, model);
@@ -310,10 +313,6 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> ImportFromXlsx(IFormFile importexcelfile, [FromServices] IImportManager<CategoryDto> importManager)
         {
-            //a vendor and staff cannot import categories
-            if (_workContext.CurrentVendor != null || await _groupService.IsStaff(_workContext.CurrentCustomer))
-                return AccessDeniedView();
-
             try
             {
                 if (importexcelfile is { Length: > 0 })
@@ -415,38 +414,14 @@ namespace Grand.Web.Admin.Controllers
 
                 return Content("");
             }
-            else
-            {
-                Error(ModelState);
-                return View(model);
-            }
+
+            Error(ModelState);
+            return View(model);
 
 
         }
 
         #endregion
 
-        #region Activity log
-
-        [PermissionAuthorizeAction(PermissionActionName.Preview)]
-        [HttpPost]
-        public async Task<IActionResult> ListActivityLog(DataSourceRequest command, string categoryId)
-        {
-            var category = await _categoryService.GetCategoryById(categoryId);
-
-            var permission = await CheckAccessToCategory(category);
-            if (!permission.allow)
-                return ErrorForKendoGridJson(permission.message);
-
-            var activityLog = await _categoryViewModelService.PrepareActivityLogModel(categoryId, command.Page, command.PageSize);
-            var gridModel = new DataSourceResult {
-                Data = activityLog.activityLogModel,
-                Total = activityLog.totalCount
-            };
-
-            return Json(gridModel);
-        }
-
-        #endregion
     }
 }

@@ -4,21 +4,35 @@ using Grand.Infrastructure.Mapper;
 using System.Reflection;
 using Widgets.Slider.Domain;
 using Widgets.Slider.Models;
+using Grand.Business.Core.Interfaces.Common.Directory;
+using Grand.Web.Common.Extensions;
 
 namespace Widgets.Slider
 {
     public static class MyExtensions
     {
-        public static SlideModel ToModel(this PictureSlider entity)
+        public static SlideModel ToModel(this PictureSlider entity, IDateTimeService dateTimeService)
         {
-            return entity.MapTo<PictureSlider, SlideModel>();
+            var slideModel = entity.MapTo<PictureSlider, SlideModel>();
+            slideModel.StartDateUtc = entity.StartDateUtc.ConvertToUserTime(dateTimeService);
+            slideModel.EndDateUtc = entity.EndDateUtc.ConvertToUserTime(dateTimeService);            
+            return slideModel;
         }
 
-        public static PictureSlider ToEntity(this SlideModel model)
+        public static PictureSlider ToEntity(this SlideModel model, IDateTimeService dateTimeService)
         {
-            return model.MapTo<SlideModel, PictureSlider>();
+            var pictureSlider = model.MapTo<SlideModel, PictureSlider>();
+            pictureSlider.StartDateUtc = model.StartDateUtc.ConvertToUtcTime(dateTimeService);
+            pictureSlider.EndDateUtc = model.EndDateUtc.ConvertToUtcTime(dateTimeService);
+            return pictureSlider;
         }
-
+        public static PictureSlider ToEntity(this SlideModel model, PictureSlider destination, IDateTimeService dateTimeService)
+        {
+            var pictureSlider = model.MapTo(destination);
+            pictureSlider.StartDateUtc = model.StartDateUtc.ConvertToUtcTime(dateTimeService);
+            pictureSlider.EndDateUtc = model.EndDateUtc.ConvertToUtcTime(dateTimeService);
+            return pictureSlider;
+        }
 
         public static SlideListModel ToListModel(this PictureSlider entity)
         {
@@ -45,11 +59,10 @@ namespace Widgets.Slider
                     }
 
                     if (insert && prop.GetValue(item) != null)
-                        local.Add(new TranslationEntity()
-                        {
+                        local.Add(new TranslationEntity {
                             LanguageId = item.LanguageId,
                             LocaleKey = prop.Name,
-                            LocaleValue = prop.GetValue(item)?.ToString(),
+                            LocaleValue = prop.GetValue(item)?.ToString()
                         });
                 }
             }
@@ -59,7 +72,5 @@ namespace Widgets.Slider
         {
             return obj.GetProperty(propertyName) != null;
         }
-    }
-
-
+    }    
 }

@@ -1,24 +1,23 @@
-﻿using Grand.Api.DTOs.Catalog;
+﻿using Grand.Api.Commands.Models.Catalog;
+using Grand.Api.DTOs.Catalog;
 using Grand.Api.Extensions;
 using Grand.Business.Core.Events.Catalog;
-using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Extensions;
+using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Seo;
 using Grand.Domain.Catalog;
 using Grand.Domain.Seo;
 using Grand.Infrastructure;
 using MediatR;
 
-namespace Grand.Api.Commands.Models.Catalog
+namespace Grand.Api.Commands.Handlers.Catalog
 {
     public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, ProductDto>
     {
         private readonly IProductService _productService;
         private readonly IStockQuantityService _stockQuantityService;
         private readonly ISlugService _slugService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly ITranslationService _translationService;
         private readonly ILanguageService _languageService;
         private readonly IOutOfStockSubscriptionService _outOfStockSubscriptionService;
@@ -30,7 +29,6 @@ namespace Grand.Api.Commands.Models.Catalog
         public UpdateProductCommandHandler(
             IProductService productService,
             ISlugService slugService,
-            ICustomerActivityService customerActivityService,
             ITranslationService translationService,
             ILanguageService languageService,
             IOutOfStockSubscriptionService outOfStockSubscriptionService,
@@ -41,7 +39,6 @@ namespace Grand.Api.Commands.Models.Catalog
         {
             _productService = productService;
             _slugService = slugService;
-            _customerActivityService = customerActivityService;
             _translationService = translationService;
             _languageService = languageService;
             _outOfStockSubscriptionService = outOfStockSubscriptionService;
@@ -59,7 +56,6 @@ namespace Grand.Api.Commands.Models.Catalog
             var prevPublished = product.Published;
 
             product = request.Model.ToEntity(product);
-            product.UpdatedOnUtc = DateTime.UtcNow;
             request.Model.SeName = await product.ValidateSeName(request.Model.SeName, product.Name, true, _seoSettings, _slugService, _languageService);
             product.SeName = request.Model.SeName;
             //search engine name
@@ -76,15 +72,16 @@ namespace Grand.Api.Commands.Models.Catalog
                 await _outOfStockSubscriptionService.SendNotificationsToSubscribers(product, "");
             }
 
-            //activity log
-            _ = _customerActivityService.InsertActivity("EditProduct", product.Id, _workContext.CurrentCustomer, "", _translationService.GetResource("ActivityLog.EditProduct"), product.Name);
-
-            //raise event 
-            if (!prevPublished && product.Published)
-                await _mediator.Publish(new ProductPublishEvent(product));
-
-            if (prevPublished && !product.Published)
-                await _mediator.Publish(new ProductUnPublishEvent(product));
+            switch (prevPublished)
+            {
+                //raise event 
+                case false when product.Published:
+                    await _mediator.Publish(new ProductPublishEvent(product), cancellationToken);
+                    break;
+                case true when !product.Published:
+                    await _mediator.Publish(new ProductUnPublishEvent(product), cancellationToken);
+                    break;
+            }
 
             return product.ToModel();
         }

@@ -1,6 +1,7 @@
-﻿using Grand.Business.Core.Interfaces.Common.Logging;
-using Grand.Domain.Data;
+﻿using Grand.Data;
+using Grand.Domain;
 using Grand.Infrastructure.Migrations;
+using Microsoft.Extensions.Logging;
 
 namespace Grand.Business.System.Services.Migrations
 {
@@ -8,14 +9,14 @@ namespace Grand.Business.System.Services.Migrations
     {
         private readonly IDatabaseContext _databaseContext;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger _logger;
+        private readonly ILogger<MigrationProcess> _logger;
 
         private readonly IRepository<MigrationDb> _repositoryMigration;
 
         public MigrationProcess(
             IDatabaseContext databaseContext,
             IServiceProvider serviceProvider,
-            ILogger logger,
+            ILogger<MigrationProcess> logger,
             IRepository<MigrationDb> repositoryMigration)
         {
             _databaseContext = databaseContext;
@@ -32,7 +33,7 @@ namespace Grand.Business.System.Services.Migrations
                 if (result.Success)
                     SaveMigration(result);
                 else
-                    _logger.InsertLog(Domain.Logging.LogLevel.Error, $"Something went wrong during migration process {migration.Name}");
+                    _logger.LogError("Something went wrong during migration process {MigrationName}", migration.Name);
                 return result;
             }
             catch (Exception ex)
@@ -45,18 +46,17 @@ namespace Grand.Business.System.Services.Migrations
         {
             var model = new MigrationResult {
                 Success = migration.UpgradeProcess(_databaseContext, _serviceProvider),
-                Migration = migration,
+                Migration = migration
             };
             return model;
         }
 
         private void SaveMigration(MigrationResult migrationResult, bool install = false)
         {
-            _repositoryMigration.Insert(new MigrationDb() {
+            _repositoryMigration.Insert(new MigrationDb {
                 Identity = migrationResult.Migration.Identity,
                 Name = migrationResult.Migration.Name,
                 Version = migrationResult.Migration.Version.ToString(),
-                CreatedOnUtc = DateTime.UtcNow,
                 InstallApp = install
             });
         }
@@ -84,7 +84,7 @@ namespace Grand.Business.System.Services.Migrations
             var migrationManager = new MigrationManager();
             foreach (var item in migrationManager.GetCurrentMigrations())
             {
-                SaveMigration(new MigrationResult() {
+                SaveMigration(new MigrationResult {
                     Migration = item,
                     Success = true
                 }, true);

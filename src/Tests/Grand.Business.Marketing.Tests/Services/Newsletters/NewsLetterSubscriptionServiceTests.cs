@@ -1,9 +1,9 @@
 ﻿using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Events.Marketing;
 using Grand.Business.Core.Interfaces.Marketing.Newsletters;
-using Grand.Business.Marketing.Services.Newsteletters;
+using Grand.Business.Marketing.Services.Newsletters;
 using Grand.Domain;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Messages;
 using Grand.Infrastructure.Events;
 using Grand.SharedKernel;
@@ -35,8 +35,9 @@ namespace Grand.Business.Marketing.Tests.Services.Newsletters
         public void InsertNewsLetterSubscription_InvalidEmail_ThrowException()
         {
             var email = "NotValidEmail";
-            var newsLetterSubscription = new NewsLetterSubscription();
-            newsLetterSubscription.Email = email;
+            var newsLetterSubscription = new NewsLetterSubscription {
+                Email = email
+            };
             Assert.ThrowsExceptionAsync<GrandException>(async () => await _newsLetterSubscriptionService.InsertNewsLetterSubscription(newsLetterSubscription));
         }
 
@@ -44,7 +45,7 @@ namespace Grand.Business.Marketing.Tests.Services.Newsletters
         public async Task InsertNewsLetterSubscription_ActiveSubcription_InvokeRepositoryAndPublishSubscriptionEvent()
         {
             var email = "johny@gmail.com";
-            var newsLetterSubscription = new NewsLetterSubscription() { Email = email, Active = true };
+            var newsLetterSubscription = new NewsLetterSubscription { Email = email, Active = true };
             await _newsLetterSubscriptionService.InsertNewsLetterSubscription(newsLetterSubscription);
             _subscriptionRepository.Verify(r => r.InsertAsync(newsLetterSubscription), Times.Once);
             _historyServiceMock.Verify(h => h.SaveObject(It.IsAny<BaseEntity>()), Times.Once);
@@ -56,7 +57,7 @@ namespace Grand.Business.Marketing.Tests.Services.Newsletters
         public async Task InsertNewsLetterSubscription_InactiveSubcription_InvokeRepository()
         {
             var email = "johny@gmail.com";
-            var newsLetterSubscription = new NewsLetterSubscription() { Email = email, Active = false };
+            var newsLetterSubscription = new NewsLetterSubscription { Email = email, Active = false };
             await _newsLetterSubscriptionService.InsertNewsLetterSubscription(newsLetterSubscription);
             _subscriptionRepository.Verify(r => r.InsertAsync(newsLetterSubscription), Times.Once);
             _historyServiceMock.Verify(h => h.SaveObject(It.IsAny<BaseEntity>()), Times.Once);
@@ -68,7 +69,7 @@ namespace Grand.Business.Marketing.Tests.Services.Newsletters
         public async Task UpdateNewsLetterSubscription_InvokeRepository()
         {
             var email = "johny@gmail.com";
-            var newsLetterSubscription = new NewsLetterSubscription() { Email = email, Active = false };
+            var newsLetterSubscription = new NewsLetterSubscription { Email = email, Active = false };
             await _newsLetterSubscriptionService.UpdateNewsLetterSubscription(newsLetterSubscription);
             _subscriptionRepository.Verify(r => r.UpdateAsync(newsLetterSubscription), Times.Once);
             _historyServiceMock.Verify(h => h.SaveObject(It.IsAny<BaseEntity>()), Times.Once);
@@ -79,7 +80,7 @@ namespace Grand.Business.Marketing.Tests.Services.Newsletters
         public async Task DeleteNewsLetterSubscription_InvokeRepositoryAndEmailUnsubscribedEvent()
         {
             var email = "johny@gmail.com";
-            var newsLetterSubscription = new NewsLetterSubscription() { Email = email, Active = false };
+            var newsLetterSubscription = new NewsLetterSubscription { Email = email, Active = false };
             await _newsLetterSubscriptionService.DeleteNewsLetterSubscription(newsLetterSubscription);
             _subscriptionRepository.Verify(r => r.DeleteAsync(newsLetterSubscription), Times.Once);
             _mediatorMock.Verify(m => m.Publish<EmailUnsubscribedEvent>(It.IsAny<EmailUnsubscribedEvent>(), default(CancellationToken)), Times.Once);

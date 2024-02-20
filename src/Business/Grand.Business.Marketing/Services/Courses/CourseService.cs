@@ -2,10 +2,10 @@
 using Grand.Domain;
 using Grand.Domain.Courses;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Orders;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Marketing.Services.Courses
@@ -15,20 +15,22 @@ namespace Grand.Business.Marketing.Services.Courses
         private readonly IRepository<Course> _courseRepository;
         private readonly IRepository<Order> _orderRepository;
         private readonly IMediator _mediator;
-
+        private readonly AccessControlConfig _accessControlConfig;
+        
         public CourseService(IRepository<Course> courseRepository,
             IRepository<Order> orderRepository,
-            IMediator mediator)
+            IMediator mediator,
+            AccessControlConfig accessControlConfig)
         {
             _courseRepository = courseRepository;
             _orderRepository = orderRepository;
             _mediator = mediator;
+            _accessControlConfig = accessControlConfig;
         }
 
         public virtual async Task Delete(Course course)
         {
-            if (course == null)
-                throw new ArgumentNullException(nameof(course));
+            ArgumentNullException.ThrowIfNull(course);
 
             await _courseRepository.DeleteAsync(course);
 
@@ -51,9 +53,9 @@ namespace Grand.Business.Marketing.Services.Courses
 
             query = query.Where(c => c.Published);
 
-            if (!CommonHelper.IgnoreAcl || (!string.IsNullOrEmpty(storeId) && !CommonHelper.IgnoreStoreLimitations))
+            if (!_accessControlConfig.IgnoreAcl || (!string.IsNullOrEmpty(storeId) && !_accessControlConfig.IgnoreStoreLimitations))
             {
-                if (!CommonHelper.IgnoreAcl)
+                if (!_accessControlConfig.IgnoreAcl)
                 {
                     //ACL (access control list)
                     var allowedCustomerGroupsIds = customer.GetCustomerGroupIds();
@@ -61,7 +63,7 @@ namespace Grand.Business.Marketing.Services.Courses
                             where !p.LimitedToGroups || allowedCustomerGroupsIds.Any(x => p.CustomerGroups.Contains(x))
                             select p;
                 }
-                if (!string.IsNullOrEmpty(storeId) && !CommonHelper.IgnoreStoreLimitations)
+                if (!string.IsNullOrEmpty(storeId) && !_accessControlConfig.IgnoreStoreLimitations)
                 {
                     //Store acl
                     query = from p in query
@@ -91,8 +93,7 @@ namespace Grand.Business.Marketing.Services.Courses
 
         public virtual async Task<Course> Insert(Course course)
         {
-            if (course == null)
-                throw new ArgumentNullException(nameof(course));
+            ArgumentNullException.ThrowIfNull(course);
 
             await _courseRepository.InsertAsync(course);
 
@@ -104,8 +105,7 @@ namespace Grand.Business.Marketing.Services.Courses
 
         public virtual async Task<Course> Update(Course course)
         {
-            if (course == null)
-                throw new ArgumentNullException(nameof(course));
+            ArgumentNullException.ThrowIfNull(course);
 
             await _courseRepository.UpdateAsync(course);
 

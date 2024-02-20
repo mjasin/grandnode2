@@ -1,12 +1,12 @@
-﻿using Grand.Data.Tests.MongoDb;
-using Grand.Domain.Data;
+﻿using Grand.Business.Marketing.Services.Contacts;
+using Grand.Data.Tests.MongoDb;
+using Grand.Data;
 using Grand.Domain.Messages;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-
-namespace Grand.Business.Marketing.Services.Contacts.Tests
+namespace Grand.Business.Marketing.Tests.Services.Contacts
 {
     [TestClass()]
     public class ContactUsServiceTests
@@ -27,7 +27,7 @@ namespace Grand.Business.Marketing.Services.Contacts.Tests
         public async Task DeleteContactUsTest()
         {
             //Arrange
-            var contactUs = new ContactUs() {
+            var contactUs = new ContactUs {
                 FullName = "test"
             };
             await _contactUsService.InsertContactUs(contactUs);
@@ -74,7 +74,7 @@ namespace Grand.Business.Marketing.Services.Contacts.Tests
         public async Task GetContactUsByIdTest()
         {
             //Arrange
-            var contactUs = new ContactUs() {
+            var contactUs = new ContactUs {
                 FullName = "test"
             };
             await _contactUsService.InsertContactUs(contactUs);
@@ -91,7 +91,7 @@ namespace Grand.Business.Marketing.Services.Contacts.Tests
         public async Task InsertContactUsTest()
         {
             //Act
-            var contactUs = new ContactUs() {
+            var contactUs = new ContactUs {
                 FullName = "test"
             };
             await _contactUsService.InsertContactUs(contactUs);

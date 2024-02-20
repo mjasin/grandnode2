@@ -1,11 +1,11 @@
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Directory;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Common.Services.Directory
@@ -20,7 +20,8 @@ namespace Grand.Business.Common.Services.Directory
         private readonly IRepository<Country> _countryRepository;
         private readonly IMediator _mediator;
         private readonly ICacheBase _cacheBase;
-
+        private readonly AccessControlConfig _accessControlConfig;
+        
         #endregion
 
         #region Ctor
@@ -31,12 +32,15 @@ namespace Grand.Business.Common.Services.Directory
         /// <param name="countryRepository">Country repository</param>
         /// <param name="mediator">Mediator</param>
         /// <param name="cacheBase">Cache manager</param>
+        /// <param name="accessControlConfig">Access control</param>
         public CountryService(
             IRepository<Country> countryRepository,
             IMediator mediator,
-            ICacheBase cacheBase)
+            ICacheBase cacheBase, 
+            AccessControlConfig accessControlConfig)
         {
             _cacheBase = cacheBase;
+            _accessControlConfig = accessControlConfig;
             _countryRepository = countryRepository;
             _mediator = mediator;
         }
@@ -64,7 +68,7 @@ namespace Grand.Business.Common.Services.Directory
                 if (!showHidden)
                     query = query.Where(c => c.Published);
 
-                if (!showHidden && !CommonHelper.IgnoreStoreLimitations && !string.IsNullOrEmpty(storeId))
+                if (!showHidden && !_accessControlConfig.IgnoreStoreLimitations && !string.IsNullOrEmpty(storeId))
                 {
                     //Store acl
                     query = from p in query
@@ -152,7 +156,7 @@ namespace Grand.Business.Common.Services.Directory
             var key = string.Format(CacheKey.COUNTRIES_BY_TWOLETTER, twoLetterIsoCode);
             return await _cacheBase.GetAsync(key, async () =>
             {
-                return await Task.FromResult(_countryRepository.Table.FirstOrDefault(x => x.TwoLetterIsoCode == twoLetterIsoCode));
+                return await _countryRepository.GetOneAsync(x => x.TwoLetterIsoCode == twoLetterIsoCode);
             });
         }
 
@@ -166,7 +170,7 @@ namespace Grand.Business.Common.Services.Directory
             var key = string.Format(CacheKey.COUNTRIES_BY_THREELETTER, threeLetterIsoCode);
             return await _cacheBase.GetAsync(key, async () =>
             {
-                return await Task.FromResult(_countryRepository.Table.FirstOrDefault(x => x.ThreeLetterIsoCode == threeLetterIsoCode));
+                return await _countryRepository.GetOneAsync(x => x.ThreeLetterIsoCode == threeLetterIsoCode);
             });
         }
 
@@ -176,8 +180,7 @@ namespace Grand.Business.Common.Services.Directory
         /// <param name="country">Country</param>
         public virtual async Task InsertCountry(Country country)
         {
-            if (country == null)
-                throw new ArgumentNullException(nameof(country));
+            ArgumentNullException.ThrowIfNull(country);
 
             await _countryRepository.InsertAsync(country);
 
@@ -193,8 +196,7 @@ namespace Grand.Business.Common.Services.Directory
         /// <param name="country">Country</param>
         public virtual async Task UpdateCountry(Country country)
         {
-            if (country == null)
-                throw new ArgumentNullException(nameof(country));
+            ArgumentNullException.ThrowIfNull(country);
 
             await _countryRepository.UpdateAsync(country);
 
@@ -209,8 +211,7 @@ namespace Grand.Business.Common.Services.Directory
         /// <param name="country">Country</param>
         public virtual async Task DeleteCountry(Country country)
         {
-            if (country == null)
-                throw new ArgumentNullException(nameof(country));
+            ArgumentNullException.ThrowIfNull(country);
 
             await _countryRepository.DeleteAsync(country);
 
@@ -248,8 +249,7 @@ namespace Grand.Business.Common.Services.Directory
         /// <param name="countryId">Country ident</param>
         public virtual async Task InsertStateProvince(StateProvince stateProvince, string countryId)
         {
-            if (stateProvince == null)
-                throw new ArgumentNullException(nameof(stateProvince));
+            ArgumentNullException.ThrowIfNull(stateProvince);
 
             var country = await GetCountryById(countryId);
             if (country == null)
@@ -267,8 +267,7 @@ namespace Grand.Business.Common.Services.Directory
         /// <param name="countryId">Country ident</param>
         public virtual async Task UpdateStateProvince(StateProvince stateProvince, string countryId)
         {
-            if (stateProvince == null)
-                throw new ArgumentNullException(nameof(stateProvince));
+            ArgumentNullException.ThrowIfNull(stateProvince);
 
             var country = await GetCountryById(countryId);
             if (country == null)
@@ -295,8 +294,7 @@ namespace Grand.Business.Common.Services.Directory
         /// <param name="countryId">Country ident</param>
         public virtual async Task DeleteStateProvince(StateProvince stateProvince, string countryId)
         {
-            if (stateProvince == null)
-                throw new ArgumentNullException(nameof(stateProvince));
+            ArgumentNullException.ThrowIfNull(stateProvince);
 
             var country = await GetCountryById(countryId);
             if (country == null)

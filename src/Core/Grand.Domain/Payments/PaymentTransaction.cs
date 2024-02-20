@@ -2,18 +2,11 @@
 {
     public class PaymentTransaction : BaseEntity
     {
-        public PaymentTransaction()
-        {
-            CustomValues = new Dictionary<string, object>();
-            Errors = new List<string>();
-        }
-
         /// <summary>
         /// Gets or sets payment method system name
         /// </summary>
         public string PaymentMethodSystemName { get; set; }
 
-        /// <summary>
         /// <summary>
         /// Gets or sets transaction status
         /// </summary>
@@ -94,21 +87,12 @@
         /// <summary>
         /// Gets or sets custom values
         /// </summary>
-        public Dictionary<string, object> CustomValues { get; set; }
+        public Dictionary<string, object> CustomValues { get; set; } = new();
 
         /// <summary>
         /// gets or sets errors
         /// </summary>
-        public IList<string> Errors { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time of transaction creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
-        /// <summary>
-        /// Gets or sets the date and time of transaction updated
-        /// </summary>
-        public DateTime? UpdatedOnUtc { get; set; }
+        public IList<string> Errors { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets

@@ -1,8 +1,9 @@
 ﻿using Grand.Business.Core.Interfaces.Common.Directory;
+using Grand.Business.Customers.Queries.Handlers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Customers.Queries.Handlers.Tests
+namespace Grand.Business.Customers.Tests.Queries.Handlers
 {
     [TestClass()]
     public class GetGroupBySystemNameQueryHandlerTests
@@ -21,8 +22,9 @@ namespace Grand.Business.Customers.Queries.Handlers.Tests
         public async Task HandleTest()
         {
             //Assert
-            var groupBySystemNameQuery = new Core.Queries.Customers.GetGroupBySystemNameQuery();
-            groupBySystemNameQuery.SystemName = "sample";
+            var groupBySystemNameQuery = new Core.Queries.Customers.GetGroupBySystemNameQuery {
+                SystemName = "sample"
+            };
 
             //Act
             _ = await handler.Handle(groupBySystemNameQuery, CancellationToken.None);

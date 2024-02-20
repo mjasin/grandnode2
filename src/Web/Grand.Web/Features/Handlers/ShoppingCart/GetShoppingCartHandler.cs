@@ -157,7 +157,7 @@ namespace Grand.Web.Features.Handlers.ShoppingCart
                 if (!minOrderSubtotalAmountOk)
                 {
                     var minOrderSubtotalAmount = await _currencyService.ConvertFromPrimaryStoreCurrency(_orderSettings.MinOrderSubtotalAmount, request.Currency);
-                    model.MinOrderSubtotalWarning = string.Format(_translationService.GetResource("Checkout.MinOrderSubtotalAmount"), _priceFormatter.FormatPrice(minOrderSubtotalAmount, false));
+                    model.MinOrderSubtotalWarning = string.Format(_translationService.GetResource("Checkout.MinOrderSubtotalAmount"), _priceFormatter.FormatPrice(minOrderSubtotalAmount, request.Currency));
                 }
             }
             model.TermsOfServiceOnShoppingCartPage = _orderSettings.TermsOfServiceOnShoppingCartPage;
@@ -181,7 +181,7 @@ namespace Grand.Web.Features.Handlers.ShoppingCart
             model.GiftVoucherBox.Display = _shoppingCartSettings.ShowGiftVoucherBox;
 
             //cart warnings
-            var cartWarnings = await _shoppingCartValidator.GetShoppingCartWarnings(request.Cart, checkoutAttributes, request.ValidateCheckoutAttributes);
+            var cartWarnings = await _shoppingCartValidator.GetShoppingCartWarnings(request.Cart, checkoutAttributes, request.ValidateCheckoutAttributes, true);
             foreach (var warning in cartWarnings)
                 model.Warnings.Add(warning);
 
@@ -228,10 +228,15 @@ namespace Grand.Web.Features.Handlers.ShoppingCart
                         if (!await _permissionService.Authorize(StandardPermission.DisplayPrices)) continue;
                         var priceAdjustmentBase = (await _taxService.GetCheckoutAttributePrice(attribute, attributeValue)).checkoutPrice;
                         var priceAdjustment = await _currencyService.ConvertFromPrimaryStoreCurrency(priceAdjustmentBase, request.Currency);
-                        if (priceAdjustmentBase > 0)
-                            attributeValueModel.PriceAdjustment = "+" + _priceFormatter.FormatPrice(priceAdjustment);
-                        else if (priceAdjustmentBase < 0)
-                            attributeValueModel.PriceAdjustment = "-" + _priceFormatter.FormatPrice(-priceAdjustment);
+                        switch (priceAdjustmentBase)
+                        {
+                            case > 0:
+                                attributeValueModel.PriceAdjustment = "+" + _priceFormatter.FormatPrice(priceAdjustment);
+                                break;
+                            case < 0:
+                                attributeValueModel.PriceAdjustment = "-" + _priceFormatter.FormatPrice(-priceAdjustment);
+                                break;
+                        }
                     }
                 }
                 //set already selected attributes

@@ -1,7 +1,8 @@
-﻿using Grand.SharedKernel.Extensions;
+﻿using Grand.Data;
+using Grand.SharedKernel.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Domain.Data.Tests
+namespace Grand.Domain.Tests.Data
 {
     [TestClass()]
     public class DataSettingsManagerTests
@@ -23,7 +24,7 @@ namespace Grand.Domain.Data.Tests
         [TestMethod()]
         public async Task SaveSettings_LoadSettings_Test()
         {
-            await DataSettingsManager.SaveSettings(new DataSettings() { ConnectionString = "connectionstring", DbProvider = DbProvider.MongoDB });
+            await DataSettingsManager.SaveSettings(new DataSettings { ConnectionString = "connectionstring", DbProvider = DbProvider.MongoDB });
             var settings = DataSettingsManager.LoadSettings();
             Assert.IsNotNull(settings);
             Assert.IsTrue(DataSettingsManager.DatabaseIsInstalled());
@@ -34,7 +35,7 @@ namespace Grand.Domain.Data.Tests
         [TestMethod()]
         public async Task DatabaseIsInstalledTest_True()
         {
-            await DataSettingsManager.SaveSettings(new DataSettings() { ConnectionString = "connectionstring", DbProvider = DbProvider.MongoDB });
+            await DataSettingsManager.SaveSettings(new DataSettings { ConnectionString = "connectionstring", DbProvider = DbProvider.MongoDB });
             Assert.IsTrue(DataSettingsManager.DatabaseIsInstalled());
         }
 

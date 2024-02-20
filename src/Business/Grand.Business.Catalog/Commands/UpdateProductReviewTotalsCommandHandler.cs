@@ -1,12 +1,12 @@
 ﻿using Grand.Business.Core.Commands.Catalog;
 using Grand.Business.Core.Interfaces.Catalog.Products;
+using Grand.Domain.Catalog;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
-using Grand.Domain.Catalog;
-using Grand.Domain.Data;
 using MediatR;
 
-namespace Grand.Business.Catalog.Commands.Handlers
+namespace Grand.Business.Catalog.Commands
 {
     public class UpdateProductReviewTotalsCommandHandler : IRequestHandler<UpdateProductReviewTotalsCommand, bool>
     {

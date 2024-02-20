@@ -47,7 +47,7 @@ namespace Grand.Web.Controllers
 
             //hide page if it`s set as no published
             if (!model.Published
-                && !await _permissionService.Authorize(StandardPermission.AccessAdminPanel)
+                && !await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel)
                 && !await _permissionService.Authorize(StandardPermission.ManagePages))
                 return RedirectToRoute("HomePage");
 
@@ -55,7 +55,7 @@ namespace Grand.Web.Controllers
             var layoutViewPath = await _mediator.Send(new GetPageLayoutViewPath { LayoutId = model.PageLayoutId });
 
             //display "edit" (manage) link
-            if (await _permissionService.Authorize(StandardPermission.AccessAdminPanel) &&
+            if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel) &&
                 await _permissionService.Authorize(StandardPermission.ManagePages))
                 DisplayEditLink(Url.Action("Edit", "Page", new { id = model.Id, area = "Admin" }));
 
@@ -93,7 +93,7 @@ namespace Grand.Web.Controllers
             var page = await _mediator.Send(new GetPageBlock { PageId = model.Id, Password = model.Password });
 
             if (page is not { IsPasswordProtected: true })
-                return Json(new { Authenticated = authResult, Title = title, Body = body, Error = error });
+                return Json(new { Authenticated = false, Title = title, Body = body, Error = error });
             if (page.Password != null && page.Password.Equals(model.Password))
             {
                 authResult = true;

@@ -2,7 +2,6 @@
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Business.Core.Interfaces.Marketing.Courses;
 using Grand.Web.Common.DataSource;
@@ -30,14 +29,19 @@ namespace Grand.Web.Admin.Controllers
         private readonly ICourseLessonService _courseLessonService;
         private readonly ICourseViewModelService _courseViewModelService;
         private readonly IWorkContext _workContext;
-        private readonly IStoreService _storeService;
         private readonly ILanguageService _languageService;
         private readonly IGroupService _groupService;
 
-        public CourseController(ITranslationService translationService, ICourseLevelService courseLevelService, ICourseService courseService,
-            ICourseSubjectService courseSubjectService, ICourseLessonService courseLessonService,
-            ICourseViewModelService courseViewModelService, IWorkContext workContext, IStoreService storeService,
-            ILanguageService languageService, IGroupService groupService)
+        public CourseController(
+            ITranslationService translationService, 
+            ICourseLevelService courseLevelService, 
+            ICourseService courseService,
+            ICourseSubjectService courseSubjectService, 
+            ICourseLessonService courseLessonService,
+            ICourseViewModelService courseViewModelService, 
+            IWorkContext workContext, 
+            ILanguageService languageService, 
+            IGroupService groupService)
         {
             _translationService = translationService;
             _courseLevelService = courseLevelService;
@@ -46,7 +50,6 @@ namespace Grand.Web.Admin.Controllers
             _courseLessonService = courseLessonService;
             _courseViewModelService = courseViewModelService;
             _workContext = workContext;
-            _storeService = storeService;
             _languageService = languageService;
             _groupService = groupService;
         }
@@ -54,7 +57,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Level
 
-        public IActionResult Level() => View();
+        public IActionResult Level()
+        {
+            return View();
+        }
 
         [PermissionAuthorizeAction(PermissionActionName.List)]
         [HttpPost]
@@ -120,7 +126,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Course
 
-        public IActionResult List() => View();
+        public IActionResult List()
+        {
+            return View();
+        }
 
         [PermissionAuthorizeAction(PermissionActionName.List)]
         [HttpPost]
@@ -154,7 +163,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 var course = await _courseViewModelService.InsertCourseModel(model);
@@ -179,7 +188,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!course.LimitedToStores || (course.LimitedToStores && course.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && course.Stores.Count > 1))
-                    Warning(_translationService.GetResource("Admin.Courses.Course.Permisions"));
+                    Warning(_translationService.GetResource("Admin.Courses.Course.Permissions"));
                 else
                 {
                     if (!course.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))
@@ -224,7 +233,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 course = await _courseViewModelService.UpdateCourseModel(course, model);
@@ -281,11 +290,6 @@ namespace Grand.Web.Admin.Controllers
         public async Task<IActionResult> AssociateProductToCoursePopupList(DataSourceRequest command,
             CourseModel.AssociateProductToCourseModel model, [FromServices] IWorkContext workContext)
         {
-            //a vendor should have access only to his products
-            if (workContext.CurrentVendor != null)
-            {
-                model.SearchVendorId = workContext.CurrentVendor.Id;
-            }
             var products = await _courseViewModelService.PrepareProductModel(model, command.Page, command.PageSize);
             var gridModel = new DataSourceResult
             {
@@ -304,13 +308,7 @@ namespace Grand.Web.Admin.Controllers
             var associatedProduct = await productService.GetProductById(model.AssociatedToProductId);
             if (associatedProduct == null)
                 return Content("Cannot load a product");
-
-            //a vendor should have access only to his products
-            if (workContext.CurrentVendor != null && associatedProduct.VendorId != workContext.CurrentVendor.Id)
-                return Content("This is not your product");
-
-            //a vendor should have access only to his products
-            model.IsLoggedInAsVendor = workContext.CurrentVendor != null;
+            
             ViewBag.RefreshPage = true;
             ViewBag.productIdInput = productIdInput;
             ViewBag.productNameInput = productNameInput;
@@ -414,7 +412,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!course.LimitedToStores || (course.LimitedToStores && course.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && course.Stores.Count > 1))
-                    Warning(_translationService.GetResource("Admin.Courses.Course.Permisions"));
+                    Warning(_translationService.GetResource("Admin.Courses.Course.Permissions"));
                 else
                 {
                     if (!course.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))
@@ -439,7 +437,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!course.LimitedToStores || (course.LimitedToStores && course.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && course.Stores.Count > 1))
-                    Warning(_translationService.GetResource("Admin.Courses.Course.Permisions"));
+                    Warning(_translationService.GetResource("Admin.Courses.Course.Permissions"));
                 else
                 {
                     if (!course.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))
@@ -477,7 +475,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!course.LimitedToStores || (course.LimitedToStores && course.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && course.Stores.Count > 1))
-                    Warning(_translationService.GetResource("Admin.Courses.Course.Permisions"));
+                    Warning(_translationService.GetResource("Admin.Courses.Course.Permissions"));
                 else
                 {
                     if (!course.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))

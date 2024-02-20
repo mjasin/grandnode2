@@ -1,16 +1,16 @@
-﻿using Grand.Business.Core.Commands.Checkout.Orders;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
+using Grand.Business.Core.Commands.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Checkout.GiftVouchers;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Shipping;
 using Grand.Domain.Catalog;
 using Grand.Domain.Orders;
-using Grand.Domain.Shipping;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class InsertOrderItemCommandHandlerTests
@@ -40,7 +40,7 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         public async Task HandleTest()
         {
             //Arrange
-            var command = new InsertOrderItemCommand() { Order = new Order() { OrderStatusId = (int)OrderStatusSystem.Pending }, OrderItem = new OrderItem() { Quantity = 1, OpenQty = 1, Status = OrderItemStatus.Open }, Product = new Product() };
+            var command = new InsertOrderItemCommand { Order = new Order { OrderStatusId = (int)OrderStatusSystem.Pending }, OrderItem = new OrderItem { Quantity = 1, OpenQty = 1, Status = OrderItemStatus.Open }, Product = new Product() };
             _giftVoucherServiceMock.Setup(c => c.GetGiftVouchersByPurchasedWithOrderItemId(It.IsAny<string>())).ReturnsAsync(new List<GiftVoucher>());
             //Act
             var result = await _handler.Handle(command, CancellationToken.None);

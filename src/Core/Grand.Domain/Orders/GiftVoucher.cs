@@ -5,7 +5,7 @@ namespace Grand.Domain.Orders
     /// <summary>
     /// Represents a gift voucher
     /// </summary>
-    public partial class GiftVoucher : BaseEntity
+    public class GiftVoucher : BaseEntity
     {
         private ICollection<GiftVoucherUsageHistory> _giftVoucherUsageHistory;
         
@@ -75,17 +75,12 @@ namespace Grand.Domain.Orders
         public DateTime? ValidTo { get; set; }
 
         /// <summary>
-        /// Gets or sets the date and time of instance creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
-        
-        /// <summary>
         /// Gets or sets the gift voucher usage history
         /// </summary>
         public virtual ICollection<GiftVoucherUsageHistory> GiftVoucherUsageHistory
         {
-            get { return _giftVoucherUsageHistory ??= new List<GiftVoucherUsageHistory>(); }
-            protected set { _giftVoucherUsageHistory = value; }
+            get => _giftVoucherUsageHistory ??= new List<GiftVoucherUsageHistory>();
+            protected set => _giftVoucherUsageHistory = value;
         }
         
         /// <summary>

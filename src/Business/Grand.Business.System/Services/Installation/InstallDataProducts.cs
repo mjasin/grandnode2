@@ -1,6 +1,5 @@
 ﻿using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Storage;
-using Grand.Business.Core.Interfaces.System.Installation;
 using Grand.Domain.Catalog;
 using Grand.Domain.Media;
 using Grand.Domain.Seo;
@@ -77,8 +76,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMaximumQuantity = 10000,
                 Published = true,
                 ShowOnHomePage = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductAttributeMappings =
                 {
                     new ProductAttributeMapping
@@ -266,8 +263,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -318,8 +313,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -375,8 +368,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMaximumQuantity = 10000,
                 Published = true,
                 ShowOnHomePage = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -454,8 +445,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -540,8 +529,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -625,8 +612,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -711,8 +696,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -798,8 +781,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -873,8 +854,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -924,8 +903,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -975,8 +952,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -1030,8 +1005,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -1081,8 +1054,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -1138,8 +1109,6 @@ namespace Grand.Business.System.Services.Installation
                 Published = true,
                 ShowOnHomePage = true,
                 MarkAsNew = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 BrandId = _brandRepository.Table.Single(c => c.Name == "Xiaomi").Id,
                 ProductCategories =
                 {
@@ -1185,8 +1154,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 BrandId = _brandRepository.Table.Single(c => c.Name == "Xiaomi").Id,
                 ProductCategories =
                 {
@@ -1237,8 +1204,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 BrandId = _brandRepository.Table.Single(c => c.Name == "Xiaomi").Id,
                 ProductCategories =
                 {
@@ -1292,8 +1257,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMaximumQuantity = 10000,
                 Published = true,
                 MarkAsNew = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 BrandId = _brandRepository.Table.Single(c => c.Name == "Xiaomi").Id,
                 TierPrices =
                 {
@@ -1364,8 +1327,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -1415,8 +1376,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 BrandId = _brandRepository.Table.Single(c => c.Name == "Xiaomi").Id,
                 ProductCategories =
                 {
@@ -1472,8 +1431,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductAttributeMappings =
                 {
                     new ProductAttributeMapping
@@ -1576,8 +1533,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductAttributeMappings =
                 {
                     new ProductAttributeMapping
@@ -1714,8 +1669,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -1766,8 +1719,6 @@ namespace Grand.Business.System.Services.Installation
                 BackorderModeId = BackorderMode.NoBackorders,
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -1815,8 +1766,6 @@ namespace Grand.Business.System.Services.Installation
                 BackorderModeId = BackorderMode.NoBackorders,
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -1858,8 +1807,6 @@ namespace Grand.Business.System.Services.Installation
                 BackorderModeId = BackorderMode.NoBackorders,
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -1903,8 +1850,6 @@ namespace Grand.Business.System.Services.Installation
                 BackorderModeId = BackorderMode.NoBackorders,
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductAttributeMappings =
                 {
                     new ProductAttributeMapping
@@ -1997,8 +1942,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 TierPrices =
                 {
                     new TierPrice
@@ -2066,8 +2009,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductAttributeMappings =
                 {
                     new ProductAttributeMapping
@@ -2121,8 +2062,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2166,8 +2105,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2212,8 +2149,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 TierPrices =
                 {
                     new TierPrice
@@ -2287,8 +2222,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductAttributeMappings =
                 {
                     new ProductAttributeMapping
@@ -2370,8 +2303,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2422,8 +2353,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2494,8 +2423,6 @@ namespace Grand.Business.System.Services.Installation
                 HasSampleDownload = true,
                 SampleDownloadId = downloadCyberpunk2.Id,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2561,8 +2488,6 @@ namespace Grand.Business.System.Services.Installation
                 HasSampleDownload = true,
                 SampleDownloadId = downloadGTA2.Id,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2618,8 +2543,6 @@ namespace Grand.Business.System.Services.Installation
                 UnlimitedDownloads = true,
                 HasUserAgreement = false,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2671,8 +2594,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2724,8 +2645,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2775,8 +2694,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2830,8 +2747,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMaximumQuantity = 10000,
                 Published = true,
                 MarkAsNew = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2877,8 +2792,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2923,8 +2836,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -2969,8 +2880,6 @@ namespace Grand.Business.System.Services.Installation
                 AllowOutOfStockSubscriptions = false,
                 Published = true,
                 ShowOnHomePage = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -3016,8 +2925,6 @@ namespace Grand.Business.System.Services.Installation
                 AllowOutOfStockSubscriptions = false,
                 Published = true,
                 MarkAsNew = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -3061,8 +2968,6 @@ namespace Grand.Business.System.Services.Installation
                 NotifyAdminForQuantityBelow = 1,
                 AllowOutOfStockSubscriptions = false,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                 {
                     new ProductCategory
@@ -3107,8 +3012,6 @@ namespace Grand.Business.System.Services.Installation
                 OrderMinimumQuantity = 1,
                 OrderMaximumQuantity = 10000,
                 Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow,
                 ProductCategories =
                {
                     new ProductCategory
@@ -3740,11 +3643,11 @@ namespace Grand.Business.System.Services.Installation
                     IsApproved = true,
                     StoreId = defaultStore.Id,
                     Title = "Some sample review",
-                    ReviewText = string.Format("This sample review is for the {0}. I've been waiting for this product to be available. It is priced just right.", product.Name),
+                    ReviewText =
+                        $"This sample review is for the {product.Name}. I've been waiting for this product to be available. It is priced just right.",
                     Rating = rating,
                     HelpfulYesTotal = 0,
-                    HelpfulNoTotal = 0,
-                    CreatedOnUtc = DateTime.UtcNow,
+                    HelpfulNoTotal = 0
 
                 };
                 await _productReviewRepository.InsertAsync(productReview);
@@ -3753,7 +3656,7 @@ namespace Grand.Business.System.Services.Installation
                 product.ApprovedTotalReviews += 1;
                 product.AvgRating = rating / product.ApprovedTotalReviews;
             }
-            await _productRepository.UpdateAsync(allProducts);
+            allProducts.ForEach(x=>_productRepository.Update(x));
         }
         private async Task AddProductTag(Product product, string tag)
         {

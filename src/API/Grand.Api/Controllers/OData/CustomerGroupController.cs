@@ -6,14 +6,16 @@ using Grand.Business.Core.Utilities.Common.Security;
 using MediatR;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
+using MongoDB.AspNetCore.OData;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
 namespace Grand.Api.Controllers.OData
 {
-    public partial class CustomerGroupController : BaseODataController
+    [Route("odata/CustomerGroup")]
+    [ApiExplorerSettings(IgnoreApi = false, GroupName = "v1")]
+    public class CustomerGroupController : BaseODataController
     {
         private readonly IMediator _mediator;
         private readonly IPermissionService _permissionService;
@@ -29,7 +31,7 @@ namespace Grand.Api.Controllers.OData
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Get(string key)
+        public async Task<IActionResult> Get([FromRoute] string key)
         {
             if (!await _permissionService.Authorize(PermissionSystemName.Customers)) return Forbid();
 
@@ -41,7 +43,7 @@ namespace Grand.Api.Controllers.OData
 
         [SwaggerOperation(summary: "Get entities from CustomerGroup", OperationId = "GetCustomerGroups")]
         [HttpGet]
-        [EnableQuery(HandleNullPropagation = HandleNullPropagationOption.False)]
+        [MongoEnableQuery(HandleNullPropagation = HandleNullPropagationOption.False)]
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get()
@@ -60,7 +62,7 @@ namespace Grand.Api.Controllers.OData
         {
             if (!await _permissionService.Authorize(PermissionSystemName.Customers)) return Forbid();
 
-            model = await _mediator.Send(new AddCustomerGroupCommand() { Model = model });
+            model = await _mediator.Send(new AddCustomerGroupCommand { Model = model });
             return Ok(model);
         }
 
@@ -79,20 +81,23 @@ namespace Grand.Api.Controllers.OData
 
             if (!model.IsSystem)
             {
-                model = await _mediator.Send(new UpdateCustomerGroupCommand() { Model = model });
+                model = await _mediator.Send(new UpdateCustomerGroupCommand { Model = model });
                 return Ok(model);
             }
             return BadRequest(ModelState);
         }
 
         [SwaggerOperation(summary: "Partially update entity in CustomerGroup", OperationId = "PartiallyUpdateCustomerGroup")]
-        [HttpPatch]
+        [HttpPatch("{key}")]
         [ProducesResponseType((int)HttpStatusCode.Forbidden)]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Patch([FromODataUri] string key, [FromBody] JsonPatchDocument<CustomerGroupDto> model)
+        public async Task<IActionResult> Patch([FromRoute] string key, [FromBody] JsonPatchDocument<CustomerGroupDto> model)
         {
+            if (string.IsNullOrEmpty(key))
+                return BadRequest("Key is null or empty");
+            
             if (!await _permissionService.Authorize(PermissionSystemName.Customers)) return Forbid();
 
             var customerGroup = await _mediator.Send(new GetGenericQuery<CustomerGroupDto, Domain.Customers.CustomerGroup>(key));
@@ -100,9 +105,9 @@ namespace Grand.Api.Controllers.OData
 
             var cr = customerGroup.FirstOrDefault();
             model.ApplyTo(cr);
-            if (!cr.IsSystem)
+            if (cr is { IsSystem: false })
             {
-                await _mediator.Send(new UpdateCustomerGroupCommand() { Model = cr });
+                await _mediator.Send(new UpdateCustomerGroupCommand { Model = cr });
                 return Ok();
             }
             return BadRequest(ModelState);
@@ -120,9 +125,9 @@ namespace Grand.Api.Controllers.OData
             var customerGroup = await _mediator.Send(new GetGenericQuery<CustomerGroupDto, Domain.Customers.CustomerGroup>(key));
             if (!customerGroup.Any()) return NotFound();
 
-            if (customerGroup.FirstOrDefault().IsSystem) return Forbid();
+            if (customerGroup.FirstOrDefault()!.IsSystem) return Forbid();
 
-            await _mediator.Send(new DeleteCustomerGroupCommand() { Model = customerGroup.FirstOrDefault() });
+            await _mediator.Send(new DeleteCustomerGroupCommand { Model = customerGroup.FirstOrDefault() });
 
             return Ok();
         }

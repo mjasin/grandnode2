@@ -1,23 +1,22 @@
-﻿using Grand.Api.DTOs.Catalog;
+﻿using Grand.Api.Commands.Models.Catalog;
+using Grand.Api.DTOs.Catalog;
 using Grand.Api.Extensions;
-using Grand.Business.Core.Interfaces.Catalog.Collections;
 using Grand.Business.Core.Extensions;
+using Grand.Business.Core.Interfaces.Catalog.Collections;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Seo;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Domain.Seo;
 using Grand.Infrastructure;
 using MediatR;
 
-namespace Grand.Api.Commands.Models.Catalog
+namespace Grand.Api.Commands.Handlers.Catalog
 {
     public class UpdateCollectionCommandHandler : IRequestHandler<UpdateCollectionCommand, CollectionDto>
     {
         private readonly ICollectionService _collectionService;
         private readonly ISlugService _slugService;
         private readonly ILanguageService _languageService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly ITranslationService _translationService;
         private readonly IPictureService _pictureService;
         private readonly IWorkContext _workContext;
@@ -28,7 +27,6 @@ namespace Grand.Api.Commands.Models.Catalog
             ICollectionService collectionService,
             ISlugService slugService,
             ILanguageService languageService,
-            ICustomerActivityService customerActivityService,
             ITranslationService translationService,
             IPictureService pictureService,
             IWorkContext workContext,
@@ -37,7 +35,6 @@ namespace Grand.Api.Commands.Models.Catalog
             _collectionService = collectionService;
             _slugService = slugService;
             _languageService = languageService;
-            _customerActivityService = customerActivityService;
             _translationService = translationService;
             _pictureService = pictureService;
             _workContext = workContext;
@@ -49,7 +46,6 @@ namespace Grand.Api.Commands.Models.Catalog
             var collection = await _collectionService.GetCollectionById(request.Model.Id);
             var prevPictureId = collection.PictureId;
             collection = request.Model.ToEntity(collection);
-            collection.UpdatedOnUtc = DateTime.UtcNow;
             request.Model.SeName = await collection.ValidateSeName(request.Model.SeName, collection.Name, true, _seoSettings, _slugService, _languageService);
             collection.SeName = request.Model.SeName;
             await _collectionService.UpdateCollection(collection);
@@ -70,9 +66,6 @@ namespace Grand.Api.Commands.Models.Catalog
                 if (picture != null)
                     await _pictureService.SetSeoFilename(picture, _pictureService.GetPictureSeName(collection.Name));
             }
-            //activity log
-            _ = _customerActivityService.InsertActivity("EditCollection", collection.Id, _workContext.CurrentCustomer, "", _translationService.GetResource("ActivityLog.EditCollection"), collection.Name);
-
             return collection.ToModel();
         }
     }

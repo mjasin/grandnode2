@@ -89,13 +89,13 @@ namespace Grand.Business.System.Services.Installation
                 foreach (Match match in matches)
                     languageCode = match.Groups[1].Value;
 
-                var languageNode = xmlDocument.SelectSingleNode(@"//Language");
+                var languageNode = xmlDocument.SelectSingleNode("//Language");
 
-                if (languageNode == null || languageNode.Attributes == null)
+                if (languageNode?.Attributes == null)
                     continue;
 
                 //get language friendly name
-                var languageName = languageNode.Attributes["Name"].InnerText.Trim();
+                var languageName = languageNode.Attributes["Name"]?.InnerText.Trim();
 
                 //is default
                 var isDefaultAttribute = languageNode.Attributes["IsDefault"];
@@ -110,11 +110,11 @@ namespace Grand.Business.System.Services.Installation
                     Code = languageCode,
                     Name = languageName,
                     IsDefault = isDefault,
-                    IsRightToLeft = isRightToLeft,
+                    IsRightToLeft = isRightToLeft
                 };
 
                 //load resources
-                var resources = xmlDocument.SelectNodes(@"//Language/LocaleResource");
+                var resources = xmlDocument.SelectNodes("//Language/LocaleResource");
                 if (resources == null)
                     continue;
                 foreach (XmlNode resNode in resources)
@@ -159,22 +159,22 @@ namespace Grand.Business.System.Services.Installation
 
             _availableCollation = new List<InstallationCollation>();
             var filePath = CommonPath.MapPath("App_Data/Resources/supportedcollation.xml");
-            var xmlDocument = new XmlDocument();
+            var xmlDocument = new XmlDocument { XmlResolver = null };
             xmlDocument.Load(File.OpenRead(filePath));
 
-            var collation = xmlDocument.SelectNodes(@"//Collations/Collation");
+            var collation = xmlDocument.SelectNodes("//Collations/Collation");
 
-            foreach (XmlNode resNode in collation)
+            foreach (XmlNode resNode in collation!)
             {
-                var resNameAttribute = resNode.Attributes["Name"];
+                var resNameAttribute = resNode.Attributes!["Name"];
                 var resValueNode = resNode.SelectSingleNode("Value");
 
-                var resourceName = resNameAttribute.Value.Trim();
-                var resourceValue = resValueNode.InnerText.Trim();
+                var resourceName = resNameAttribute!.Value.Trim();
+                var resourceValue = resValueNode!.InnerText.Trim();
 
-                _availableCollation.Add(new InstallationCollation() {
+                _availableCollation.Add(new InstallationCollation {
                     Name = resourceName,
-                    Value = resourceValue,
+                    Value = resourceValue
                 });
             }
 

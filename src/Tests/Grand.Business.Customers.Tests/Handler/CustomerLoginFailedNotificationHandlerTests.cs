@@ -18,7 +18,7 @@ namespace Grand.Business.Customers.Tests.Handler
         public void Init()
         {
             _customerServiceMock = new Mock<ICustomerService>();
-            _customerSettings = new CustomerSettings(){ FailedPasswordAllowedAttempts = 10 };
+            _customerSettings = new CustomerSettings { FailedPasswordAllowedAttempts = 10 };
             _handler = new CustomerLoginFailedEventHandler(_customerServiceMock.Object, _customerSettings);
         }
 
@@ -28,7 +28,7 @@ namespace Grand.Business.Customers.Tests.Handler
             //Arrange
             var customer = new Customer {
                 FailedLoginAttempts = 1,
-                CannotLoginUntilDateUtc = null,
+                CannotLoginUntilDateUtc = null
             };
             //Act
             await _handler.Handle(new CustomerLoginFailedEvent(customer), CancellationToken.None);
@@ -43,7 +43,7 @@ namespace Grand.Business.Customers.Tests.Handler
             //Arrange
             var customer = new Customer {
                 FailedLoginAttempts = 10,
-                CannotLoginUntilDateUtc = null,
+                CannotLoginUntilDateUtc = null
             };
             //Act
             await _handler.Handle(new CustomerLoginFailedEvent(customer), CancellationToken.None);

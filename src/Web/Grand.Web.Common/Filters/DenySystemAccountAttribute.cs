@@ -1,5 +1,5 @@
 ﻿using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -21,7 +21,7 @@ namespace Grand.Web.Common.Filters
         public DenySystemAccountAttribute(bool ignore = false) : base(typeof(DenySystemAccountFilter))
         {
             _ignoreFilter = ignore;
-            Arguments = new object[] { ignore };
+            Arguments = [ignore];
         }
 
         public bool IgnoreFilter => _ignoreFilter;
@@ -59,8 +59,7 @@ namespace Grand.Web.Common.Filters
             public Task OnAuthorizationAsync(AuthorizationFilterContext context)
             {
                 //ignore filter (the action available even when navigation is not allowed)
-                if (context == null)
-                    throw new ArgumentNullException(nameof(context));
+                ArgumentNullException.ThrowIfNull(context);
 
                 var actionFilter = context.ActionDescriptor.FilterDescriptors
                     .Where(f => f.Scope == FilterScope.Action)

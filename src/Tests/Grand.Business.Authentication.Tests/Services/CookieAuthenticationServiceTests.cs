@@ -35,9 +35,10 @@ namespace Grand.Business.Authentication.Tests.Services
             _customerSettings = new CustomerSettings();
             _groupServiceMock = new Mock<IGroupService>();
             _userFieldServiceMock = new Mock<IUserFieldService>();
-            _config = new SecurityConfig();
-            _config.CookieClaimsIssuer = "grandnode";
-            _config.CookiePrefix = ".Grand.";
+            _config = new SecurityConfig {
+                CookieClaimsIssuer = "grandnode",
+                CookiePrefix = ".Grand."
+            };
             _cookieAuthService = new CookieAuthenticationService(_customerSettings, _customerServiceMock.Object, _groupServiceMock.Object, _userFieldServiceMock.Object, _httpAccessorMock.Object, _config);
             //For mock HttpContext extension methods like SignOutAsync ,SignInAsync etc..
             _authServiceMock = new Mock<IAuthenticationService>();
@@ -45,7 +46,7 @@ namespace Grand.Business.Authentication.Tests.Services
             serviceProviderMock
                 .Setup(_ => _.GetService(typeof(IAuthenticationService)))
                 .Returns(_authServiceMock.Object);
-            _httpContext = new DefaultHttpContext() { RequestServices = serviceProviderMock.Object };
+            _httpContext = new DefaultHttpContext { RequestServices = serviceProviderMock.Object };
             _httpAccessorMock.Setup(c => c.HttpContext).Returns(_httpContext);
         }
 
@@ -88,7 +89,7 @@ namespace Grand.Business.Authentication.Tests.Services
         [TestMethod()]
         public async Task GetAuthenticatedCustomer_UsernameEnableRegisterd_ReturnCustomer()
         {
-            var expectedCustomer = new Customer() { Username = "John", Active = true };
+            var expectedCustomer = new Customer { Username = "John", Active = true };
 
             _customerSettings.UsernamesEnabled = true;
             var cliaim = new Claim(ClaimTypes.Name, "Johny", "", "grandnode");
@@ -109,7 +110,7 @@ namespace Grand.Business.Authentication.Tests.Services
         [TestMethod()]
         public async Task GetAuthenticatedCustomer_UsernameEnableGuests_ReturnNull()
         {
-            var expectedCustomer = new Customer() { Username = "John", Active = true };
+            var expectedCustomer = new Customer { Username = "John", Active = true };
             _customerSettings.UsernamesEnabled = true;
             var cliaim = new Claim(ClaimTypes.Name, "Johny", "", "grandnode");
             IList<Claim> claims = new List<Claim>

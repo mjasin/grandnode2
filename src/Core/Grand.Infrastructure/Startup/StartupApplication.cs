@@ -1,6 +1,6 @@
-﻿using Grand.Domain.Data;
-using Grand.Domain.Data.LiteDb;
-using Grand.Domain.Data.Mongo;
+﻿using Grand.Data;
+using Grand.Data.LiteDb;
+using Grand.Data.Mongo;
 using Grand.Infrastructure.Configuration;
 using LiteDB;
 using Microsoft.AspNetCore.Builder;
@@ -30,6 +30,8 @@ namespace Grand.Infrastructure.Startup
 
         private void RegisterDataLayer(IServiceCollection serviceCollection, IConfiguration configuration)
         {
+            serviceCollection.AddSingleton<IAuditInfoProvider, AuditInfoProvider>();
+
             var dbConfig = new DatabaseConfig();
             configuration.GetSection("Database").Bind(dbConfig);
 
@@ -53,7 +55,7 @@ namespace Grand.Infrastructure.Startup
                     var databaseName = mongoUrl.DatabaseName;
                     var clientSettings = MongoClientSettings.FromConnectionString(connectionString);
                     
-                    if (applicationInsights.Enabled)
+                    if (applicationInsights.TrackDependencyMongoDb)
                         clientSettings.ClusterConfigurator = builder => { builder.Subscribe(new ApplicationInsightsSubscriber(serviceCollection)); };
 
                     serviceCollection.AddScoped(_ => new MongoClient(clientSettings).GetDatabase(databaseName));

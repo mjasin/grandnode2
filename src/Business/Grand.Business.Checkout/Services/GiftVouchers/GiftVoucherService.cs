@@ -2,7 +2,7 @@ using Grand.Business.Core.Interfaces.Checkout.GiftVouchers;
 using Grand.Business.Core.Queries.Checkout.Orders;
 using Grand.Infrastructure.Extensions;
 using Grand.Domain;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Orders;
 using MediatR;
 
@@ -97,8 +97,7 @@ namespace Grand.Business.Checkout.Services.GiftVouchers
         /// <param name="giftVoucher">Gift voucher</param>
         public virtual async Task InsertGiftVoucher(GiftVoucher giftVoucher)
         {
-            if (giftVoucher == null)
-                throw new ArgumentNullException(nameof(giftVoucher));
+            ArgumentNullException.ThrowIfNull(giftVoucher);
 
             giftVoucher.Code = giftVoucher.Code.ToLowerInvariant();
 
@@ -114,8 +113,7 @@ namespace Grand.Business.Checkout.Services.GiftVouchers
         /// <param name="giftVoucher">Gift voucher</param>
         public virtual async Task UpdateGiftVoucher(GiftVoucher giftVoucher)
         {
-            if (giftVoucher == null)
-                throw new ArgumentNullException(nameof(giftVoucher));
+            ArgumentNullException.ThrowIfNull(giftVoucher);
 
             giftVoucher.Code = giftVoucher.Code.ToLowerInvariant();
 
@@ -130,8 +128,7 @@ namespace Grand.Business.Checkout.Services.GiftVouchers
         /// <param name="giftVoucher">Gift voucher</param>
         public virtual async Task DeleteGiftVoucher(GiftVoucher giftVoucher)
         {
-            if (giftVoucher == null)
-                throw new ArgumentNullException(nameof(giftVoucher));
+            ArgumentNullException.ThrowIfNull(giftVoucher);
 
             await _giftVoucherRepository.DeleteAsync(giftVoucher);
 

@@ -149,8 +149,7 @@ namespace Grand.Web.Features.Handlers.Products
         private async Task<ProductDetailsModel> PrepareProductDetailsModel(Store store, Product product,
             ShoppingCartItem updateCartItem, bool isAssociatedProduct)
         {
-            if (product == null)
-                throw new ArgumentNullException(nameof(product));
+            ArgumentNullException.ThrowIfNull(product);
 
             var model = await PrepareStandardProperties(product, updateCartItem);
 
@@ -388,7 +387,7 @@ namespace Grand.Web.Features.Handlers.Products
                 Mpn = product.Mpn,
                 ShowGtin = _catalogSettings.ShowGtin,
                 Gtin = product.Gtin,
-                StockAvailability = _stockQuantityService.FormatStockMessage(product, warehouseId, null),
+                StockAvailability = StockAvailability(product, warehouseId, new List<CustomAttribute>()),
                 UserFields = product.UserFields,
                 HasSampleDownload = product.IsDownload && product.HasSampleDownload,
                 DisplayDiscontinuedMessage =
@@ -468,6 +467,13 @@ namespace Grand.Web.Features.Handlers.Products
             return model;
 
             #endregion
+        }
+
+        private string StockAvailability(Product product, string warehouseId, List<CustomAttribute> attributes)
+        {
+            var stock = _stockQuantityService.FormatStockMessage(product, warehouseId, attributes);
+            var stockAvailability = string.Format(_translationService.GetResource(stock.resource), stock.arg0);
+            return stockAvailability;
         }
 
         private async Task<ProductAskQuestionSimpleModel> PrepareProductAskQuestionSimpleModel(Product product)
@@ -570,8 +576,7 @@ namespace Grand.Web.Features.Handlers.Products
                             Id = tag.Id,
                             Name = tag.GetTranslation(y => y.Name, _workContext.WorkingLanguage.Id),
                             SeName = tag.SeName,
-                            ProductCount =
-                                await _productTagService.GetProductCount(tag.Id, _workContext.CurrentStore.Id)
+                            ProductCount = tag.Count
                         });
                     }
                 }
@@ -723,7 +728,7 @@ namespace Grand.Web.Features.Handlers.Products
                         {
                             model.IsReservation = true;
                             var priceStr = _priceFormatter.FormatPrice(finalPriceWithDiscount);
-                            model.ReservationPrice = _priceFormatter.FormatReservationProductPeriod(product, priceStr);
+                            model.ReservationPrice = string.Format(_translationService.GetResource(product.ResourceReservationProductPeriod()), priceStr, product.Interval);
                         }
 
                         if (product.ProductTypeId != ProductType.Auction) return model;
@@ -825,8 +830,8 @@ namespace Grand.Web.Features.Handlers.Products
                 : minimumCustomerEnteredPrice;
             model.CustomerEnteredPriceRange = string.Format(
                 _translationService.GetResource("Products.EnterProductPrice.Range"),
-                _priceFormatter.FormatPrice(minimumCustomerEnteredPrice, false),
-                _priceFormatter.FormatPrice(maximumCustomerEnteredPrice, false));
+                _priceFormatter.FormatPrice(minimumCustomerEnteredPrice),
+                _priceFormatter.FormatPrice(maximumCustomerEnteredPrice));
 
             return model;
         }
@@ -917,10 +922,9 @@ namespace Grand.Web.Features.Handlers.Products
                             && product.ProductAttributeCombinations.Any()
                             && product.ProductAttributeMappings.Count == 1)
                         {
-                            var customattributes =
+                            var customAttributes =
                                 ProductExtensions.AddProductAttribute(null, attribute, attributeValue.Id);
-                            stockAvailability =
-                                _stockQuantityService.FormatStockMessage(product, string.Empty, customattributes);
+                            stockAvailability = StockAvailability(product, string.Empty, customAttributes.ToList());
                         }
 
                         var valueModel = new ProductDetailsModel.ProductAttributeValueModel {
@@ -940,12 +944,17 @@ namespace Grand.Web.Features.Handlers.Products
                                 await _pricingService.GetProductAttributeValuePriceAdjustment(attributeValue);
                             var productprice =
                                 await _taxService.GetProductPrice(product, attributeValuePriceAdjustment);
-                            if (productprice.productprice > 0)
-                                valueModel.PriceAdjustment =
-                                    "+" + _priceFormatter.FormatPrice(productprice.productprice, false, attributeValue.IsCostIncrementByPercentage);
-                            else if (productprice.productprice < 0)
-                                valueModel.PriceAdjustment =
-                                    "-" + _priceFormatter.FormatPrice(-productprice.productprice, false, attributeValue.IsCostIncrementByPercentage);
+                            switch (productprice.productprice)
+                            {
+                                case > 0:
+                                    valueModel.PriceAdjustment =
+                                        "+" + _priceFormatter.FormatPrice(productprice.productprice, _workContext.WorkingCurrency);
+                                    break;
+                                case < 0:
+                                    valueModel.PriceAdjustment =
+                                        "-" + _priceFormatter.FormatPrice(-productprice.productprice, _workContext.WorkingCurrency);
+                                    break;
+                            }
 
                             valueModel.PriceAdjustmentValue = productprice.productprice;
                         }
@@ -1084,7 +1093,7 @@ namespace Grand.Web.Features.Handlers.Products
                     _workContext.CurrentCustomer, _workContext.WorkingCurrency,
                     0, _catalogSettings.DisplayTierPricesWithDiscounts, tierPrice.Quantity)).finalPrice);
                 tier.Quantity = tierPrice.Quantity;
-                tier.Price = _priceFormatter.FormatPrice(priceBase.productprice, false);
+                tier.Price = _priceFormatter.FormatPrice(priceBase.productprice, _workContext.WorkingCurrency);
                 model.Add(tier);
             }
 

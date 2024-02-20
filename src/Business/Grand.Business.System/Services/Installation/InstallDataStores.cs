@@ -1,5 +1,4 @@
-﻿using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Stores;
+﻿using Grand.Domain.Stores;
 using Microsoft.AspNetCore.Http;
 
 namespace Grand.Business.System.Services.Installation
@@ -25,7 +24,7 @@ namespace Grand.Business.System.Services.Installation
                     CompanyVat = null,
                     CompanyEmail = companyEmail,
                     CompanyHours = "Monday - Sunday / 8:00AM - 6:00PM",
-                    Domains = new List<DomainHost>() { new DomainHost() { HostName = host.Value, Url = $"{httpscheme}://{host}/", Primary = true } }
+                    Domains = new List<DomainHost> { new DomainHost { HostName = host.Value, Url = $"{httpscheme}://{host}/", Primary = true } }
                 };
 
             store = await _storeRepository.InsertAsync(store);

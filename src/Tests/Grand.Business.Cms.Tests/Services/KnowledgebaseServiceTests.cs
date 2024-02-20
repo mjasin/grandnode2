@@ -1,15 +1,17 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Cms.Services;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Knowledgebase;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Cms.Services.Tests
+namespace Grand.Business.Cms.Tests.Services
 {
     [TestClass()]
     public class KnowledgebaseServiceTests
@@ -34,12 +36,12 @@ namespace Grand.Business.Cms.Services.Tests
             _mediatorMock = new Mock<IMediator>();
             _workContextMock = new Mock<IWorkContext>();
 
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "", Name = "test store" });
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "", Name = "test store" });
             _workContextMock.Setup(c => c.CurrentCustomer).Returns(() => new Customer());
 
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _knowledgebaseService = new KnowledgebaseService(_repositoryKnowledgebaseCategory, _repositoryKnowledgebaseArticle, _repositoryKnowledgebaseArticleComment, _mediatorMock.Object,
-                _workContextMock.Object, _cacheBase);
+                _workContextMock.Object, _cacheBase, new AccessControlConfig());
         }
 
         [TestMethod()]
@@ -84,7 +86,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetPublicKnowledgebaseCategoryTest()
         {
             //Arrange
-            var knowledgebaseCategory = new KnowledgebaseCategory() { Published = true };
+            var knowledgebaseCategory = new KnowledgebaseCategory { Published = true };
             await _repositoryKnowledgebaseCategory.InsertAsync(knowledgebaseCategory);
             //Act
             var result = await _knowledgebaseService.GetPublicKnowledgebaseCategory(knowledgebaseCategory.Id);
@@ -108,7 +110,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetKnowledgebaseCategoriesTest()
         {
             //Arrange
-            var knowledgebaseCategory = new KnowledgebaseCategory() { Published = true };
+            var knowledgebaseCategory = new KnowledgebaseCategory { Published = true };
             await _repositoryKnowledgebaseCategory.InsertAsync(knowledgebaseCategory);
             //Act
             var result = await _knowledgebaseService.GetKnowledgebaseCategories();
@@ -120,7 +122,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetKnowledgebaseArticleTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true };
             await _repositoryKnowledgebaseArticle.InsertAsync(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetKnowledgebaseArticle(knowledgebaseArticle.Id);
@@ -132,7 +134,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetKnowledgebaseArticlesTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true };
             await _repositoryKnowledgebaseArticle.InsertAsync(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetKnowledgebaseArticles();
@@ -144,7 +146,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task InsertKnowledgebaseArticleTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true };
             //Act
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Assert
@@ -155,7 +157,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task UpdateKnowledgebaseArticleTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             knowledgebaseArticle.Name = "test";
@@ -168,7 +170,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task DeleteKnowledgebaseArticleTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             await _knowledgebaseService.DeleteKnowledgebaseArticle(knowledgebaseArticle);
@@ -180,7 +182,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetKnowledgebaseArticlesByCategoryIdTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true, ParentCategoryId = "1" };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true, ParentCategoryId = "1" };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetKnowledgebaseArticlesByCategoryId("1");
@@ -192,7 +194,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetPublicKnowledgebaseCategoriesTest()
         {
             //Arrange
-            var knowledgebaseCategory = new KnowledgebaseCategory() { Published = true };
+            var knowledgebaseCategory = new KnowledgebaseCategory { Published = true };
             await _repositoryKnowledgebaseCategory.InsertAsync(knowledgebaseCategory);
             //Act
             var result = await _knowledgebaseService.GetPublicKnowledgebaseCategories();
@@ -204,7 +206,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetPublicKnowledgebaseArticlesTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetPublicKnowledgebaseArticles();
@@ -216,7 +218,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetPublicKnowledgebaseArticleTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetPublicKnowledgebaseArticle(knowledgebaseArticle.Id);
@@ -228,7 +230,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetPublicKnowledgebaseArticlesByCategoryTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true, ParentCategoryId = "1" };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true, ParentCategoryId = "1" };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetPublicKnowledgebaseArticlesByCategory(knowledgebaseArticle.ParentCategoryId);
@@ -240,7 +242,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetPublicKnowledgebaseArticlesByKeywordTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true, Name = "test" };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true, Name = "test" };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetPublicKnowledgebaseArticlesByKeyword("test");
@@ -252,7 +254,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetPublicKnowledgebaseCategoriesByKeywordTest()
         {
             //Arrange
-            var knowledgebaseCategory = new KnowledgebaseCategory() { Published = true, Name = "test" };
+            var knowledgebaseCategory = new KnowledgebaseCategory { Published = true, Name = "test" };
             await _repositoryKnowledgebaseCategory.InsertAsync(knowledgebaseCategory);
             //Act
             var result = await _knowledgebaseService.GetPublicKnowledgebaseCategoriesByKeyword("test");
@@ -264,7 +266,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetHomepageKnowledgebaseArticlesTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true, Name = "test", ShowOnHomepage = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true, Name = "test", ShowOnHomepage = true };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetHomepageKnowledgebaseArticles();
@@ -276,7 +278,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetKnowledgebaseArticlesByNameTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true, Name = "test", ShowOnHomepage = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true, Name = "test", ShowOnHomepage = true };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             //Act
             var result = await _knowledgebaseService.GetKnowledgebaseArticlesByName(knowledgebaseArticle.Name);
@@ -288,7 +290,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetRelatedKnowledgebaseArticlesTest()
         {
             //Arrange
-            var knowledgebaseArticle = new KnowledgebaseArticle() { Published = true, Name = "test", ShowOnHomepage = true };
+            var knowledgebaseArticle = new KnowledgebaseArticle { Published = true, Name = "test", ShowOnHomepage = true };
             await _knowledgebaseService.InsertKnowledgebaseArticle(knowledgebaseArticle);
             var knowledgebaseArticle1 = new KnowledgebaseArticle();
             knowledgebaseArticle1.RelatedArticles.Add(knowledgebaseArticle.Id);
@@ -314,7 +316,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetAllCommentsTest()
         {
             //Arrange
-            var knowledgebaseArticleComment = new KnowledgebaseArticleComment() { CustomerId = "1" };
+            var knowledgebaseArticleComment = new KnowledgebaseArticleComment { CustomerId = "1" };
             await _knowledgebaseService.InsertArticleComment(knowledgebaseArticleComment);
             //Act
             var result = await _knowledgebaseService.GetAllComments("1");
@@ -326,7 +328,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetArticleCommentByIdTest()
         {
             //Arrange
-            var knowledgebaseArticleComment = new KnowledgebaseArticleComment() { CustomerId = "1" };
+            var knowledgebaseArticleComment = new KnowledgebaseArticleComment { CustomerId = "1" };
             await _knowledgebaseService.InsertArticleComment(knowledgebaseArticleComment);
             //Act
             var result = await _knowledgebaseService.GetArticleCommentById(knowledgebaseArticleComment.Id);
@@ -338,10 +340,10 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetArticleCommentsByIdsTest()
         {
             //Arrange
-            var knowledgebaseArticleComment = new KnowledgebaseArticleComment() { CustomerId = "1" };
+            var knowledgebaseArticleComment = new KnowledgebaseArticleComment { CustomerId = "1" };
             await _knowledgebaseService.InsertArticleComment(knowledgebaseArticleComment);
             //Act
-            var result = await _knowledgebaseService.GetArticleCommentsByIds(new[] { knowledgebaseArticleComment.Id });
+            var result = await _knowledgebaseService.GetArticleCommentsByIds([knowledgebaseArticleComment.Id]);
             //Assert
             Assert.IsTrue(result.Any());
 
@@ -351,7 +353,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task GetArticleCommentsByArticleIdTest()
         {
             //Arrange
-            var knowledgebaseArticleComment = new KnowledgebaseArticleComment() { CustomerId = "1", ArticleId = "1" };
+            var knowledgebaseArticleComment = new KnowledgebaseArticleComment { CustomerId = "1", ArticleId = "1" };
             await _knowledgebaseService.InsertArticleComment(knowledgebaseArticleComment);
             //Act
             var result = await _knowledgebaseService.GetArticleCommentsByArticleId(knowledgebaseArticleComment.ArticleId);
@@ -363,7 +365,7 @@ namespace Grand.Business.Cms.Services.Tests
         public async Task DeleteArticleCommentTest()
         {
             //Arrange
-            var knowledgebaseArticleComment = new KnowledgebaseArticleComment() { CustomerId = "1" };
+            var knowledgebaseArticleComment = new KnowledgebaseArticleComment { CustomerId = "1" };
             await _knowledgebaseService.InsertArticleComment(knowledgebaseArticleComment);
             //Act
             await _knowledgebaseService.DeleteArticleComment(knowledgebaseArticleComment);

@@ -11,18 +11,15 @@ using Grand.Web.Common.Models;
 using Grand.Web.Common.Security.Authorization;
 using Grand.Domain.Directory;
 using Grand.Domain.Shipping;
-using Grand.Infrastructure;
 using Grand.Web.Admin.Models.Directory;
 using Grand.Web.Admin.Models.Shipping;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Grand.Web.Admin.Models.Common;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Domain;
 using Grand.Domain.Customers;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Extensions.Mapping.Settings;
-using Microsoft.Extensions.Primitives;
 
 namespace Grand.Web.Admin.Controllers
 {
@@ -42,7 +39,7 @@ namespace Grand.Web.Admin.Controllers
         private readonly ILanguageService _languageService;
         private readonly IStoreService _storeService;
         private readonly IGroupService _groupService;
-        private readonly IWorkContext _workContext;
+
         #endregion
 
         #region Constructors
@@ -58,8 +55,7 @@ namespace Grand.Web.Admin.Controllers
             ITranslationService translationService,
             ILanguageService languageService,
             IStoreService storeService,
-            IGroupService groupService,
-            IWorkContext workContext)
+            IGroupService groupService)
         {
             _shippingService = shippingService;
             _shippingMethodService = shippingMethodService;
@@ -72,7 +68,6 @@ namespace Grand.Web.Admin.Controllers
             _languageService = languageService;
             _storeService = storeService;
             _groupService = groupService;
-            _workContext = workContext;
         }
 
         #endregion
@@ -140,7 +135,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Shipping rate  methods
 
-        public IActionResult Providers() => View();
+        public IActionResult Providers()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Providers(DataSourceRequest command)
@@ -198,7 +196,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Shipping methods
 
-        public IActionResult Methods() => View();
+        public IActionResult Methods()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Methods(DataSourceRequest command)
@@ -335,8 +336,7 @@ namespace Grand.Web.Admin.Controllers
             return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> Settings(ShippingSettingsModel model, 
-            [FromServices] ICustomerActivityService customerActivityService)
+        public async Task<IActionResult> Settings(ShippingSettingsModel model)
         {
             //load settings for a chosen store scope
             var storeScope = await GetActiveStore();
@@ -344,11 +344,6 @@ namespace Grand.Web.Admin.Controllers
             shippingSettings = model.ToEntity(shippingSettings);
 
             await _settingService.SaveSetting(shippingSettings, storeScope);
-
-            //activity log
-            _ = customerActivityService.InsertActivity("EditSettings", "",
-                _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.EditSettings"));
 
             Success(_translationService.GetResource("Admin.Configuration.Updated"));
             return RedirectToAction("Settings");
@@ -358,7 +353,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Delivery dates
 
-        public IActionResult DeliveryDates() => View();
+        public IActionResult DeliveryDates()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> DeliveryDates(DataSourceRequest command)
@@ -468,7 +466,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region Warehouses
 
-        public IActionResult Warehouses() => View();
+        public IActionResult Warehouses()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Warehouses(DataSourceRequest command)
@@ -498,7 +499,6 @@ namespace Grand.Web.Admin.Controllers
             {
                 var warehouse = model.ToEntity();
                 var address = model.Address.ToEntity();
-                address.CreatedOnUtc = DateTime.UtcNow;
                 warehouse.Address = address;
                 await _warehouseService.InsertWarehouse(warehouse);
 
@@ -562,7 +562,10 @@ namespace Grand.Web.Admin.Controllers
 
         #region PickupPoints
 
-        public IActionResult PickupPoints() => View();
+        public IActionResult PickupPoints()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> PickupPoints(DataSourceRequest command)

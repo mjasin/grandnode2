@@ -1,4 +1,5 @@
-﻿using Grand.Business.Core.Commands.Checkout.Orders;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
+using Grand.Business.Core.Commands.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Catalog.Discounts;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
@@ -9,7 +10,7 @@ using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class DeleteOrderCommandHandlerTests
@@ -46,7 +47,7 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         public async Task HandleTest()
         {
             //Arrange
-            var command = new DeleteOrderCommand() { Order = new Order() { OrderStatusId = (int)OrderStatusSystem.Pending } };
+            var command = new DeleteOrderCommand { Order = new Order { OrderStatusId = (int)OrderStatusSystem.Pending } };
             _shipmentServiceMock.Setup(c => c.GetShipmentsByOrder(It.IsAny<string>())).ReturnsAsync(new List<Shipment>());
             //Act
             var result = await _handler.Handle(command, CancellationToken.None);

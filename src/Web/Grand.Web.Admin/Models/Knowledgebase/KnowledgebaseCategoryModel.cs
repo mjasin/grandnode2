@@ -9,12 +9,6 @@ namespace Grand.Web.Admin.Models.Knowledgebase
 {
     public class KnowledgebaseCategoryModel : BaseEntityModel, ILocalizedModel<KnowledgebaseCategoryLocalizedModel>, IGroupLinkModel, IStoreLinkModel
     {
-        public KnowledgebaseCategoryModel()
-        {
-            Categories = new List<SelectListItem>();
-            Locales = new List<KnowledgebaseCategoryLocalizedModel>();
-        }
-
         [GrandResourceDisplayName("Admin.Content.Knowledgebase.KnowledgebaseCategory.Fields.Name")]
         public string Name { get; set; }
 
@@ -30,9 +24,9 @@ namespace Grand.Web.Admin.Models.Knowledgebase
         [GrandResourceDisplayName("Admin.Content.Knowledgebase.KnowledgebaseCategory.Fields.Published")]
         public bool Published { get; set; }
 
-        public List<SelectListItem> Categories { get; set; }
+        public List<SelectListItem> Categories { get; set; } = new();
 
-        public IList<KnowledgebaseCategoryLocalizedModel> Locales { get; set; }
+        public IList<KnowledgebaseCategoryLocalizedModel> Locales { get; set; } = new List<KnowledgebaseCategoryLocalizedModel>();
 
         [UIHint("CustomerGroups")]
         [GrandResourceDisplayName("Admin.Content.Knowledgebase.KnowledgebaseCategory.Fields.LimitedToGroups")]
@@ -56,18 +50,6 @@ namespace Grand.Web.Admin.Models.Knowledgebase
         public string[] Stores { get; set; }
         public bool LimitedToStores { get; set; }
 
-        public class ActivityLogModel : BaseEntityModel
-        {
-            [GrandResourceDisplayName("Admin.Content.Knowledgebase.ActivityLogType")]
-            public string ActivityLogTypeName { get; set; }
-            [GrandResourceDisplayName("Admin.Content.Knowledgebase.ActivityLog.Comment")]
-            public string Comment { get; set; }
-            [GrandResourceDisplayName("Admin.Content.Knowledgebase.ActivityLog.CreatedOn")]
-            public DateTime CreatedOn { get; set; }
-            [GrandResourceDisplayName("Admin.Content.Knowledgebase.ActivityLog.Customer")]
-            public string CustomerId { get; set; }
-            public string CustomerEmail { get; set; }
-        }
     }
 
     public class KnowledgebaseCategoryLocalizedModel : ILocalizedModelLocal, ISlugModelLocal

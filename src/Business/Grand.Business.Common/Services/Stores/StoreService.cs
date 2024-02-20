@@ -2,7 +2,7 @@ using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
 using Grand.Infrastructure.Extensions;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Stores;
 using MediatR;
 
@@ -85,8 +85,7 @@ namespace Grand.Business.Common.Services.Stores
         /// <param name="store">Store</param>
         public virtual async Task InsertStore(Store store)
         {
-            if (store == null)
-                throw new ArgumentNullException(nameof(store));
+            ArgumentNullException.ThrowIfNull(store);
 
             await _storeRepository.InsertAsync(store);
 
@@ -103,8 +102,7 @@ namespace Grand.Business.Common.Services.Stores
         /// <param name="store">Store</param>
         public virtual async Task UpdateStore(Store store)
         {
-            if (store == null)
-                throw new ArgumentNullException(nameof(store));
+            ArgumentNullException.ThrowIfNull(store);
 
             await _storeRepository.UpdateAsync(store);
 
@@ -121,8 +119,7 @@ namespace Grand.Business.Common.Services.Stores
         /// <param name="store">Store</param>
         public virtual async Task DeleteStore(Store store)
         {
-            if (store == null)
-                throw new ArgumentNullException(nameof(store));
+            ArgumentNullException.ThrowIfNull(store);
 
             var allStores = await GetAllStores();
             if (allStores.Count == 1)

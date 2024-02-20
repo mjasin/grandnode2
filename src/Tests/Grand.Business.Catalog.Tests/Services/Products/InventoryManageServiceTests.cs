@@ -1,20 +1,20 @@
-﻿using Grand.Business.Common.Services.Security;
+﻿using Grand.Business.Catalog.Services.Products;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Shipping;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using Grand.SharedKernel.Extensions;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Products.Tests
+namespace Grand.Business.Catalog.Tests.Services.Products
 {
 
     [TestClass()]
@@ -41,12 +41,12 @@ namespace Grand.Business.Catalog.Services.Products.Tests
             _repositoryInventoryJournal = new MongoDBRepositoryTest<InventoryJournal>();
             _workContextMock = new Mock<IWorkContext>();
             _translationService = new Mock<ITranslationService>();
-            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store() { Id = "" });
+            _workContextMock.Setup(c => c.CurrentStore).Returns(() => new Domain.Stores.Store { Id = "" });
             _workContextMock.Setup(c => c.CurrentCustomer).Returns(() => new Customer());
             _mediatorMock = new Mock<IMediator>();
             _settings = new CatalogSettings();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
-            _stockQuantityService = new StockQuantityService(_translationService.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
+            _stockQuantityService = new StockQuantityService();
             _inventoryManageService = new InventoryManageService(_repository, _repositoryInventoryJournal, _stockQuantityService, _cacheBase, _mediatorMock.Object, _settings);
         }
 
@@ -56,9 +56,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task AdjustReservedTest_ManageStock_Reserve()
         {
             //Arrange
-            var product = new Product() {
+            var product = new Product {
                 ManageInventoryMethodId = ManageInventoryMethod.ManageStock,
-                ReservedQuantity = 5,
+                ReservedQuantity = 5
             };
             await _repository.InsertAsync(product);
             //Act
@@ -72,9 +72,9 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task AdjustReservedTest_ManageStock_UnblockReserved()
         {
             //Arrange
-            var product = new Product() {
+            var product = new Product {
                 ManageInventoryMethodId = ManageInventoryMethod.ManageStock,
-                ReservedQuantity = 10,
+                ReservedQuantity = 10
             };
             await _repository.InsertAsync(product);
             //Act
@@ -88,15 +88,15 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task BookReservedInventoryTest_ManageStock()
         {
             //Arrange
-            var product = new Product() {
+            var product = new Product {
                 ManageInventoryMethodId = ManageInventoryMethod.ManageStock,
                 StockQuantity = 10,
-                ReservedQuantity = 10,
+                ReservedQuantity = 10
             };
             await _repository.InsertAsync(product);
 
             var shipment = new Shipment();
-            var shipmentItem = new Domain.Shipping.ShipmentItem() { Quantity = 10 };
+            var shipmentItem = new Domain.Shipping.ShipmentItem { Quantity = 10 };
 
             //Act
             await _inventoryManageService.BookReservedInventory(product, shipment, shipmentItem);
@@ -110,15 +110,15 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task ReverseBookedInventoryTest()
         {
             //Arrange
-            var product = new Product() {
+            var product = new Product {
                 ManageInventoryMethodId = ManageInventoryMethod.ManageStock,
                 StockQuantity = 10,
-                ReservedQuantity = 10,
+                ReservedQuantity = 10
             };
             await _repository.InsertAsync(product);
 
             var shipment = new Shipment();
-            var shipmentItem = new Domain.Shipping.ShipmentItem() { Quantity = 10 };
+            var shipmentItem = new Domain.Shipping.ShipmentItem { Quantity = 10 };
             await _inventoryManageService.BookReservedInventory(product, shipment, shipmentItem);
 
             //Act
@@ -135,10 +135,10 @@ namespace Grand.Business.Catalog.Services.Products.Tests
         public async Task UpdateStockProductTest()
         {
             //Arrange
-            var product = new Product() {
+            var product = new Product {
                 ManageInventoryMethodId = ManageInventoryMethod.ManageStock,
                 StockQuantity = 0,
-                ReservedQuantity = 0,
+                ReservedQuantity = 0
             };
             await _repository.InsertAsync(product);
 

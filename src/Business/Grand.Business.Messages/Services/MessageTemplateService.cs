@@ -1,11 +1,11 @@
 ﻿using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Interfaces.Messages;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Messages;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Messages.Services
@@ -18,6 +18,7 @@ namespace Grand.Business.Messages.Services
         private readonly IAclService _aclService;
         private readonly IMediator _mediator;
         private readonly ICacheBase _cacheBase;
+        private readonly AccessControlConfig _accessControlConfig;
 
         #endregion
 
@@ -29,12 +30,13 @@ namespace Grand.Business.Messages.Services
         public MessageTemplateService(ICacheBase cacheBase,
             IAclService aclService,
             IRepository<MessageTemplate> messageTemplateRepository,
-            IMediator mediator)
+            IMediator mediator, AccessControlConfig accessControlConfig)
         {
             _cacheBase = cacheBase;
             _aclService = aclService;
             _messageTemplateRepository = messageTemplateRepository;
             _mediator = mediator;
+            _accessControlConfig = accessControlConfig;
         }
 
         #endregion
@@ -47,8 +49,7 @@ namespace Grand.Business.Messages.Services
         /// <param name="messageTemplate">Message template</param>
         public virtual async Task InsertMessageTemplate(MessageTemplate messageTemplate)
         {
-            if (messageTemplate == null)
-                throw new ArgumentNullException(nameof(messageTemplate));
+            ArgumentNullException.ThrowIfNull(messageTemplate);
 
             await _messageTemplateRepository.InsertAsync(messageTemplate);
 
@@ -64,8 +65,7 @@ namespace Grand.Business.Messages.Services
         /// <param name="messageTemplate">Message template</param>
         public virtual async Task UpdateMessageTemplate(MessageTemplate messageTemplate)
         {
-            if (messageTemplate == null)
-                throw new ArgumentNullException(nameof(messageTemplate));
+            ArgumentNullException.ThrowIfNull(messageTemplate);
 
             await _messageTemplateRepository.UpdateAsync(messageTemplate);
 
@@ -81,8 +81,7 @@ namespace Grand.Business.Messages.Services
         /// <param name="messageTemplate">Message template</param>
         public virtual async Task DeleteMessageTemplate(MessageTemplate messageTemplate)
         {
-            if (messageTemplate == null)
-                throw new ArgumentNullException(nameof(messageTemplate));
+            ArgumentNullException.ThrowIfNull(messageTemplate);
 
             await _messageTemplateRepository.DeleteAsync(messageTemplate);
 
@@ -151,7 +150,7 @@ namespace Grand.Business.Messages.Services
                 query = query.OrderBy(t => t.Name);
 
                 //Store acl
-                if (string.IsNullOrEmpty(storeId) || CommonHelper.IgnoreStoreLimitations)
+                if (string.IsNullOrEmpty(storeId) || _accessControlConfig.IgnoreStoreLimitations)
                     return await Task.FromResult(query.ToList());
 
                 query = from p in query
@@ -170,8 +169,7 @@ namespace Grand.Business.Messages.Services
         /// <returns>Message template copy</returns>
         public virtual async Task<MessageTemplate> CopyMessageTemplate(MessageTemplate messageTemplate)
         {
-            if (messageTemplate == null)
-                throw new ArgumentNullException(nameof(messageTemplate));
+            ArgumentNullException.ThrowIfNull(messageTemplate);
 
             var mtCopy = new MessageTemplate {
                 Name = messageTemplate.Name,

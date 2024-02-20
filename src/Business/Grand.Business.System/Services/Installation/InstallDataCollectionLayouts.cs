@@ -1,11 +1,10 @@
-﻿using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Catalog;
+﻿using Grand.Domain.Catalog;
 
 namespace Grand.Business.System.Services.Installation
 {
     public partial class InstallationService
     {
-        protected virtual async Task InstallCollectionLayouts()
+        protected virtual Task InstallCollectionLayouts()
         {
             var collectionLayouts = new List<CollectionLayout>
                                {
@@ -14,9 +13,10 @@ namespace Grand.Business.System.Services.Installation
                                            Name = "Grid or Lines",
                                            ViewPath = "CollectionLayout.GridOrLines",
                                            DisplayOrder = 1
-                                       },
+                                       }
                                };
-            await _collectionLayoutRepository.InsertAsync(collectionLayouts);
+            collectionLayouts.ForEach(x=>_collectionLayoutRepository.Insert(x));
+            return Task.CompletedTask;
         }
     }
 }

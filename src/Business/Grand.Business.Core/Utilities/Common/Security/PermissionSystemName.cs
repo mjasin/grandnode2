@@ -3,6 +3,7 @@
     public static class PermissionSystemName
     {
         public const string AccessAdminPanel = "AccessAdminPanel";
+        public const string AccessVendorPanel = "AccessVendorPanel";
         public const string AllowCustomerImpersonation = "AllowCustomerImpersonation";
         public const string Products = "ManageProducts";
         public const string Categories = "ManageCategories";
@@ -54,12 +55,10 @@
         public const string ShippingSettings = "ManageShippingSettings";
         public const string Currencies = "ManageCurrencies";
         public const string Measures = "ManageMeasures";
-        public const string ActivityLog = "ManageActivityLog";
         public const string Acl = "ManageACL";
         public const string EmailAccounts = "ManageEmailAccounts";
         public const string Stores = "ManageStores";
         public const string Plugins = "ManagePlugins";
-        public const string SystemLog = "ManageSystemLog";
         public const string MessageQueue = "ManageMessageQueue";
         public const string MessageContactForm = "ManageMessageContactForm";
         public const string Maintenance = "ManageMaintenance";

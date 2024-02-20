@@ -1,15 +1,16 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
 using Grand.Business.Core.Commands.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Checkout.Orders;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Customers;
-using MediatR;
-using Moq;
 using Grand.Domain.Customers;
 using Grand.Domain.Directory;
+using MediatR;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class ReduceLoyaltyPointsCommandHandlerTests
@@ -41,9 +42,10 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         public async Task HandleTest()
         {
             //Arrange
-            var command = new ReduceLoyaltyPointsCommand();
-            command.Order = new Domain.Orders.Order() { StoreId = "", OrderNumber = 1, CalcLoyaltyPoints = 100 };
-            var expectedCustomer = new Customer() { Username = "John", Active = true };
+            var command = new ReduceLoyaltyPointsCommand {
+                Order = new Domain.Orders.Order { StoreId = "", OrderNumber = 1, CalcLoyaltyPoints = 100 }
+            };
+            var expectedCustomer = new Customer { Username = "John", Active = true };
             _customerServiceMock.Setup(c => c.GetCustomerById(It.IsAny<string>())).Returns(() => Task.FromResult(expectedCustomer));
             _currencyServiceMock.Setup(c => c.GetCurrencyByCode(It.IsAny<string>())).Returns(() => Task.FromResult(new Domain.Directory.Currency()));
             _currencyServiceMock.Setup(c => c.ConvertToPrimaryStoreCurrency(100, It.IsAny<Currency>())).Returns(() => Task.FromResult((double)100));

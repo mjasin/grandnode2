@@ -1,14 +1,16 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Common.Events;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Common.Events.Tests
+namespace Grand.Business.Common.Tests.Events
 {
     [TestClass()]
     public class GroupDeletedEventHandlerTests
@@ -23,7 +25,7 @@ namespace Grand.Business.Common.Events.Tests
         {
             _repository = new MongoDBRepositoryTest<Customer>();
             _product = new MongoDBRepositoryTest<Product>();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), new Mock<IMediator>().Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), new Mock<IMediator>().Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
 
             _handler = new GroupDeletedEventHandler(_repository, _product, _cacheBase);
         }
@@ -43,7 +45,7 @@ namespace Grand.Business.Common.Events.Tests
             customer2.Groups.Add("3");
             await _repository.InsertAsync(customer2);
             //Act
-            var notification = new Infrastructure.Events.EntityDeleted<CustomerGroup>(new CustomerGroup() { Id = "1" });
+            var notification = new Infrastructure.Events.EntityDeleted<CustomerGroup>(new CustomerGroup { Id = "1" });
             await _handler.Handle(notification, CancellationToken.None);
 
             //Assert

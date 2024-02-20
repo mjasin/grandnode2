@@ -1,15 +1,16 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
-using System.Diagnostics;
-using System.Globalization;
+
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Buffers;
+using System.Diagnostics;
+using System.Globalization;
 
-namespace Grand.Web.Common.TagHelpers.Admin
+namespace Grand.Web.Common.TagHelpers.Admin.Extend
 {
     internal class TemplateBuilder
     {
@@ -36,30 +37,11 @@ namespace Grand.Web.Common.TagHelpers.Admin
             bool readOnly,
             object additionalViewData)
         {
-            if (viewEngine == null)
-            {
-                throw new ArgumentNullException(nameof(viewEngine));
-            }
-
-            if (bufferScope == null)
-            {
-                throw new ArgumentNullException(nameof(bufferScope));
-            }
-
-            if (viewContext == null)
-            {
-                throw new ArgumentNullException(nameof(viewContext));
-            }
-
-            if (viewData == null)
-            {
-                throw new ArgumentNullException(nameof(viewData));
-            }
-
-            if (modelExplorer == null)
-            {
-                throw new ArgumentNullException(nameof(modelExplorer));
-            }
+            ArgumentNullException.ThrowIfNull(viewEngine);
+            ArgumentNullException.ThrowIfNull(bufferScope);
+            ArgumentNullException.ThrowIfNull(viewContext);
+            ArgumentNullException.ThrowIfNull(viewData);
+            ArgumentNullException.ThrowIfNull(modelExplorer);
 
             _viewEngine = viewEngine;
             _bufferScope = bufferScope;
@@ -90,11 +72,11 @@ namespace Grand.Web.Common.TagHelpers.Admin
             }
 
             // Create VDD of type object so any model type is allowed.
-            var viewData = new ViewDataDictionary<object>(_viewData);
-
-            // Create a new ModelExplorer in order to preserve the model metadata of the original _viewData even
-            // though _model may have been reset to null. Otherwise we might lose track of the model type /property.
-            viewData.ModelExplorer = _modelExplorer.GetExplorerForModel(_model);
+            var viewData = new ViewDataDictionary<object>(_viewData) {
+                // Create a new ModelExplorer in order to preserve the model metadata of the original _viewData even
+                // though _model may have been reset to null. Otherwise we might lose track of the model type /property.
+                ModelExplorer = _modelExplorer.GetExplorerForModel(_model)
+            };
 
             var formatString = _readOnly ?
                 viewData.ModelMetadata.DisplayFormatString :

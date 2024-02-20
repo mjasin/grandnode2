@@ -1,12 +1,13 @@
-﻿using Grand.Business.Core.Interfaces.Catalog.Products;
+﻿using Grand.Business.Catalog.Queries.Handlers;
+using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Queries.Handlers.Tests
+namespace Grand.Business.Catalog.Tests.Queries.Handlers
 {
     [TestClass()]
     public class GetPersonalizedProductsQueryHandlerTests

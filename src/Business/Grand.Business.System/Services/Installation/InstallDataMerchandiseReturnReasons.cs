@@ -1,11 +1,10 @@
-﻿using Grand.Business.Core.Interfaces.System.Installation;
-using Grand.Domain.Orders;
+﻿using Grand.Domain.Orders;
 
 namespace Grand.Business.System.Services.Installation
 {
     public partial class InstallationService
     {
-        protected virtual async Task InstallMerchandiseReturnReasons()
+        protected virtual Task InstallMerchandiseReturnReasons()
         {
             var merchandiseReturnReasons = new List<MerchandiseReturnReason>
                                 {
@@ -25,7 +24,9 @@ namespace Grand.Business.System.Services.Installation
                                             DisplayOrder = 3
                                         }
                                 };
-            await _merchandiseReturnReasonRepository.InsertAsync(merchandiseReturnReasons);
+
+            merchandiseReturnReasons.ForEach(x=>_merchandiseReturnReasonRepository.Insert(x));
+            return Task.CompletedTask;
         }
     }
 }

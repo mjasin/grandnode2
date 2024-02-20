@@ -4,26 +4,27 @@ using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Utilities.Catalog;
 using Grand.Domain.Orders;
 using Grand.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiscountRules.Provider
+namespace DiscountRules.Standard.Providers
 {
     public class ShoppingCartDiscountRule : IDiscountRule
     {
         private readonly IWorkContext _workContext;
         private readonly IProductService _productService;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ShoppingCartSettings _shoppingCartSettings;
 
         public ShoppingCartDiscountRule(
             IWorkContext workContext,
             IProductService productService,
-            IServiceProvider serviceProvider,
+            IHttpContextAccessor httpContextAccessor,
             ShoppingCartSettings shoppingCartSettings)
         {
             _workContext = workContext;
             _productService = productService;
-            _serviceProvider = serviceProvider;
+            _httpContextAccessor = httpContextAccessor;
             _shoppingCartSettings = shoppingCartSettings;
         }
 
@@ -34,8 +35,7 @@ namespace DiscountRules.Provider
         /// <returns>true - requirement is met; otherwise, false</returns>
         public async Task<DiscountRuleValidationResult> CheckRequirement(DiscountRuleValidationRequest request)
         {
-            if (request == null)
-                throw new ArgumentNullException(nameof(request));
+            ArgumentNullException.ThrowIfNull(request);
 
             var result = new DiscountRuleValidationResult();
 
@@ -59,7 +59,7 @@ namespace DiscountRules.Provider
             }
             double spentAmount = 0;
 
-            var priceCalculationService = _serviceProvider.GetRequiredService<IPricingService>();
+            var priceCalculationService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IPricingService>();
 
             foreach (var ca in cart)
             {

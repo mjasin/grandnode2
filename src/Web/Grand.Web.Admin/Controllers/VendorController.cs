@@ -49,7 +49,10 @@ namespace Grand.Web.Admin.Controllers
         #region Methods
 
         //list
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
         public IActionResult List()
         {
@@ -281,10 +284,6 @@ namespace Grand.Web.Admin.Controllers
             var vendor = await _vendorService.GetVendorById(vendorId);
             if (vendor == null)
                 throw new ArgumentException("No vendor found with the specified id");
-
-            //a vendor should have access only to his own profile
-            if (workContext.CurrentVendor != null && vendor.Id != workContext.CurrentVendor.Id)
-                return Content("This is not your vendor");
 
             var vendorReviews = await _vendorService.GetAllVendorReviews("", null,
                 null, null, "", vendorId, command.Page - 1, command.PageSize);

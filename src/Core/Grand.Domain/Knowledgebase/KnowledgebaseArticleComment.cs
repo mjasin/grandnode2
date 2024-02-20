@@ -1,6 +1,6 @@
 ﻿namespace Grand.Domain.Knowledgebase
 {
-    public partial class KnowledgebaseArticleComment : BaseEntity
+    public class KnowledgebaseArticleComment : BaseEntity
     {
         /// <summary>
         /// Gets or sets the customer identifier
@@ -22,9 +22,5 @@
         /// </summary>
         public string ArticleId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the date and time of instance creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
     }
 }

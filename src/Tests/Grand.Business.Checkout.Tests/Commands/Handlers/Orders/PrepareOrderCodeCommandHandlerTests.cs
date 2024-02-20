@@ -1,6 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class PrepareOrderCodeCommandHandlerTests
@@ -11,7 +12,7 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         [TestInitialize]
         public void Init()
         {
-            _handler = new PrepareOrderCodeCommandHandler(new Domain.Orders.OrderSettings() { LengthCode = LengthCode });
+            _handler = new PrepareOrderCodeCommandHandler(new Domain.Orders.OrderSettings { LengthCode = LengthCode });
         }
 
         [TestMethod()]

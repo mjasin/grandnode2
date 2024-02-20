@@ -6,21 +6,10 @@ namespace Grand.Web.Admin.Models.Common
 {
     public class MaintenanceModel : BaseModel
     {
-        public MaintenanceModel()
-        {
-            DeleteGuests = new DeleteGuestsModel();
-            DeleteAbandonedCarts = new DeleteAbandonedCartsModel();
-            DeleteExportedFiles = new DeleteExportedFilesModel();
-            ConvertedPictureModel = new ConvertPictureModel { NumberOfConvertItems = -1 };
-        }
-
-        public DeleteGuestsModel DeleteGuests { get; set; }
-        public DeleteAbandonedCartsModel DeleteAbandonedCarts { get; set; }
-        public DeleteExportedFilesModel DeleteExportedFiles { get; set; }
-        public ConvertPictureModel ConvertedPictureModel { get; set; }
-
-        public bool DeleteActivityLog { get; set; }
-        public bool DeleteSystemLog { get; set; }
+        public DeleteGuestsModel DeleteGuests { get; set; } = new();
+        public DeleteAbandonedCartsModel DeleteAbandonedCarts { get; set; } = new();
+        public DeleteExportedFilesModel DeleteExportedFiles { get; set; } = new();
+        public ConvertPictureModel ConvertedPictureModel { get; set; } = new() { NumberOfConvertItems = -1 };
 
         #region Nested classes
 

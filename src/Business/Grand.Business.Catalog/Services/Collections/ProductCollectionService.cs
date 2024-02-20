@@ -3,12 +3,12 @@ using Grand.Business.Core.Utilities.Catalog;
 using Grand.Domain;
 using Grand.Domain.Catalog;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
-using Grand.SharedKernel.Extensions;
 using MediatR;
 
 namespace Grand.Business.Catalog.Services.Collections
@@ -21,7 +21,8 @@ namespace Grand.Business.Catalog.Services.Collections
         private readonly IWorkContext _workContext;
         private readonly IMediator _mediator;
         private readonly ICacheBase _cacheBase;
-
+        private readonly AccessControlConfig _accessControlConfig;
+        
         #endregion
 
         #region Ctor
@@ -29,12 +30,13 @@ namespace Grand.Business.Catalog.Services.Collections
         public ProductCollectionService(ICacheBase cacheBase,
             IRepository<Product> productRepository,
             IWorkContext workContext,
-            IMediator mediator)
+            IMediator mediator, AccessControlConfig accessControlConfig)
         {
             _cacheBase = cacheBase;
             _productRepository = productRepository;
             _workContext = workContext;
             _mediator = mediator;
+            _accessControlConfig = accessControlConfig;
         }
         #endregion
 
@@ -55,9 +57,9 @@ namespace Grand.Business.Catalog.Services.Collections
             {
                 var query = _productRepository.Table.Where(x => x.ProductCollections.Any(y => y.CollectionId == collectionId));
 
-                if (!showHidden && (!CommonHelper.IgnoreAcl || !CommonHelper.IgnoreStoreLimitations))
+                if (!showHidden && (!_accessControlConfig.IgnoreAcl || !_accessControlConfig.IgnoreStoreLimitations))
                 {
-                    if (!CommonHelper.IgnoreAcl)
+                    if (!_accessControlConfig.IgnoreAcl)
                     {
                         //ACL (access control list)
                         var allowedCustomerGroupsIds = _workContext.CurrentCustomer.GetCustomerGroupIds();
@@ -65,7 +67,7 @@ namespace Grand.Business.Catalog.Services.Collections
                                 where !p.LimitedToGroups || allowedCustomerGroupsIds.Any(x => p.CustomerGroups.Contains(x))
                                 select p;
                     }
-                    if (!CommonHelper.IgnoreStoreLimitations && !string.IsNullOrEmpty(storeId))
+                    if (!_accessControlConfig.IgnoreStoreLimitations && !string.IsNullOrEmpty(storeId))
                     {
                         //Store acl
                         query = from p in query
@@ -102,8 +104,7 @@ namespace Grand.Business.Catalog.Services.Collections
         /// <param name="productId">Product ident</param>
         public virtual async Task InsertProductCollection(ProductCollection productCollection, string productId)
         {
-            if (productCollection == null)
-                throw new ArgumentNullException(nameof(productCollection));
+            ArgumentNullException.ThrowIfNull(productCollection);
 
             await _productRepository.AddToSet(productId, x => x.ProductCollections, productCollection);
 
@@ -122,8 +123,7 @@ namespace Grand.Business.Catalog.Services.Collections
         /// <param name="productId">Product id</param>
         public virtual async Task UpdateProductCollection(ProductCollection productCollection, string productId)
         {
-            if (productCollection == null)
-                throw new ArgumentNullException(nameof(productCollection));
+            ArgumentNullException.ThrowIfNull(productCollection);
 
             await _productRepository.UpdateToSet(productId, x => x.ProductCollections, z => z.Id, productCollection.Id, productCollection);
 
@@ -142,8 +142,7 @@ namespace Grand.Business.Catalog.Services.Collections
         /// <param name="productId">Product id</param>
         public virtual async Task DeleteProductCollection(ProductCollection productCollection, string productId)
         {
-            if (productCollection == null)
-                throw new ArgumentNullException(nameof(productCollection));
+            ArgumentNullException.ThrowIfNull(productCollection);
 
             await _productRepository.PullFilter(productId, x => x.ProductCollections, z => z.Id, productCollection.Id);
 

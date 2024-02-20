@@ -1,16 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Grand.Business.Checkout.Commands.Handlers.Orders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Grand.Business.Checkout.Commands.Handlers.Orders;
 using Grand.Business.Core.Interfaces.Catalog.Products;
-using Moq;
 using Grand.Domain;
 using Grand.Domain.Catalog;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
-namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
+namespace Grand.Business.Checkout.Tests.Commands.Handlers.Orders
 {
     [TestClass()]
     public class AddCustomerReservationCommandHandlerTests
@@ -29,27 +24,27 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders.Tests
         public async Task HandleTest()
         {
             //Arrange
-            var command = new Core.Commands.Checkout.Orders.AddCustomerReservationCommand();
-            command.Customer = new Domain.Customers.Customer();
-            command.RentalStartDate = DateTime.UtcNow.AddDays(1).Date;
-            command.RentalEndDate = DateTime.UtcNow.AddDays(2).Date;
-            command.Product = new Domain.Catalog.Product() {
-                IncBothDate = true,
-                IntervalUnitId = IntervalUnit.Day
+            var command = new Core.Commands.Checkout.Orders.AddCustomerReservationCommand {
+                Customer = new Domain.Customers.Customer(),
+                RentalStartDate = DateTime.UtcNow.AddDays(1).Date,
+                RentalEndDate = DateTime.UtcNow.AddDays(2).Date,
+                Product = new Domain.Catalog.Product {
+                    IncBothDate = true,
+                    IntervalUnitId = IntervalUnit.Day
+                },
+                ShoppingCartItem = new Domain.Orders.ShoppingCartItem { }
             };
-            command.ShoppingCartItem = new Domain.Orders.ShoppingCartItem() { };
 
             _productReservationServiceMock.Setup(c => c.GetProductReservationsByProductId(It.IsAny<string>(), true, null, 0, int.MaxValue)).Returns(() => Task.FromResult((IPagedList<ProductReservation>)
-                new PagedList<ProductReservation>() {
-                    new ProductReservation() { Date = DateTime.UtcNow.AddDays(4).Date, Resource = "" },
-                    new ProductReservation() { Date = DateTime.UtcNow.AddDays(3).Date, Resource = "" },
-                    new ProductReservation() { Date = DateTime.UtcNow.AddDays(2).Date, Resource = "" },
-                    new ProductReservation() { Date = DateTime.UtcNow.AddDays(1).Date, Resource = "" },
-                    new ProductReservation() { Date = DateTime.UtcNow.Date, Resource = "" } }
+                new PagedList<ProductReservation> {
+                    new ProductReservation { Date = DateTime.UtcNow.AddDays(4).Date, Resource = "" },
+                    new ProductReservation { Date = DateTime.UtcNow.AddDays(3).Date, Resource = "" },
+                    new ProductReservation { Date = DateTime.UtcNow.AddDays(2).Date, Resource = "" },
+                    new ProductReservation { Date = DateTime.UtcNow.AddDays(1).Date, Resource = "" },
+                    new ProductReservation { Date = DateTime.UtcNow.Date, Resource = "" } }
                 ));
 
-            _productReservationServiceMock.Setup(c => c.GetCustomerReservationsHelpers(It.IsAny<string>())).ReturnsAsync((IList<CustomerReservationsHelper>)
-               new List<CustomerReservationsHelper>() { });
+            _productReservationServiceMock.Setup(c => c.GetCustomerReservationsHelpers(It.IsAny<string>())).ReturnsAsync(new List<CustomerReservationsHelper> { });
             //Act
             var result = await _handler.Handle(command, CancellationToken.None);
 

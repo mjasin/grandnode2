@@ -1,14 +1,16 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Common.Services.Seo;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Seo;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Common.Services.Seo.Tests
+namespace Grand.Business.Common.Tests.Services.Seo
 {
     [TestClass()]
     public class SlugServiceTests
@@ -25,15 +27,15 @@ namespace Grand.Business.Common.Services.Seo.Tests
             _repository = new MongoDBRepositoryTest<EntityUrl>();
 
             _mediatorMock = new Mock<IMediator>();
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
-            _slugService = new SlugService(_cacheBase, _repository, new Infrastructure.Configuration.PerformanceConfig());
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
+            _slugService = new SlugService(_cacheBase, _repository);
         }
 
         [TestMethod()]
         public async Task GetEntityUrlByIdTest()
         {
             //Arrange
-            var entity = new EntityUrl() { Slug = "slug" };
+            var entity = new EntityUrl { Slug = "slug" };
             await _repository.InsertAsync(entity);
             //Act
             var result = _slugService.GetEntityUrlById(entity.Id);
@@ -45,7 +47,7 @@ namespace Grand.Business.Common.Services.Seo.Tests
         public async Task InsertEntityUrlTest()
         {
             //Arrange
-            var entity = new EntityUrl() { Slug = "slug" };
+            var entity = new EntityUrl { Slug = "slug" };
             //Act
             await _slugService.InsertEntityUrl(entity);
             //Assert
@@ -56,7 +58,7 @@ namespace Grand.Business.Common.Services.Seo.Tests
         public async Task UpdateEntityUrlTest()
         {
             //Arrange
-            var entity = new EntityUrl() { Slug = "slug" };
+            var entity = new EntityUrl { Slug = "slug" };
             await _slugService.InsertEntityUrl(entity);
             //Act
             entity.Slug = "slug2";
@@ -69,7 +71,7 @@ namespace Grand.Business.Common.Services.Seo.Tests
         public async Task DeleteEntityUrlTest()
         {
             //Arrange
-            var entity = new EntityUrl() { Slug = "slug" };
+            var entity = new EntityUrl { Slug = "slug" };
             await _slugService.InsertEntityUrl(entity);
             //Act
             await _slugService.DeleteEntityUrl(entity);
@@ -81,7 +83,7 @@ namespace Grand.Business.Common.Services.Seo.Tests
         public async Task GetBySlugTest()
         {
             //Arrange
-            var entity = new EntityUrl() { Slug = "slug" };
+            var entity = new EntityUrl { Slug = "slug" };
             await _slugService.InsertEntityUrl(entity);
             //Act
             var result = await _slugService.GetBySlug(entity.Slug);
@@ -93,7 +95,7 @@ namespace Grand.Business.Common.Services.Seo.Tests
         public async Task GetBySlugCachedTest()
         {
             //Arrange
-            var entity = new EntityUrl() { Slug = "slug" };
+            var entity = new EntityUrl { Slug = "slug" };
             await _slugService.InsertEntityUrl(entity);
             //Act
             var result = await _slugService.GetBySlugCached(entity.Slug);
@@ -118,7 +120,7 @@ namespace Grand.Business.Common.Services.Seo.Tests
         public async Task GetActiveSlugTest()
         {
             //Arrange
-            await _slugService.InsertEntityUrl(new EntityUrl() { IsActive = true });
+            await _slugService.InsertEntityUrl(new EntityUrl { IsActive = true });
             //Act
             var result = await _slugService.GetAllEntityUrl();
             //Assert

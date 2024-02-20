@@ -1,18 +1,15 @@
-﻿using Grand.Business.Core.Interfaces.Catalog.Discounts;
+﻿using DiscountRules.Standard.Models;
+using Grand.Business.Core.Interfaces.Catalog.Discounts;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Utilities.Common.Security;
-using Grand.Web.Common.Controllers;
-using Grand.Web.Common.Filters;
 using Grand.Domain.Discounts;
+using Grand.Web.Common.Controllers;
 using Microsoft.AspNetCore.Mvc;
-using DiscountRules.Standard.HadSpentAmount.Models;
 using System.Globalization;
 
-namespace DiscountRules.Standard.HadSpentAmount.Controllers
+namespace DiscountRules.Standard.Areas.Admin.Controllers
 {
-    [Area("Admin")]
-    [AuthorizeAdmin]
-    public class HadSpentAmountController : BasePluginController
+    public class HadSpentAmountController : BaseAdminPluginController
     {
         private readonly IDiscountService _discountService;
         private readonly IPermissionService _permissionService;
@@ -44,7 +41,7 @@ namespace DiscountRules.Standard.HadSpentAmount.Controllers
                 spentAmountRequirement = Convert.ToDouble(discountRequirement.Metadata);
             }
 
-            var model = new RequirementModel {
+            var model = new RequirementSpentAmountModel {
                 RequirementId = !string.IsNullOrEmpty(discountRequirementId) ? discountRequirementId : "",
                 DiscountId = discountId,
                 SpentAmount = spentAmountRequirement

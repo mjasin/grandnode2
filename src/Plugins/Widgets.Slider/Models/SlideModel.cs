@@ -8,10 +8,6 @@ namespace Widgets.Slider.Models
 {
     public class SlideModel : BaseEntityModel, ILocalizedModel<SlideLocalizedModel>, IStoreLinkModel
     {
-        public SlideModel()
-        {
-            Locales = new List<SlideLocalizedModel>();
-        }
         [GrandResourceDisplayName("Widgets.Slider.Name")]
         public string Name { get; set; }
 
@@ -37,7 +33,7 @@ namespace Widgets.Slider.Models
         [UIHint("Picture")]
         public string PictureId { get; set; }
 
-        public IList<SlideLocalizedModel> Locales { get; set; }
+        public IList<SlideLocalizedModel> Locales { get; set; } = new List<SlideLocalizedModel>();
 
         //Store acl
         [GrandResourceDisplayName("Widgets.Slider.LimitedToStores")]
@@ -54,6 +50,14 @@ namespace Widgets.Slider.Models
         [UIHint("Brand")]
         [GrandResourceDisplayName("Widgets.Slider.Brand")]
         public string BrandId { get; set; }
+
+        [GrandResourceDisplayName("Widgets.Slider.StartDate")]
+        [UIHint("DateTimeNullable")]
+        public DateTime? StartDateUtc { get; set; }
+
+        [GrandResourceDisplayName("Widgets.Slider.EndDate")]
+        [UIHint("DateTimeNullable")]
+        public DateTime? EndDateUtc { get; set; }
 
     }
 

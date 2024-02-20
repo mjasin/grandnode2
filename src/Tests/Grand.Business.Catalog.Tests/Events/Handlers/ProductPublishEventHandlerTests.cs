@@ -1,8 +1,9 @@
-﻿using Grand.Infrastructure.Caching;
+﻿using Grand.Business.Catalog.Events.Handlers;
+using Grand.Infrastructure.Caching;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Events.Handlers.Tests
+namespace Grand.Business.Catalog.Tests.Events.Handlers
 {
     [TestClass()]
     public class ProductPublishEventHandlerTests
@@ -24,7 +25,7 @@ namespace Grand.Business.Catalog.Events.Handlers.Tests
         public async Task Handle_Publish()
         {
             //Act
-            await handlerPublish.Handle(new Core.Events.Catalog.ProductPublishEvent(new Domain.Catalog.Product() { ShowOnHomePage = true }), CancellationToken.None);
+            await handlerPublish.Handle(new Core.Events.Catalog.ProductPublishEvent(new Domain.Catalog.Product { ShowOnHomePage = true }), CancellationToken.None);
             _casheManagerMock.Verify(c => c.RemoveByPrefix(It.IsAny<string>(), true), Times.Exactly(1));
 
         }
@@ -32,7 +33,7 @@ namespace Grand.Business.Catalog.Events.Handlers.Tests
         public async Task Handle_UnPublish()
         {
             //Act
-            await handlerUnPublish.Handle(new Core.Events.Catalog.ProductUnPublishEvent(new Domain.Catalog.Product() { ShowOnHomePage = true }), CancellationToken.None);
+            await handlerUnPublish.Handle(new Core.Events.Catalog.ProductUnPublishEvent(new Domain.Catalog.Product { ShowOnHomePage = true }), CancellationToken.None);
             _casheManagerMock.Verify(c => c.RemoveByPrefix(It.IsAny<string>(), true), Times.Exactly(1));
         }
     }

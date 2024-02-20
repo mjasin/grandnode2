@@ -4,7 +4,7 @@
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace Grand.Web.Common.TagHelpers.Admin
+namespace Grand.Web.Common.TagHelpers.Admin.Extend
 {
     internal class ViewBufferPage
     {
@@ -23,6 +23,9 @@ namespace Grand.Web.Common.TagHelpers.Admin
 
         // Very common trivial method; nudge it to inline https://github.com/aspnet/Mvc/pull/8339
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Append(ViewBufferValue value) => Buffer[Count++] = value;
+        public void Append(ViewBufferValue value)
+        {
+            Buffer[Count++] = value;
+        }
     }
 }

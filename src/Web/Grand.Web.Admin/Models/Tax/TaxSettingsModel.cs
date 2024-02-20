@@ -7,13 +7,6 @@ namespace Grand.Web.Admin.Models.Tax
 {
     public class TaxSettingsModel : BaseModel
     {
-        public TaxSettingsModel()
-        {
-            TaxCategories = new List<SelectListItem>();
-            EuVatShopCountries = new List<SelectListItem>();
-            DefaultTaxAddress = new AddressModel();
-        }
-
         public string ActiveStore { get; set; }
 
 
@@ -26,9 +19,6 @@ namespace Grand.Web.Admin.Models.Tax
         [GrandResourceDisplayName("Admin.Configuration.Tax.Settings.TaxDisplayType")]
         public int TaxDisplayType { get; set; }
         public SelectList TaxDisplayTypeValues { get; set; }
-
-        [GrandResourceDisplayName("Admin.Configuration.Tax.Settings.DisplayTaxSuffix")]
-        public bool DisplayTaxSuffix { get; set; }
 
         [GrandResourceDisplayName("Admin.Configuration.Tax.Settings.DisplayTaxRates")]
         public bool DisplayTaxRates { get; set; }
@@ -47,12 +37,12 @@ namespace Grand.Web.Admin.Models.Tax
         public SelectList TaxBasedOnValues { get; set; }
 
         [GrandResourceDisplayName("Admin.Configuration.Tax.Settings.DefaultTaxAddress")]
-        public AddressModel DefaultTaxAddress { get; set; }
+        public AddressModel DefaultTaxAddress { get; set; } = new();
 
         [GrandResourceDisplayName("Admin.Configuration.Tax.Settings.DefaultTaxCategory")]
         public string DefaultTaxCategoryId { get; set; }
 
-        public IList<SelectListItem> TaxCategories { get; set; }
+        public IList<SelectListItem> TaxCategories { get; set; } = new List<SelectListItem>();
 
         [GrandResourceDisplayName("Admin.Configuration.Tax.Settings.ShippingIsTaxable")]
         public bool ShippingIsTaxable { get; set; }
@@ -77,7 +67,7 @@ namespace Grand.Web.Admin.Models.Tax
 
         [GrandResourceDisplayName("Admin.Configuration.Tax.Settings.EuVatShopCountry")]
         public string EuVatShopCountryId { get; set; }
-        public IList<SelectListItem> EuVatShopCountries { get; set; }
+        public IList<SelectListItem> EuVatShopCountries { get; set; } = new List<SelectListItem>();
 
         [GrandResourceDisplayName("Admin.Configuration.Tax.Settings.EuVatAllowVatExemption")]
         public bool EuVatAllowVatExemption { get; set; }

@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a merchandise return note
     /// </summary>
-    public partial class MerchandiseReturnNote : BaseEntity
+    public class MerchandiseReturnNote : BaseEntity
     {
         /// <summary>
         /// Gets or sets the merchandise return identifier
@@ -29,11 +29,6 @@
         /// Gets or sets a value indicating whether a customer can see a note
         /// </summary>
         public bool DisplayToCustomer { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time of merchandise return note creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
 
         /// <summary>
         /// Gets or sets value indicating whether this merchandise return note was create by customer

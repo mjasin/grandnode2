@@ -5,7 +5,6 @@ using Grand.Business.Core.Interfaces.Catalog.Collections;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Interfaces.Customers;
 using Grand.Business.Core.Utilities.Common.Security;
@@ -39,7 +38,6 @@ namespace Grand.Web.Controllers
         private readonly IUserFieldService _userFieldService;
         private readonly IAclService _aclService;
         private readonly IPermissionService _permissionService;
-        private readonly ICustomerActivityService _customerActivityService;
         private readonly IMediator _mediator;
 
         private readonly VendorSettings _vendorSettings;
@@ -58,7 +56,6 @@ namespace Grand.Web.Controllers
             IUserFieldService userFieldService,
             IAclService aclService,
             IPermissionService permissionService,
-            ICustomerActivityService customerActivityService,
             IMediator mediator,
             VendorSettings vendorSettings)
         {
@@ -72,7 +69,6 @@ namespace Grand.Web.Controllers
             _userFieldService = userFieldService;
             _aclService = aclService;
             _permissionService = permissionService;
-            _customerActivityService = customerActivityService;
             _mediator = mediator;
             _vendorSettings = vendorSettings;
         }
@@ -89,7 +85,7 @@ namespace Grand.Web.Controllers
                 _workContext.CurrentStore.Id);
         }
 
-        private VendorReviewOverviewModel PrepareVendorReviewOverviewModel(Vendor vendor)
+        private VendorReviewOverviewModel PrepareVendorReviewOverviewModel(Domain.Vendors.Vendor vendor)
         {
             var model = new VendorReviewOverviewModel {
                 RatingSum = vendor.ApprovedRatingSum,
@@ -129,13 +125,8 @@ namespace Grand.Web.Controllers
             await SaveLastContinueShoppingPage(customer);
 
             //display "edit" (manage) link
-            if (await _permissionService.Authorize(StandardPermission.AccessAdminPanel, customer) && await _permissionService.Authorize(StandardPermission.ManageCategories, customer))
+            if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel, customer) && await _permissionService.Authorize(StandardPermission.ManageCategories, customer))
                 DisplayEditLink(Url.Action("Edit", "Category", new { id = category.Id, area = "Admin" }));
-
-            //activity log
-            _ = _customerActivityService.InsertActivity("PublicStore.ViewCategory", category.Id,
-                _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.PublicStore.ViewCategory"), category.Name);
 
             //model
             var model = await _mediator.Send(new GetCategory {
@@ -194,13 +185,8 @@ namespace Grand.Web.Controllers
             await SaveLastContinueShoppingPage(customer);
 
             //display "edit" (manage) link
-            if (await _permissionService.Authorize(StandardPermission.AccessAdminPanel, customer) && await _permissionService.Authorize(StandardPermission.ManageBrands, customer))
+            if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel, customer) && await _permissionService.Authorize(StandardPermission.ManageBrands, customer))
                 DisplayEditLink(Url.Action("Edit", "Brand", new { id = brand.Id, area = "Admin" }));
-
-            //activity log
-            _ = _customerActivityService.InsertActivity("PublicStore.ViewBrand", brand.Id,
-                _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.PublicStore.ViewBrand"), brand.Name);
 
             //model
             var model = await _mediator.Send(new GetBrand {
@@ -258,13 +244,8 @@ namespace Grand.Web.Controllers
             await SaveLastContinueShoppingPage(customer);
 
             //display "edit" (manage) link
-            if (await _permissionService.Authorize(StandardPermission.AccessAdminPanel, customer) && await _permissionService.Authorize(StandardPermission.ManageCollections, customer))
+            if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel, customer) && await _permissionService.Authorize(StandardPermission.ManageCollections, customer))
                 DisplayEditLink(Url.Action("Edit", "Collection", new { id = collection.Id, area = "Admin" }));
-
-            //activity log
-            _ = _customerActivityService.InsertActivity("PublicStore.ViewCollection", collection.Id,
-                _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                _translationService.GetResource("ActivityLog.PublicStore.ViewCollection"), collection.Name);
 
             //model
             var model = await _mediator.Send(new GetCollection {
@@ -313,7 +294,7 @@ namespace Grand.Web.Controllers
             await SaveLastContinueShoppingPage(customer);
 
             //display "edit" (manage) link
-            if (await _permissionService.Authorize(StandardPermission.AccessAdminPanel, customer) && await _permissionService.Authorize(StandardPermission.ManageCollections, customer))
+            if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel, customer) && await _permissionService.Authorize(StandardPermission.ManageCollections, customer))
                 DisplayEditLink(Url.Action("Edit", "Vendor", new { id = vendor.Id, area = "Admin" }));
 
             var model = await _mediator.Send(new GetVendor {
@@ -356,11 +337,6 @@ namespace Grand.Web.Controllers
             if (ModelState.IsValid)
             {
                 var vendorReview = await _mediator.Send(new InsertVendorReviewCommand { Vendor = vendor, Store = _workContext.CurrentStore, Model = model });
-                //activity log
-                _ = _customerActivityService.InsertActivity("PublicStore.AddVendorReview", vendor.Id,
-                    _workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(),
-                    _translationService.GetResource("ActivityLog.PublicStore.AddVendorReview"), vendor.Name);
-
                 //raise event
                 if (vendorReview.IsApproved)
                     await _mediator.Publish(new VendorReviewApprovedEvent(vendorReview));
@@ -495,12 +471,12 @@ namespace Grand.Web.Controllers
                 model.adv = true;
             }
             //Prepare model
-            var isSearchTermSpecified = HttpContext?.Request?.Query.ContainsKey("q");
+            var isSearchTermSpecified = HttpContext.Request.Query.ContainsKey("q");
             var searchModel = await _mediator.Send(new GetSearch {
                 Command = command,
                 Currency = _workContext.WorkingCurrency,
                 Customer = _workContext.CurrentCustomer,
-                IsSearchTermSpecified = isSearchTermSpecified ?? false,
+                IsSearchTermSpecified = isSearchTermSpecified,
                 Language = _workContext.WorkingLanguage,
                 Model = model,
                 Store = _workContext.CurrentStore

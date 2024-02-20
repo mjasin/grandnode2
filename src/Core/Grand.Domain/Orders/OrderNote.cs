@@ -3,7 +3,7 @@ namespace Grand.Domain.Orders
     /// <summary>
     /// Represents an order note
     /// </summary>
-    public partial class OrderNote : BaseEntity
+    public class OrderNote : BaseEntity
     {
         /// <summary>
         /// Gets or sets the order identifier
@@ -24,11 +24,6 @@ namespace Grand.Domain.Orders
         /// Gets or sets a value indicating whether a customer can see a note
         /// </summary>
         public bool DisplayToCustomer { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time of order note creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
 
         /// <summary>
         /// Gets or sets value indicating whether this order note was create by customer

@@ -3,9 +3,7 @@ using Grand.Business.Core.Interfaces.Checkout.CheckoutAttributes;
 using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Utilities.Common.Security;
-using Grand.Domain.Catalog;
 using Grand.Domain.Directory;
 using Grand.Infrastructure;
 using Grand.Web.Admin.Extensions.Mapping;
@@ -60,9 +58,15 @@ namespace Grand.Web.Admin.Controllers
         #region Checkout attributes
 
         //list
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
-        public IActionResult List() => View();
+        public IActionResult List()
+        {
+            return View();
+        }
 
         [HttpPost]
         [PermissionAuthorizeAction(PermissionActionName.List)]
@@ -164,14 +168,10 @@ namespace Grand.Web.Admin.Controllers
         [HttpPost]
         [PermissionAuthorizeAction(PermissionActionName.Delete)]
         public async Task<IActionResult> Delete(string id,
-            [FromServices] IWorkContext workContext,
-            [FromServices] ICustomerActivityService customerActivityService)
+            [FromServices] IWorkContext workContext)
         {
             var checkoutAttribute = await _checkoutAttributeService.GetCheckoutAttributeById(id);
             await _checkoutAttributeService.DeleteCheckoutAttribute(checkoutAttribute);
-
-            //activity log
-            await customerActivityService.InsertActivity("DeleteCheckoutAttribute", checkoutAttribute.Id, workContext.CurrentCustomer, HttpContext.Connection?.RemoteIpAddress?.ToString(), _translationService.GetResource("ActivityLog.DeleteCheckoutAttribute"), checkoutAttribute.Name);
 
             Success(_translationService.GetResource("Admin.Orders.CheckoutAttributes.Deleted"));
             return RedirectToAction("List");

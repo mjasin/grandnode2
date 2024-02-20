@@ -1,9 +1,6 @@
 using Grand.Business.Core.Interfaces.Checkout.Shipping;
 using Grand.Business.Core.Utilities.Checkout;
-using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
-using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Domain.Common;
 using Grand.Domain.Customers;
 using Grand.Domain.Orders;
@@ -11,6 +8,7 @@ using Grand.Domain.Shipping;
 using Grand.Domain.Stores;
 using Grand.Infrastructure.Extensions;
 using Grand.SharedKernel;
+using Microsoft.Extensions.Logging;
 
 namespace Grand.Business.Checkout.Services.Shipping
 {
@@ -21,8 +19,7 @@ namespace Grand.Business.Checkout.Services.Shipping
     {
         #region Fields
 
-        private readonly ILogger _logger;
-        private readonly ITranslationService _translationService;
+        private readonly ILogger<ShippingService> _logger;
         private readonly ICountryService _countryService;
         private readonly IEnumerable<IShippingRateCalculationProvider> _shippingRateCalculationProvider;
         private readonly ShippingSettings _shippingSettings;
@@ -36,15 +33,13 @@ namespace Grand.Business.Checkout.Services.Shipping
         /// Ctor
         /// </summary>
         public ShippingService(
-            ILogger logger,
-            ITranslationService translationService,
+            ILogger<ShippingService> logger,
             ICountryService countryService,
             IEnumerable<IShippingRateCalculationProvider> shippingRateCalculationProvider,
             ShippingProviderSettings shippingProviderSettings,
             ShippingSettings shippingSettings)
         {
             _logger = logger;
-            _translationService = translationService;
             _countryService = countryService;
             _shippingRateCalculationProvider = shippingRateCalculationProvider;
             _shippingProviderSettings = shippingProviderSettings;
@@ -163,8 +158,7 @@ namespace Grand.Business.Checkout.Services.Shipping
             Address shippingAddress, string allowedShippingRateMethodSystemName = "",
             Store store = null)
         {
-            if (cart == null)
-                throw new ArgumentNullException(nameof(cart));
+            ArgumentNullException.ThrowIfNull(cart);
 
             var result = new GetShippingOptionResponse();
 
@@ -186,7 +180,7 @@ namespace Grand.Business.Checkout.Services.Shipping
             foreach (var shippingRateMethod in shippingRateMethods)
             {
                 //request shipping options (separately for each package-request)
-                IList<ShippingOption> shippingRateMethodOptions = null;
+                IList<ShippingOption> shippingRateMethodOptions;
                 var getShippingOptionResponse = await shippingRateMethod.GetShippingOptions(shippingOptionRequest);
 
                 if (getShippingOptionResponse.Success)
@@ -200,7 +194,7 @@ namespace Grand.Business.Checkout.Services.Shipping
                     foreach (var error in getShippingOptionResponse.Errors)
                     {
                         result.AddError(error);
-                        _ = _logger.Warning($"Shipping ({shippingRateMethod.FriendlyName}). {error}");
+                        _logger.LogWarning("Shipping ({FriendlyName}) {Error}", shippingRateMethod.FriendlyName, error);
                     }
                     //clear the shipping options in this case
                     break;
@@ -222,7 +216,7 @@ namespace Grand.Business.Checkout.Services.Shipping
 
             //no shipping options loaded
             if (result.ShippingOptions.Count == 0 && result.Errors.Count == 0)
-                result.Errors.Add(_translationService.GetResource("Checkout.ShippingOptionCouldNotBeLoaded"));
+                result.Errors.Add("Shipping options could not be loaded");
 
             return result;
         }

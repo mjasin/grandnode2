@@ -1,11 +1,11 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Events.Handlers;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Domain.Directory;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-
-namespace Grand.Business.Catalog.Events.Handlers.Tests
+namespace Grand.Business.Catalog.Tests.Events.Handlers
 {
     [TestClass()]
     public class DeleteMeasureUnitOnProductEventHandlerTests
@@ -25,14 +25,17 @@ namespace Grand.Business.Catalog.Events.Handlers.Tests
         {
             //Arrange
             var measureUnit = new MeasureUnit();
-            var product = new Product();
-            product.UnitId = measureUnit.Id;
+            var product = new Product {
+                UnitId = measureUnit.Id
+            };
             await _repository.InsertAsync(product);
-            var product2 = new Product();
-            product2.UnitId = measureUnit.Id;
+            var product2 = new Product {
+                UnitId = measureUnit.Id
+            };
             await _repository.InsertAsync(product2);
-            var product3 = new Product();
-            product3.UnitId = "1";
+            var product3 = new Product {
+                UnitId = "1"
+            };
             await _repository.InsertAsync(product3);
 
             //Act

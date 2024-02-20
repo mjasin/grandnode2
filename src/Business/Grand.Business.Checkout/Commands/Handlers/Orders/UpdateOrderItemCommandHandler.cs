@@ -73,13 +73,12 @@ namespace Grand.Business.Checkout.Commands.Handlers.Orders
             }
             await _orderService.UpdateOrder(request.Order);
             //check order status
-            await _mediator.Send(new CheckOrderStatusCommand() { Order = request.Order }, cancellationToken);
+            await _mediator.Send(new CheckOrderStatusCommand { Order = request.Order }, cancellationToken);
 
             //add a note
             await _orderService.InsertOrderNote(new OrderNote {
                 Note = "Order item has been edited",
                 DisplayToCustomer = false,
-                CreatedOnUtc = DateTime.UtcNow,
                 OrderId = request.Order.Id
             });
 

@@ -1,10 +1,11 @@
-﻿using Grand.Business.Core.Interfaces.Common.Directory;
+﻿using Grand.Business.Authentication.Services;
+using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Domain;
 using Grand.Domain.Security;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Authentication.Services.Tests
+namespace Grand.Business.Authentication.Tests.Services
 {
     [TestClass()]
     public class RefreshTokenServiceTests
@@ -16,7 +17,7 @@ namespace Grand.Business.Authentication.Services.Tests
         public void Init()
         {
             _userFieldServiceMock = new Mock<IUserFieldService>();
-            _service = new RefreshTokenService(_userFieldServiceMock.Object, new Infrastructure.Configuration.FrontendAPIConfig() {
+            _service = new RefreshTokenService(_userFieldServiceMock.Object, new Infrastructure.Configuration.FrontendAPIConfig {
                 SecretKey = "JWTRefreshTokenHIGHsecuredPasswordVVVp1OH7Xzyr",
                 ValidIssuer = "http://localhost:4200",
                 ValidAudience = "http://localhost:4200",
@@ -26,7 +27,7 @@ namespace Grand.Business.Authentication.Services.Tests
                 ExpiryInMinutes = 1440,
                 RefreshTokenExpiryInMinutes = 1440,
                 Enabled = true,
-                ValidateIssuer = false,
+                ValidateIssuer = false
             });
         }
 
@@ -57,7 +58,7 @@ namespace Grand.Business.Authentication.Services.Tests
         {
             //Arrange
             _userFieldServiceMock.Setup(c => c.GetFieldsForEntity<RefreshToken>(It.IsAny<BaseEntity>(), It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(Task.FromResult(new RefreshToken() { Token = "123" }));
+                .Returns(Task.FromResult(new RefreshToken { Token = "123" }));
             //Act
             var result = await _service.GetCustomerRefreshToken(new Domain.Customers.Customer());
             //Assert

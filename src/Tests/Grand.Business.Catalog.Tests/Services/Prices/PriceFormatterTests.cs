@@ -1,11 +1,11 @@
-﻿using Grand.Business.Core.Interfaces.Catalog.Prices;
-using Grand.Business.Catalog.Services.Prices;
+﻿using Grand.Business.Catalog.Services.Prices;
+using Grand.Business.Common.Services.Directory;
+using Grand.Business.Core.Interfaces.Catalog.Prices;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Security;
-using Grand.Business.Common.Services.Directory;
-using Grand.Domain.Data;
-using Grand.Domain.Data.Mongo;
+using Grand.Data;
+using Grand.Data.Mongo;
 using Grand.Domain.Directory;
 using Grand.Domain.Localization;
 using Grand.Domain.Tax;
@@ -16,7 +16,7 @@ using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Tests.Service.Prices
+namespace Grand.Business.Catalog.Tests.Services.Prices
 {
     [TestClass()]
     public class PriceFormatterTests
@@ -55,9 +55,7 @@ namespace Grand.Business.Catalog.Tests.Service.Prices
                 DisplayLocale = "",
                 CustomFormatting = "€0.00",
                 DisplayOrder = 1,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow
+                Published = true
             };
 
             var currency02 = new Currency {
@@ -67,14 +65,12 @@ namespace Grand.Business.Catalog.Tests.Service.Prices
                 DisplayLocale = "en-US",
                 CustomFormatting = "",
                 DisplayOrder = 2,
-                Published = true,
-                CreatedOnUtc = DateTime.UtcNow,
-                UpdatedOnUtc = DateTime.UtcNow
+                Published = true
             };
 
             var tempCurrencyRepo = new Mock<IRepository<Currency>>();
             {
-                var tempIMongoCollection = new Mock<MongoRepository<Currency>>().Object;
+                var tempIMongoCollection = new Mock<MongoRepository<Currency>>(Mock.Of<IAuditInfoProvider>()).Object;
                 tempIMongoCollection.Insert(currency01);
                 tempIMongoCollection.Insert(currency02);
                 tempCurrencyRepo.Setup(x => x.Table).Returns(tempIMongoCollection.Table);
@@ -102,7 +98,7 @@ namespace Grand.Business.Catalog.Tests.Service.Prices
                 _translationService = tempLocalizationService.Object;
             }
 
-            _priceFormatter = new PriceFormatter(_workContext, _currencyService, _translationService, _taxSettings);
+            _priceFormatter = new PriceFormatter(_workContext);
         }
 
         [TestMethod()]
@@ -130,7 +126,7 @@ namespace Grand.Business.Catalog.Tests.Service.Prices
                 LanguageCulture = "en-US"
             };
 
-            Assert.AreEqual("€412.20", _priceFormatter.FormatPrice(412.2, currency0111, language0111, false, false));
+            Assert.AreEqual("€412.20", _priceFormatter.FormatPrice(412.2, currency0111));
         }
 
         [TestMethod()]
@@ -142,7 +138,7 @@ namespace Grand.Business.Catalog.Tests.Service.Prices
                 Name = "US Dollar",
                 CurrencyCode = "USD",
                 DisplayLocale = "en-US",
-                MidpointRoundId = MidpointRounding.AwayFromZero,
+                MidpointRoundId = MidpointRounding.AwayFromZero
 
             };
             var gbp_currency = new Currency {
@@ -150,50 +146,22 @@ namespace Grand.Business.Catalog.Tests.Service.Prices
                 Name = "great british pound",
                 CurrencyCode = "GBP",
                 DisplayLocale = "en-GB",
-                MidpointRoundId = MidpointRounding.AwayFromZero,
+                MidpointRoundId = MidpointRounding.AwayFromZero
             };
             var euro_currency = new Currency {
                 Id = "3",
                 Name = "Euro",
                 CurrencyCode = "EUR",
                 DisplayLocale = "en_150",
-                MidpointRoundId = MidpointRounding.AwayFromZero,
+                MidpointRoundId = MidpointRounding.AwayFromZero
             };
             var language = new Language {
                 Id = "1",
                 Name = "English",
                 LanguageCulture = "en-US"
             };
-            Assert.AreEqual("$1,234.50", _priceFormatter.FormatPrice(1234.5, usd_currency, language, false, false));
-            Assert.AreEqual("£1,234.50", _priceFormatter.FormatPrice(1234.5, gbp_currency, language, false, false));
-        }
-
-        [TestMethod()]
-        public void Can_formatPrice_with_showTax()
-        {
-            //$18,888.10                    priceIncludestax=false || showTax=false
-            //$18,888.10 incl tax           priceIncludestax=true || showTax=true
-            //$18,888.10 excl tax           priceIncludestax=false || showTax=true
-
-            var currency = new Currency {
-                Id = "1",
-                Name = "US Dollar",
-                CurrencyCode = "USD",
-                DisplayLocale = "en-US",
-                MidpointRoundId = MidpointRounding.AwayFromZero,
-            };
-            var language = new Language {
-                Id = "1",
-                Name = "English",
-                LanguageCulture = "en-US"
-            };
-
-            //
-            Assert.AreEqual("$18,888.10", _priceFormatter.FormatPrice(18888.1, currency, language, false, false));
-            //
-            Assert.AreEqual("$18,888.10 incl tax", _priceFormatter.FormatPrice(18888.1, currency, language, true, true));
-            //
-            Assert.AreEqual("$18,888.10 excl tax", _priceFormatter.FormatPrice(18888.1, currency, language, false, true));
+            Assert.AreEqual("$1,234.50", _priceFormatter.FormatPrice(1234.5, usd_currency));
+            Assert.AreEqual("£1,234.50", _priceFormatter.FormatPrice(1234.5, gbp_currency));
         }
 
         [TestMethod()]
@@ -206,7 +174,7 @@ namespace Grand.Business.Catalog.Tests.Service.Prices
                 Id = "1",
                 Name = "US Dollar",
                 CurrencyCode = "USD",
-                DisplayLocale = "en-US",
+                DisplayLocale = "en-US"
             };
             var language = new Language {
                 Id = "1",
@@ -214,7 +182,7 @@ namespace Grand.Business.Catalog.Tests.Service.Prices
                 LanguageCulture = "en-US"
             };
 
-            Assert.AreEqual("$18,888.10", _priceFormatter.FormatPrice(18888.1, currency, language, false, false));
+            Assert.AreEqual("$18,888.10", _priceFormatter.FormatPrice(18888.1, currency));
 
         }
     }

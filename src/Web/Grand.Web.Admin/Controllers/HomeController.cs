@@ -1,20 +1,18 @@
 ﻿using Grand.Business.Core.Interfaces.Authentication;
 using Grand.Business.Core.Queries.Checkout.Orders;
-using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Logging;
 using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Queries.Customers;
 using Grand.Business.Core.Interfaces.System.Reports;
 using Grand.Domain.Customers;
-using Grand.Domain.Directory;
 using Grand.Domain.Orders;
 using Grand.Infrastructure;
 using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Models.Home;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Grand.Web.Admin.Controllers
 {
@@ -29,7 +27,7 @@ namespace Grand.Web.Admin.Controllers
         private readonly IGroupService _groupService;
         private readonly IOrderReportService _orderReportService;
         private readonly IProductsReportService _productsReportService;
-        private readonly ILogger _logger;
+        private readonly ILogger<HomeController> _logger;
         private readonly IGrandAuthenticationService _authenticationService;
         private readonly IMediator _mediator;
 
@@ -45,7 +43,7 @@ namespace Grand.Web.Admin.Controllers
             IGroupService groupService,
             IOrderReportService orderReportService,
             IProductsReportService productsReportService,
-            ILogger logger,
+            ILogger<HomeController> logger,
             IGrandAuthenticationService authenticationService,
             IMediator mediator)
         {
@@ -68,10 +66,7 @@ namespace Grand.Web.Admin.Controllers
         private async Task<DashboardActivityModel> PrepareActivityModel()
         {
             var model = new DashboardActivityModel();
-            var vendorId = "";
-            if (_workContext.CurrentVendor != null)
-                vendorId = _workContext.CurrentVendor.Id;
-
+            
             var storeId = string.Empty;
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 storeId = _workContext.CurrentCustomer.StaffStoreId;
@@ -79,14 +74,15 @@ namespace Grand.Web.Admin.Controllers
             model.OrdersPending = (await _orderReportService.GetOrderAverageReportLine(storeId: storeId, os: (int)OrderStatusSystem.Pending)).CountOrders;
             model.AbandonedCarts = (await _mediator.Send(new GetCustomerQuery { StoreId = storeId, LoadOnlyWithShoppingCart = true })).Count();
 
-            var lowStockProducts = await _productsReportService.LowStockProducts(vendorId, storeId);
+            var lowStockProducts = await _productsReportService.LowStockProducts(storeId: storeId);
             model.LowStockProducts = lowStockProducts.products.Count + lowStockProducts.combinations.Count;
 
             model.MerchandiseReturns = await _mediator.Send(new GetMerchandiseReturnCountQuery { RequestStatusId = 0, StoreId = storeId });
             model.TodayRegisteredCustomers =
                 (await _mediator.Send(new GetCustomerQuery {
                     StoreId = storeId,
-                    CustomerGroupIds = new[] { (await _groupService.GetCustomerGroupBySystemName(SystemCustomerGroupNames.Registered)).Id },
+                    CustomerGroupIds = [(await _groupService.GetCustomerGroupBySystemName(SystemCustomerGroupNames.Registered)).Id
+                    ],
                     CreatedFromUtc = DateTime.UtcNow.Date
                 })).Count();
             return model;
@@ -97,20 +93,14 @@ namespace Grand.Web.Admin.Controllers
 
         #region Methods
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var model = new DashboardModel {
-                IsLoggedInAsVendor = _workContext.CurrentVendor != null && !await _groupService.IsStaff(_workContext.CurrentCustomer)
-            };
-            return View(model);
+            return View();
         }
 
-        public async Task<IActionResult> Statistics()
+        public IActionResult Statistics()
         {
-            var model = new DashboardModel {
-                IsLoggedInAsVendor = _workContext.CurrentVendor != null && !await _groupService.IsStaff(_workContext.CurrentCustomer)
-            };
-            return View(model);
+            return View();
         }
 
         public async Task<IActionResult> DashboardActivity()
@@ -170,7 +160,7 @@ namespace Grand.Web.Admin.Controllers
                 return Json(new List<dynamic> { new { id = "", name = _translationService.GetResource("Address.SelectState") } });
 
             var country = await countryService.GetCountryById(countryId);
-            var states = country != null ? country.StateProvinces.ToList() : new List<StateProvince>();
+            var states = country != null ? country.StateProvinces.ToList() : [];
             var result = (from s in states
                           select new { id = s.Id, name = s.Name }).ToList();
             if (addAsterisk.HasValue && addAsterisk.Value)
@@ -209,13 +199,11 @@ namespace Grand.Web.Admin.Controllers
             var currentCustomer = _workContext.CurrentCustomer;
             if (currentCustomer == null || await _groupService.IsGuest(currentCustomer))
             {
-                _ = _logger.Information($"Access denied to anonymous request on {pageUrl}");
+                _logger.LogInformation("Access denied to anonymous request on {PageUrl}", pageUrl);
                 return View();
             }
 
-            _ = _logger.Information(
-                $"Access denied to user #{currentCustomer.Email} '{currentCustomer.Email}' on {pageUrl}");
-
+            _logger.LogInformation("Access denied to user #{CurrentCustomerEmail} \'{CurrentCustomerEmail}\' on {PageUrl}", currentCustomer.Email, currentCustomer.Email, pageUrl);
 
             return View();
         }

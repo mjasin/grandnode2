@@ -1,6 +1,6 @@
 ﻿using Grand.Business.Core.Queries.Customers;
 using Grand.Domain.Customers;
-using Grand.Domain.Data;
+using Grand.Data;
 using MediatR;
 using System.Linq.Expressions;
 
@@ -110,7 +110,7 @@ namespace Grand.Business.Customers.Queries.Handlers
             MethodCallExpression call = Expression.Call(
                 typeof(Queryable),
                 "OrderByDescending",
-                new[] { typeof(T), property.Type },
+                [typeof(T), property.Type],
                 source.Expression,
                 Expression.Quote(sort));
 

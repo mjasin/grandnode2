@@ -1,13 +1,12 @@
 ﻿using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Infrastructure;
-using Grand.Web.Common.Components;
 using Microsoft.AspNetCore.Mvc;
 using Widgets.Slider.Domain;
 using Widgets.Slider.Models;
 using Widgets.Slider.Services;
 
-namespace Widgets.Slider.ViewComponents
+namespace Widgets.Slider.Components
 {
     [ViewComponent(Name = "WidgetSlider")]
     public class WidgetSliderComponent : ViewComponent
@@ -38,7 +37,10 @@ namespace Widgets.Slider.ViewComponents
             var i = 1;
             foreach (var item in sliders.OrderBy(x => x.DisplayOrder))
             {
-                model.Slide.Add(new PublicInfoModel.Slider() {
+                if ((item.StartDateUtc.HasValue && item.StartDateUtc > DateTime.UtcNow) || (item.EndDateUtc.HasValue && item.EndDateUtc < DateTime.UtcNow))
+                    continue;
+
+                model.Slide.Add(new PublicInfoModel.Slider {
                     Link = item.Link,
                     PictureUrl = await GetPictureUrl(item.PictureId),
                     Name = item.GetTranslation(x => x.Name, _workContext.WorkingLanguage.Id),
@@ -48,7 +50,6 @@ namespace Widgets.Slider.ViewComponents
                 });
                 i++;
             }
-
         }
 
         public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData = null)
@@ -62,24 +63,24 @@ namespace Widgets.Slider.ViewComponents
             }
             if (widgetZone == SliderWidgetDefaults.WidgetZoneCategoryPage)
             {
-                var slides = await _sliderService.GetPictureSliders(SliderType.Category, additionalData.ToString());
+                var slides = await _sliderService.GetPictureSliders(SliderType.Category, additionalData?.ToString());
                 await PrepareModel(slides, model);
             }
             if (widgetZone == SliderWidgetDefaults.WidgetZoneCollectionPage)
             {
-                var slides = await _sliderService.GetPictureSliders(SliderType.Collection, additionalData.ToString());
+                var slides = await _sliderService.GetPictureSliders(SliderType.Collection, additionalData?.ToString());
                 await PrepareModel(slides, model);
             }
             if (widgetZone == SliderWidgetDefaults.WidgetZoneBrandPage)
             {
-                var slides = await _sliderService.GetPictureSliders(SliderType.Brand, additionalData.ToString());
+                var slides = await _sliderService.GetPictureSliders(SliderType.Brand, additionalData?.ToString());
                 await PrepareModel(slides, model);
             }
 
             if (!model.Slide.Any())
                 return Content("");
 
-            return View(this.GetViewPath(), model);
+            return View(model);
         }
     }
 }

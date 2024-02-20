@@ -3,7 +3,7 @@ namespace Grand.Domain.Blogs
     /// <summary>
     /// Represents a blog comment
     /// </summary>
-    public partial class BlogComment : BaseEntity
+    public class BlogComment : BaseEntity
     {
         /// <summary>
         /// Gets or sets the customer identifier
@@ -30,9 +30,5 @@ namespace Grand.Domain.Blogs
         /// </summary>
         public string BlogPostId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the date and time of instance creation
-        /// </summary>
-        public DateTime CreatedOnUtc { get; set; }
     }
 }

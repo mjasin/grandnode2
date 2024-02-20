@@ -1,13 +1,15 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Catalog.Services.Collections;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Catalog;
-using Grand.Domain.Data;
+using Grand.Data;
 using Grand.Infrastructure.Caching;
+using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Tests.Caching;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Catalog.Services.Collections.Tests
+namespace Grand.Business.Catalog.Tests.Services.Collections
 {
     [TestClass()]
     public class CollectionLayoutServiceTests
@@ -23,7 +25,7 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
             _repository = new MongoDBRepositoryTest<CollectionLayout>();
             _mediatorMock = new Mock<IMediator>();
 
-            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object);
+            _cacheBase = new MemoryCacheBase(MemoryCacheTest.Get(), _mediatorMock.Object, new CacheConfig { DefaultCacheTimeMinutes = 1});
             _collectionLayoutService = new CollectionLayoutService(_repository, _cacheBase, _mediatorMock.Object);
         }
 
@@ -47,7 +49,7 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
         public async Task GetCollectionLayoutByIdTest()
         {
             //Arrange
-            var collectionLayout = new CollectionLayout() {
+            var collectionLayout = new CollectionLayout {
                 Name = "test"
             };
             await _collectionLayoutService.InsertCollectionLayout(collectionLayout);
@@ -73,7 +75,7 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
         public async Task UpdateCollectionLayoutTest()
         {
             //Arrange
-            var categoryLayout = new CollectionLayout() {
+            var categoryLayout = new CollectionLayout {
                 Name = "test"
             };
             await _collectionLayoutService.InsertCollectionLayout(categoryLayout);
@@ -91,11 +93,11 @@ namespace Grand.Business.Catalog.Services.Collections.Tests
         {
 
             //Arrange
-            var collectionLayout1 = new CollectionLayout() {
+            var collectionLayout1 = new CollectionLayout {
                 Name = "test1"
             };
             await _collectionLayoutService.InsertCollectionLayout(collectionLayout1);
-            var collectionLayout2 = new CollectionLayout() {
+            var collectionLayout2 = new CollectionLayout {
                 Name = "test2"
             };
             await _collectionLayoutService.InsertCollectionLayout(collectionLayout2);

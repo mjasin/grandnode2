@@ -1,11 +1,12 @@
-﻿using Grand.Data.Tests.MongoDb;
+﻿using Grand.Business.Marketing.Services.Courses;
+using Grand.Data.Tests.MongoDb;
 using Grand.Domain.Courses;
-using Grand.Domain.Data;
+using Grand.Data;
 using MediatR;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Grand.Business.Marketing.Services.Courses.Tests
+namespace Grand.Business.Marketing.Tests.Services.Courses
 {
     [TestClass()]
     public class CourseLevelServiceTests
@@ -26,7 +27,7 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
         public async Task DeleteTest()
         {
             //Arrange
-            var courseLevel = new CourseLevel() {
+            var courseLevel = new CourseLevel {
                 Name = "test"
             };
             await _courseLevelService.Insert(courseLevel);
@@ -58,7 +59,7 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
         public async Task GetByIdTest()
         {
             //Arrange
-            var courseLevel = new CourseLevel() {
+            var courseLevel = new CourseLevel {
                 Name = "test"
             };
             await _courseLevelService.Insert(courseLevel);
@@ -75,7 +76,7 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
         public async Task InsertTest()
         {
             //Act
-            var courseLevel = new CourseLevel() {
+            var courseLevel = new CourseLevel {
                 Name = "test"
             };
             await _courseLevelService.Insert(courseLevel);
@@ -88,7 +89,7 @@ namespace Grand.Business.Marketing.Services.Courses.Tests
         public async Task UpdateTest()
         {
             //Arrange
-            var courseLevel = new CourseLevel() {
+            var courseLevel = new CourseLevel {
                 Name = "test"
             };
             await _courseLevelService.Insert(courseLevel);

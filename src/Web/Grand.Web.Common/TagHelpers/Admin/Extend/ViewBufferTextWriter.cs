@@ -1,10 +1,10 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
+using System.Text.Encodings.Web;
 
-namespace Grand.Web.Common.TagHelpers.Admin
+namespace Grand.Web.Common.TagHelpers.Admin.Extend
 {
     internal class ViewBufferTextWriter : TextWriter
     {
@@ -18,15 +18,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
         /// <param name="encoding">The <see cref="System.Text.Encoding"/>.</param>
         public ViewBufferTextWriter(ViewBuffer buffer, Encoding encoding)
         {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException(nameof(buffer));
-            }
-
-            if (encoding == null)
-            {
-                throw new ArgumentNullException(nameof(encoding));
-            }
+            ArgumentNullException.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(encoding);
 
             Buffer = buffer;
             Encoding = encoding;
@@ -43,25 +36,10 @@ namespace Grand.Web.Common.TagHelpers.Admin
         /// </param>
         public ViewBufferTextWriter(ViewBuffer buffer, Encoding encoding, HtmlEncoder htmlEncoder, TextWriter inner)
         {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException(nameof(buffer));
-            }
-
-            if (encoding == null)
-            {
-                throw new ArgumentNullException(nameof(encoding));
-            }
-
-            if (htmlEncoder == null)
-            {
-                throw new ArgumentNullException(nameof(htmlEncoder));
-            }
-
-            if (inner == null)
-            {
-                throw new ArgumentNullException(nameof(inner));
-            }
+            ArgumentNullException.ThrowIfNull(buffer);
+            ArgumentNullException.ThrowIfNull(encoding);
+            ArgumentNullException.ThrowIfNull(htmlEncoder);
+            ArgumentNullException.ThrowIfNull(inner);
 
             Buffer = buffer;
             Encoding = encoding;
@@ -96,17 +74,14 @@ namespace Grand.Web.Common.TagHelpers.Admin
         /// <inheritdoc />
         public override void Write(char[] buffer, int index, int count)
         {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException(nameof(buffer));
-            }
+            ArgumentNullException.ThrowIfNull(buffer);
 
             if (index < 0 || index >= buffer.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            if (count < 0 || (buffer.Length - index < count))
+            if (count < 0 || buffer.Length - index < count)
             {
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
@@ -236,25 +211,17 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 Buffer.AppendHtml(value.ToString());
                 return Task.CompletedTask;
             }
-            else
-            {
-                return _inner.WriteAsync(value);
-            }
+
+            return _inner.WriteAsync(value);
         }
 
         /// <inheritdoc />
         public override Task WriteAsync(char[] buffer, int index, int count)
         {
-            if (buffer == null)
-            {
-                throw new ArgumentNullException(nameof(buffer));
-            }
-
-            if (index < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-            if (count < 0 || (buffer.Length - index < count))
+            ArgumentNullException.ThrowIfNull(buffer);
+            ArgumentOutOfRangeException.ThrowIfNegative(index);
+            
+            if (count < 0 || buffer.Length - index < count)
             {
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
@@ -264,10 +231,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 Buffer.AppendHtml(new string(buffer, index, count));
                 return Task.CompletedTask;
             }
-            else
-            {
-                return _inner.WriteAsync(buffer, index, count);
-            }
+
+            return _inner.WriteAsync(buffer, index, count);
         }
 
         /// <inheritdoc />
@@ -278,10 +243,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 Buffer.AppendHtml(value);
                 return Task.CompletedTask;
             }
-            else
-            {
-                return _inner.WriteAsync(value);
-            }
+
+            return _inner.WriteAsync(value);
         }
 
         /// <inheritdoc />
@@ -320,10 +283,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 Buffer.AppendHtml(NewLine);
                 return Task.CompletedTask;
             }
-            else
-            {
-                return _inner.WriteLineAsync(value);
-            }
+
+            return _inner.WriteLineAsync(value);
         }
 
         /// <inheritdoc />
@@ -335,10 +296,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 Buffer.AppendHtml(NewLine);
                 return Task.CompletedTask;
             }
-            else
-            {
-                return _inner.WriteLineAsync(value, start, offset);
-            }
+
+            return _inner.WriteLineAsync(value, start, offset);
         }
 
         /// <inheritdoc />
@@ -350,10 +309,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 Buffer.AppendHtml(NewLine);
                 return Task.CompletedTask;
             }
-            else
-            {
-                return _inner.WriteLineAsync(value);
-            }
+
+            return _inner.WriteLineAsync(value);
         }
 
         /// <inheritdoc />
@@ -364,10 +321,8 @@ namespace Grand.Web.Common.TagHelpers.Admin
                 Buffer.AppendHtml(NewLine);
                 return Task.CompletedTask;
             }
-            else
-            {
-                return _inner.WriteLineAsync();
-            }
+
+            return _inner.WriteLineAsync();
         }
 
         /// <summary>

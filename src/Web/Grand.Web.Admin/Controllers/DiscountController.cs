@@ -5,7 +5,6 @@ using Grand.Business.Core.Interfaces.Catalog.Discounts;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
-using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Business.Core.Utilities.Common.Security;
 using Grand.Business.Core.Interfaces.Customers;
 using Grand.Domain;
@@ -31,7 +30,6 @@ namespace Grand.Web.Admin.Controllers
         private readonly IDiscountService _discountService;
         private readonly ITranslationService _translationService;
         private readonly IWorkContext _workContext;
-        private readonly IStoreService _storeService;
         private readonly IDateTimeService _dateTimeService;
         private readonly IGroupService _groupService;
 
@@ -44,7 +42,6 @@ namespace Grand.Web.Admin.Controllers
             IDiscountService discountService,
             ITranslationService translationService,
             IWorkContext workContext,
-            IStoreService storeService,
             IDateTimeService dateTimeService,
             IGroupService groupService)
         {
@@ -52,7 +49,6 @@ namespace Grand.Web.Admin.Controllers
             _discountService = discountService;
             _translationService = translationService;
             _workContext = workContext;
-            _storeService = storeService;
             _dateTimeService = dateTimeService;
             _groupService = groupService;
         }
@@ -62,7 +58,10 @@ namespace Grand.Web.Admin.Controllers
         #region Discounts
 
         //list
-        public IActionResult Index() => RedirectToAction("List");
+        public IActionResult Index()
+        {
+            return RedirectToAction("List");
+        }
 
         public IActionResult List()
         {
@@ -103,7 +102,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
 
                 var discount = await _discountViewModelService.InsertDiscountModel(model);
@@ -128,7 +127,7 @@ namespace Grand.Web.Admin.Controllers
             if (await _groupService.IsStaff(_workContext.CurrentCustomer))
             {
                 if (!discount.LimitedToStores || (discount.LimitedToStores && discount.Stores.Contains(_workContext.CurrentCustomer.StaffStoreId) && discount.Stores.Count > 1))
-                    Warning(_translationService.GetResource("admin.marketing.discounts.Permisions"));
+                    Warning(_translationService.GetResource("admin.marketing.discounts.Permissions"));
                 else
                 {
                     if (!discount.AccessToEntityByStore(_workContext.CurrentCustomer.StaffStoreId))
@@ -161,7 +160,7 @@ namespace Grand.Web.Admin.Controllers
             {
                 if (await _groupService.IsStaff(_workContext.CurrentCustomer))
                 {
-                    model.Stores = new[] { _workContext.CurrentCustomer.StaffStoreId };
+                    model.Stores = [_workContext.CurrentCustomer.StaffStoreId];
                 }
                 discount = await _discountViewModelService.UpdateDiscountModel(discount, model);
                 Success(_translationService.GetResource("admin.marketing.discounts.Updated"));
@@ -288,7 +287,7 @@ namespace Grand.Web.Admin.Controllers
         public async Task<IActionResult> GetDiscountRequirementConfigurationUrl(string rulesystemName, string discountId, string discountRequirementId)
         {
             if (string.IsNullOrEmpty(rulesystemName))
-                throw new ArgumentNullException("rulesystemName");
+                throw new ArgumentNullException(nameof(rulesystemName));
 
             var discountPlugin = _discountService.LoadDiscountProviderByRuleSystemName(rulesystemName);
 
