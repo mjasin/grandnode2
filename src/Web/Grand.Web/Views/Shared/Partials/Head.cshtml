@@ -3,8 +3,15 @@
 @{
     var supportRtl = workContext.WorkingLanguage.Rtl;
 
-    <script asp-location="Head" src="/bundles/app.runtime.bundle.js"></script>
-    <script asp-location="Head" src="/bundles/chunk-vendors.runtime.bundle.js"></script>
+    <link rel="preload" href="/bundles/libs.css" as="style" />
+    <environment include="Production">
+        <link rel="preload" href="/bundles/style.min.css" as="style" />
+    </environment>
+    <link rel="preload" href="/bundles/app.runtime.bundle.js" as="script" />
+    <link rel="preload" href="chunk-vendors.runtime.bundle.js" as="script" />
+
+    <script asp-location="Head" src="/bundles/app.runtime.bundle.js" defer></script>
+    <script asp-location="Head" src="/bundles/chunk-vendors.runtime.bundle.js" defer></script>
     <link asp-src="/bundles/libs.css" rel="stylesheet">
 
     <link rel="stylesheet" type="text/css" asp-src="/assets/custom/style.css">
