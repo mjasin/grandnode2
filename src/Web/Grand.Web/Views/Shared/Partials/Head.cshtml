@@ -4,7 +4,7 @@
     var supportRtl = workContext.WorkingLanguage.Rtl;
 
     <script asp-location="Head" src="/bundles/app.runtime.bundle.js"></script>
-    <script asp-location="Head" src="/bundles/chunk-vendors.runtime.bundle.js"></script>
+    <script asp-location="Head" src="/bundles/chunk-vendors.runtime.bundle.js" defer></script>
     <link asp-src="/bundles/libs.css" rel="stylesheet">
 
     <link rel="stylesheet" type="text/css" asp-src="/assets/custom/style.css">
@@ -40,8 +40,8 @@
         }
     </environment>
 
-    <script asp-location="Footer" asp-src="/theme/script/public.common.js" asp-order="201"></script>
-    <script asp-location="Footer" asp-src="/theme/script/public.axios.js" asp-order="202"></script>
-    <script asp-location="Footer" asp-src="/theme/script/app.js" asp-order="900"></script>
-    <script asp-location="Footer" asp-src="/assets/custom/script.js" asp-order="901"></script>
+    <script asp-location="Footer" asp-src="/theme/script/public.common.js" asp-order="201" defer></script>
+    <script asp-location="Footer" asp-src="/theme/script/public.axios.js" asp-order="202" defer></script>
+    <script asp-location="Footer" asp-src="/theme/script/app.js" asp-order="900" defer></script>
+    <script asp-location="Footer" asp-src="/assets/custom/script.js" asp-order="901" defer></script>
 }
