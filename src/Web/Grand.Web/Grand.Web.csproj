@@ -8,7 +8,8 @@
 		Either workstation or server can be used for two-processor computers.
 		Server garbage collection should be the fastest option for more than two processors.      
 		More details about GC you can see here: https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals-->
-		<ServerGarbageCollection>false</ServerGarbageCollection>
+		<ServerGarbageCollection>true</ServerGarbageCollection>
+		<GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
 		<PreserveCompilationReferences>true</PreserveCompilationReferences>
 		<DockerComposeProjectPath>..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
 		<UserSecretsId>a2091e37-94a0-4446-8a5d-1d5c0835333a</UserSecretsId>
@@ -28,7 +29,6 @@
 	<ItemGroup>
 		<Content Include="App_Data\**" CopyToPublishDirectory="PreserveNewest" Exclude="App_Data\appsettings.json;App_Data\DataProtectionKeys\*.xml;" />
 		<Content Include="Roslyn\**" CopyToPublishDirectory="PreserveNewest" Exclude="Roslyn\**\*.dll" />
-		<Content Include="logs\**" CopyToPublishDirectory="PreserveNewest" />
 		<Content Remove="wwwroot\assets\images\thumbs\*.jpeg;wwwroot\assets\images\thumbs\*.jpg;wwwroot\assets\images\thumbs\*.png" />
 	</ItemGroup>
 	<Target Name="PublishViews" BeforeTargets="PrepareForPublish">
@@ -39,7 +39,7 @@
 	</Target>
 	<!--<PropertyGroup>
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
-  </PropertyGroup>-->
+  	</PropertyGroup>-->
 	<ItemGroup>
 		<Content Remove="Plugins\**" />
 		<Compile Remove="Plugins\**" />

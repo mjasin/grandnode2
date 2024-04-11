@@ -8,6 +8,12 @@
 		<RepositoryUrl>https://github.com/grandnode/grandnode2</RepositoryUrl>
 		<PackageLicenseUrl>https://github.com/grandnode/grandnode2/blob/main/LICENSE</PackageLicenseUrl>
 		<RepositoryType>Git</RepositoryType>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>none</DebugType>
+		<Optimize>true</Optimize>
 	</PropertyGroup>
 	<ItemGroup>
 		<Using Include="System"/>
@@ -36,7 +42,7 @@
 	</ItemGroup>
 	<Target Name="SetVersion" BeforeTargets="PrepareForBuild">
 		<PropertyGroup>
-			<Version>2.2.0-develop</Version>
+			<Version>2.2.0-beta</Version>
 		</PropertyGroup>
 	</Target>
 </Project>

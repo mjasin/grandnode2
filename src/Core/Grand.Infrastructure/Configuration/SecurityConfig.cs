@@ -1,4 +1,7 @@
-﻿namespace Grand.Infrastructure.Configuration
+﻿
+using Microsoft.AspNetCore.Http;
+
+namespace Grand.Infrastructure.Configuration
 {
     public class SecurityConfig
     {
@@ -7,6 +10,11 @@
         /// </summary>
         public bool UseForwardedHeaders { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to force use https
+        /// </summary>
+        public bool ForceUseHTTPS { get; set; }
+        
         /// <summary>
         /// Gets or sets a value for allowedHosts, is used for host filtering to bind your app to specific hostnames
         /// </summary>
@@ -26,6 +34,16 @@
         /// </summary>
         public string CookiePrefix { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value for Cookie SameSite
+        /// </summary>
+        public SameSiteMode CookieSameSite { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value for Cookie SameSite for external authentication
+        /// </summary>
+        public SameSiteMode CookieSameSiteExternalAuth { get; set; }
+        
         /// <summary>
         /// Gets or sets a value for Cookie claim issuer 
         /// </summary>

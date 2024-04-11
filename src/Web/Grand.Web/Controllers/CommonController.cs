@@ -144,6 +144,7 @@ namespace Grand.Web.Controllers
         [DenySystemAccount]
         public virtual async Task<IActionResult> SetLanguage(
             [FromServices] AppConfig config,
+            [FromServices] IUserFieldService userFieldService,
             string langCode, string returnUrl = default)
         {
             var language = await _languageService.GetLanguageByCode(langCode);
@@ -167,7 +168,7 @@ namespace Grand.Web.Controllers
                 returnUrl = AddLanguageSeo(returnUrl, language);
             }
 
-            await _workContext.SetWorkingLanguage(language);
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.LanguageId, language.Id, _workContext.CurrentStore.Id);
 
             //notification
             await _mediator.Publish(new ChangeLanguageEvent(_workContext.CurrentCustomer, language));
@@ -217,15 +218,15 @@ namespace Grand.Web.Controllers
         {
             var currency = await currencyService.GetCurrencyByCode(currencyCode);
             if (currency != null)
-                await _workContext.SetWorkingCurrency(currency);
+            {
+                await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.CurrencyId, currency.Id, _workContext.CurrentStore.Id);
+            }
 
             //clear coupon code
-            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.DiscountCoupons,
-                "");
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.DiscountCoupons, "");
 
             //clear gift card
-            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.GiftVoucherCoupons,
-                "");
+            await userFieldService.SaveField(_workContext.CurrentCustomer, SystemCustomerFieldNames.GiftVoucherCoupons, "");
 
             //notification
             await _mediator.Publish(new ChangeCurrencyEvent(_workContext.CurrentCustomer, currency));
@@ -288,14 +289,13 @@ namespace Grand.Web.Controllers
         //available even when navigation is not allowed
         [PublicStore(true)]
         [HttpGet]
-        public virtual async Task<IActionResult> SetTaxType(int customerTaxType, string returnUrl = default)
+        public virtual async Task<IActionResult> SetTaxType(
+        [FromServices] TaxSettings taxSettings,
+            [FromServices] IUserFieldService userFieldService,
+            int customerTaxType, string returnUrl = default)
         {
             var taxDisplayType = (TaxDisplayType)Enum.ToObject(typeof(TaxDisplayType), customerTaxType);
-            await _workContext.SetTaxDisplayType(taxDisplayType);
-
-            //notification
-            await _mediator.Publish(new ChangeTaxTypeEvent(_workContext.CurrentCustomer, taxDisplayType));
-
+            
             //home page
             if (string.IsNullOrEmpty(returnUrl))
                 returnUrl = Url.RouteUrl("HomePage");
@@ -304,6 +304,17 @@ namespace Grand.Web.Controllers
             if (!Url.IsLocalUrl(returnUrl))
                 returnUrl = Url.RouteUrl("HomePage");
 
+            //whether customers are allowed to select tax display type
+            if (!taxSettings.AllowCustomersToSelectTaxDisplayType)
+                return Redirect(returnUrl);
+
+            //save passed value
+            await userFieldService.SaveField(_workContext.CurrentCustomer,
+                SystemCustomerFieldNames.TaxDisplayTypeId, (int)taxDisplayType, _workContext.CurrentStore.Id);
+
+            //notification
+            await _mediator.Publish(new ChangeTaxTypeEvent(_workContext.CurrentCustomer, taxDisplayType));
+           
             return Redirect(returnUrl);
         }
 
