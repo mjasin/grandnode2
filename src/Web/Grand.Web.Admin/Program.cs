@@ -14,7 +14,7 @@ builder.Host.UseDefaultServiceProvider((_, options) =>
 });
 
 //add configuration
-builder.Configuration.AddAppSettingsJsonFile(args);
+builder.Configuration.AddAppSettingsJsonFile(args, builder.Environment);
 
 //add services
 Grand.Infrastructure.StartupBase.ConfigureServices(builder.Services, builder.Configuration);

@@ -7,21 +7,26 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Grand.Web.Common.Extensions
 {
-    public static class ConfigurationExtensions
+	public static class ConfigurationExtensions
     {
 
-        public static void AddAppSettingsJsonFile(this IConfigurationManager configuration, string[] args)
+        public static void AddAppSettingsJsonFile(this IConfigurationManager configuration, string[] args, IWebHostEnvironment environment)
         {
-            configuration.AddJsonFile("App_Data/appsettings.json");
-            configuration.AddEnvironmentVariables();
-            if (args.Any())
+			const string appDataPath = "App_Data";
+
+			configuration.AddJsonFile(Path.Combine(appDataPath, "appsettings.json"), optional: false, reloadOnChange: true);
+			configuration.AddJsonFile(Path.Combine(appDataPath, $"appsettings.{environment}.json"), optional: true, reloadOnChange: true);
+			configuration.AddEnvironmentVariables();
+            if (args.Length != 0)
             {
                 configuration.AddCommandLine(args);
                 var appSettings = configuration["appsettings"];
                 if (!string.IsNullOrEmpty(appSettings))
                 {
-                    configuration.AddJsonFile($"App_Data/{appSettings}/appsettings.json");
-                }
+					var pathRoot = Path.Combine(appDataPath, appSettings);
+					configuration.AddJsonFile(Path.Combine(pathRoot, "appsettings.json"), optional: false, reloadOnChange: true);
+					configuration.AddJsonFile(Path.Combine(pathRoot, $"appsettings.{environment}.json"), optional: true, reloadOnChange: true);
+				}
             }
         }
         public static void ConfigureApplicationSettings(this WebApplicationBuilder builder)

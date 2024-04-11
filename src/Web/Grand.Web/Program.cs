@@ -13,7 +13,7 @@ builder.Host.UseDefaultServiceProvider((_, options) =>
 });
 
 //add configuration
-builder.Configuration.AddAppSettingsJsonFile(args);
+builder.Configuration.AddAppSettingsJsonFile(args, builder.Environment);
 
 //add services
 StartupBase.ConfigureServices(builder.Services, builder.Configuration);
