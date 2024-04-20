@@ -30,7 +30,7 @@
                 <b-card-img-lazy class="hover-img" alt="@Model.SecondPictureModel.AlternateText" src="@Model.SecondPictureModel.ImageUrl"></b-card-img-lazy>
             }
         </a>
-        <a title="@Loc["Products.QuickView"]" class="btn btn-secondary quick-view-button" data-target="ModalQuickView" onclick="AxiosCart.quickview_product('@quickviewurl');return false;">
+        <a title="@Loc["Products.QuickView"]" href="@Url.RouteUrl("Product", new { Model.SeName })" class="btn btn-secondary quick-view-button" data-target="ModalQuickView" onclick="AxiosCart.quickview_product('@quickviewurl');return false;">
             <b-icon icon="search"></b-icon>
             <span>@Loc["Products.QuickView"]</span>
         </a>

@@ -1,1 +1,564 @@
-﻿axios.defaults.showLoader = !0; var vm = new Vue({ el: "#app", data: function () { return { show: !1, hover: !1, darkMode: !1, active: !1, NextDropdownVisible: !1, value: 5, flycartfirstload: !0, PopupAddToCartVueModal: null, PopupQuickViewVueModal: null, index: null, RelatedProducts: null, compareproducts: null, compareProductsQty: 0, loader: !1 } }, props: { flycart: null, flycartitems: null, flycartindicator: void 0, flywish: null, wishlistitems: null, wishindicator: void 0, UpdatedShoppingCartItemId: null }, mounted: function () { "true" == localStorage.fluid && (this.fluid = "fluid"), "fluid" == localStorage.fluid && (this.fluid = "fluid"), "" == localStorage.fluid && (this.fluid = "false"), "true" == localStorage.darkMode && (this.darkMode = !0), this.wishindicator = parseInt(this.$refs.wishlistQty.innerText), this.updateCompareProductsQty(), this.backToTop() }, watch: { fluid: function (e) { localStorage.fluid = e }, darkMode: function (e) { localStorage.darkMode = e }, PopupQuickViewVueModal: function () { vm.getLinkedProductsQV(vm.PopupQuickViewVueModal.Id) } }, created: function () { axios.interceptors.request.use((e => { e.showLoader && (document.getElementById("app").setAttribute("v-cloak", !0), document.querySelector(".page-loader-container").classList.add("axios-request")); return e }), (e => (e.config.showLoader && document.getElementById("app").removeAttribute("v-cloak"), Promise.reject(e)))), axios.interceptors.response.use((e => (e.config.showLoader && document.getElementById("app").removeAttribute("v-cloak"), e)), (e => (e.response.config.showLoader && document.getElementById("app").removeAttribute("v-cloak"), Promise.reject(e)))) }, methods: { backToTop() { if (!document.querySelector(".up-btn")) { const e = document.createElement("div"), t = document.createElement("div"); e.classList.add("up-btn", "up-btn__hide"), document.body.append(e), e.append(t), window.addEventListener("scroll", (() => { var t; t = 400, document.documentElement.scrollTop >= t ? e.classList.remove("up-btn__hide") : e.classList.add("up-btn__hide") })), e.addEventListener("click", (() => { window.scrollTo({ top: 0, behavior: "smooth" }) })) } }, newsletterBox(e, t) { let a; a = !e || this.$refs.newsletterSubscribe.checked; var o = { subscribe: a, email: document.getElementById("newsletter-email").value }; axios({ url: t, params: o, method: "post" }).then((function (e) { let t, a = e.data.Result, o = e.data.ResultCategory, i = e.data.Showcategories; t = e.data.Success ? "info" : "danger", vm.$bvToast.toast(a, { variant: t, autoHideDelay: 3500, solid: !0 }), i && vm.displayPopup(o, "ModalNewsletterCategory") })) }, newsletterSubscribeCategory(e) { let t = document.getElementById("newsletter-category-method-form"), a = new FormData(t); axios({ url: e, method: "post", data: a }).then((function (e) { e.data.Success || alert(e.data.Message) })).catch((function (e) { alert(e) })) }, getPrivacyPreference(e) { axios({ url: e, method: "get" }).then((function (e) { vm.displayPopup(e.data.html, "ModalPrivacyPreference") })).catch((function (e) { alert(e) })) }, savePrivacyPreference(e) { let t = document.getElementById("frmPrivacyPreference"), a = new FormData(t); axios({ url: e, method: "post", data: a }).catch((function (e) { alert(e) })) }, displayPopup(e, t) { new Vue({ el: "#" + t, data: { template: null }, render: function (e) { return this.template ? this.template() : e("b-overlay", { attrs: { show: "true" } }) }, methods: { showModal: function () { this.$refs[t].show() } }, mounted: function () { this.template = Vue.compile(e).render, this.darkMode = vm.darkMode }, updated: function () { this.showModal() } }) }, displayBarNotification(e, t, a, o) { var i; i = "error" == a ? "danger" : "info", this.$bvToast.toast(e, { title: a, variant: i, href: t, autoHideDelay: o, solid: !0 }) }, deletecartitem: function (e) { return axios({ method: "post", baseURL: e }).then((function (e) { const t = e.data.sidebarshoppingcartmodel; vm.flycart = t, vm.flycartitems = t.Items, vm.flycartindicator = t.TotalProducts })).catch((function (e) { alert(e) })), !1 }, updateCompareProductsQty: function () { const e = AxiosCart.getCookie("Grand.CompareProduct"); if ("" !== e) { const t = e.split("|").filter(Boolean).length; this.compareProductsQty = t } else this.compareProductsQty = 0 }, updateSidebarShoppingCart: function (e) { axios({ baseURL: e, method: "get", data: null, headers: { Accept: "application/json", "Content-Type": "application/json" }, showLoader: !1 }).then((e => (this.flycart = e.data, this.flycartitems = e.data.Items, this.flycartindicator = e.data.TotalProducts, this.flycartfirstload = !1))) }, updateWishlist: function (e) { axios({ baseURL: e, method: "get", data: null, headers: { Accept: "application/json", "Content-Type": "application/json" }, showLoader: !1 }).then((e => (this.loader = !1, this.flywish = e.data, this.wishlistitems = e.data.Items, this.wishindicator = e.data.Items.length))) }, getCompareList: function (e) { this.loader = !0, axios({ baseURL: e, method: "get", params: { t: (new Date).getTime() }, data: null, headers: { Accept: "application/json", "Content-Type": "application/json" }, showLoader: !1 }).then((e => { this.loader = !1, this.compareproducts = e.data })) }, removeFromCompareList: function (e, t) { if (void 0 !== e) { const a = AxiosCart.getCookie("Grand.CompareProduct").replace(e, ""); AxiosCart.setCookie("Grand.CompareProduct", a), vm.compareproducts.Products.splice(t, 1) } else AxiosCart.setCookie("Grand.CompareProduct", ""), vm.compareproducts.Products.splice(0); this.updateCompareProductsQty() }, showModalOutOfStock: function () { this.$refs["out-of-stock"].show() }, productImage: function (e) { var t = e.target.parentElement.getAttribute("data-href"); function a(e, t) { for (var a = 0, o = e.length; a < o; a++)if (e[a] == t) return !0; return !1 } var o = function (e, t) { for (var o = document.querySelectorAll(t), i = e.parentNode; i && !a(o, i);)i = i.parentNode; return i }(e.target, ".product-box"); o.querySelectorAll(".main-product-img")[0].setAttribute("src", t) }, formSubmit() { vm.$refs.form.submit() }, formSubmitParam(e, observer) { e && observer && observer.validate().then((success => { if (success) { var submitter = e.target.querySelector('[type="submit"]'); eval(submitter.dataset.form) } })) }, isMobile: function () { return void 0 !== window.orientation || -1 !== navigator.userAgent.indexOf("IEMobile") }, attrchange: function (e, t) { var a, o = document.getElementById("product-details-form"), i = new FormData(o); a = vm.PopupQuickViewVueModal.ProductBundleModels.length > 0 ? vm.PopupQuickViewVueModal.Id : e, axios({ url: "/product/productdetails_attributechange?productId=" + a + "&loadPicture=" + t, data: i, method: "post", params: { product: a } }).then((function (e) { if (vm.PopupQuickViewVueModal.ProductBundleModels.length > 0) e.data.price && (vm.PopupQuickViewVueModal.ProductPrice.Price = e.data.price); else { if (e.data.price && (0 == vm.PopupQuickViewVueModal.ProductType ? null != vm.PopupQuickViewVueModal.ProductPrice.PriceWithDiscount ? vm.PopupQuickViewVueModal.ProductPrice.PriceWithDiscount = e.data.price : vm.PopupQuickViewVueModal.ProductPrice.Price = e.data.price : vm.PopupQuickViewVueModal.AssociatedProducts.find((e => e.Id === a)).ProductPrice.Price = e.data.price), e.data.sku && (vm.PopupQuickViewVueModal.Sku = e.data.sku), e.data.mpn && (vm.PopupQuickViewVueModal.Mpn = e.data.mpn), e.data.gtin && (vm.PopupQuickViewVueModal.Gtin = e.data.gtin), e.data.stockAvailability && (vm.PopupQuickViewVueModal.StockAvailability = e.data.stockAvailability), e.data.enabledattributemappingids) for (var t = 0; t < e.data.enabledattributemappingids.length; t++)document.querySelector("#product_attribute_label_" + e.data.enabledattributemappingids[t]).style.display = "table-cell", document.querySelector("#product_attribute_input_" + e.data.enabledattributemappingids[t]).style.display = "table-cell"; if (e.data.disabledattributemappingids) for (t = 0; t < e.data.disabledattributemappingids.length; t++)document.querySelector("#product_attribute_label_" + e.data.disabledattributemappingids[t]).style.display = "none", document.querySelector("#product_attribute_input_" + e.data.disabledattributemappingids[t]).style.display = "none"; null !== e.data.pictureDefaultSizeUrl && (vm.PopupQuickViewVueModal.DefaultPictureModel.ImageUrl = e.data.pictureDefaultSizeUrl) } })) }, uploadFile: function (e) { var t = new FormData, a = e.getAttribute("data-url"); t.append("image", qqfile.files[0]), axios.post(a, t, { headers: { "Content-Type": "multipart/form-data" } }).then((function (t) { if (t.data.success) { var a = t.data.message, o = t.data.downloadGuid, i = t.data.downloadUrl, r = document.querySelector(".download-file"), d = document.getElementById("download-message"); e.setAttribute("qq-button-id", o), document.querySelector(".hidden-upload-input").value = o, d.style.display = "block", d.classList.remove("alert-danger"), d.classList.add("alert-info"), d.innerText = a, r.style.display = "block", r.children[0].setAttribute("href", i) } else { a = t.data.message; (d = document.getElementById("download-message")).style.display = "block", d.classList.remove("alert-info"), d.classList.add("alert-danger"), d.innerText = a } })) }, initReservationQV: function () { if (null !== vm.PopupQuickViewVueModal && 20 == vm.PopupQuickViewVueModal.ProductType) { var e = vm.PopupQuickViewVueModal.Id, t = vm.PopupQuickViewVueModal.ReservationFullDate, a = vm.PopupQuickViewVueModal.ReservationYear, o = vm.PopupQuickViewVueModal.ReservationMonth; Reservation.init(t, a, o, "No available reservations", "/Product/GetDatesForMonth", e, "/product/productdetails_attributechange?productId=" + e) } }, getLinkedProductsQV: function (e) { axios({ url: "/Product/RelatedProducts", method: "get", params: { productId: e }, headers: { Accept: "application/json", "Content-Type": "application/json" } }).then((function (e) { vm.RelatedProducts = e.data })) }, warehouse_change_handler(e, t) { var a = new FormData; a.append("warehouseId", document.getElementById("WarehouseId").value), a.append("productId", e), axios({ url: t, data: a, method: "post" }).then((function (e) { e.data.stockAvailability && (vm.PopupQuickViewVueModal.StockAvailability = e.data.stockAvailability) })) }, formatDate(e) { var t = new Date(e), a = "" + (t.getMonth() + 1), o = "" + t.getDate(), i = t.getFullYear(); return a.length < 2 && (a = "0" + a), o.length < 2 && (o = "0" + o), [a, o, i].join("/") }, QuickViewShown: function () { var e, t; vm.PopupQuickViewVueModal.ProductAttributes.length > 0 ? vm.attrchange(vm.PopupQuickViewVueModal.Id, !0) : vm.PopupQuickViewVueModal.ProductBundleModels.length > 0 && vm.attrchange(vm.PopupQuickViewVueModal.Id, !0); 20 == vm.PopupQuickViewVueModal.ProductType && (10 == vm.PopupQuickViewVueModal.IntervalUnit ? (null !== vm.PopupQuickViewVueModal.RentalStartDateUtc && (e = this.formatDate(vm.PopupQuickViewVueModal.RentalStartDateUtc), vm.PopupQuickViewVueModal.RentalStartDateUtc = e), null !== vm.PopupQuickViewVueModal.RentalEndDateUtc && (t = this.formatDate(vm.PopupQuickViewVueModal.RentalEndDateUtc), vm.PopupQuickViewVueModal.RentalEndDateUtc = t)) : null !== vm.PopupQuickViewVueModal.RentalStartDateUtc ? vm.PopupQuickViewVueModal.RentalStartDateUtc = this.formatDate(vm.PopupQuickViewVueModal.RentalStartDateUtc) : vm.PopupQuickViewVueModal.RentalStartDateUtc = null) } } });
+﻿axios.defaults.showLoader = true;
+
+var vm = new Vue({
+    el: '#app',
+    data: function () {
+        return {
+            show: false,
+            hover: false,
+            darkMode: false,
+            active: false,
+            NextDropdownVisible: false,
+            value: 5,
+            flycartfirstload: true,
+            PopupAddToCartVueModal: null,
+            PopupQuickViewVueModal: null,
+            index: null,
+            RelatedProducts: null,
+            compareproducts: null,
+            compareProductsQty: 0,
+            loader: false,
+        }
+    },
+    props: {
+        flycart: null,
+        flycartitems: null,
+        flycartindicator: undefined,
+        flywish: null,
+        wishlistitems: null,
+        wishindicator: undefined,
+        UpdatedShoppingCartItemId: null,
+    },
+    mounted: function () {
+        if (localStorage.fluid == "true") this.fluid = "fluid";
+        if (localStorage.fluid == "fluid") this.fluid = "fluid";
+        if (localStorage.fluid == "") this.fluid = "false";
+        if (localStorage.darkMode == "true") this.darkMode = true;
+        this.wishindicator = parseInt(this.$refs.wishlistQty.innerText);
+        this.updateCompareProductsQty();
+        this.backToTop();
+    },
+    watch: {
+        fluid: function (newName) {
+            localStorage.fluid = newName;
+        },
+        darkMode: function (newValue) {
+            localStorage.darkMode = newValue;
+        },
+        PopupQuickViewVueModal: function () {
+            vm.getLinkedProductsQV(vm.PopupQuickViewVueModal.Id);
+        }
+    },
+    //created: function () {
+    //    axios.interceptors.request.use(
+    //        config => {
+    //            if (config.showLoader) {
+    //                document.getElementById("app").setAttribute("v-cloak", true);
+    //                var element = document.querySelector(".page-loader-container");
+    //                element.classList.add("axios-request");
+    //            }
+    //            return config;
+    //        },
+    //        error => {
+    //            if (error.config.showLoader) {
+    //                document.getElementById("app").removeAttribute("v-cloak");
+    //            }
+    //            return Promise.reject(error);
+    //        }
+    //    );
+    //    axios.interceptors.response.use(
+    //        response => {
+    //            if (response.config.showLoader) {
+    //                document.getElementById("app").removeAttribute("v-cloak");
+    //            }
+
+    //            return response;
+    //        },
+    //        error => {
+    //            let response = error.response;
+
+    //            if (response.config.showLoader) {
+    //                document.getElementById("app").removeAttribute("v-cloak");
+    //            }
+
+    //            return Promise.reject(error);
+    //        }
+    //    )
+    //},
+    methods: {
+        backToTop() {
+            if (!document.querySelector('.up-btn')) {
+                const upBtn = document.createElement('div');
+                const upBtnContent = document.createElement('div');
+
+                upBtn.classList.add('up-btn', 'up-btn__hide');
+
+                function showBtn(num) {
+                    if (document.documentElement.scrollTop >= num) {
+                        upBtn.classList.remove('up-btn__hide');
+                    } else {
+                        upBtn.classList.add('up-btn__hide');
+                    }
+                }
+
+                document.body.append(upBtn);
+                upBtn.append(upBtnContent)
+                window.addEventListener('scroll', () => {
+                    showBtn(400);
+                });
+
+                upBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
+                });
+            }
+        },
+        newsletterBox(AllowToUnsubscribe, url) {
+            let subscribe;
+            if (AllowToUnsubscribe) {
+                subscribe = this.$refs.newsletterSubscribe.checked
+            } else {
+                subscribe = true
+            }
+            var postData = {
+                subscribe: subscribe,
+                email: document.getElementById("newsletter-email").value
+            };
+            axios({
+                url: url,
+                params: postData,
+                method: 'post',
+            }).then(function (response) {
+                let result = response.data.Result;
+                let resultCategory = response.data.ResultCategory;
+                let showCategories = response.data.Showcategories;
+                let success = response.data.Success;
+                let variant;
+
+                if (success) {
+                    variant = "info";
+                } else {
+                    variant = "danger";
+                }
+
+                vm.$bvToast.toast(result, {
+                    variant: variant,
+                    autoHideDelay: 3500,
+                    solid: true,
+                });
+
+                if (showCategories) {
+                    vm.displayPopup(resultCategory, 'ModalNewsletterCategory');
+                }
+
+            });
+        },
+        newsletterSubscribeCategory(url) {
+            let form = document.getElementById('newsletter-category-method-form');
+            let data = new FormData(form);
+            axios({
+                url: url,
+                method: 'post',
+                data: data,
+            }).then(function (response) {
+                if (!response.data.Success) {
+                    alert(response.data.Message);
+                }
+            }).catch(function (error) {
+                alert(error);
+            })
+        },
+        getPrivacyPreference(href) {
+            axios({
+                url: href,
+                method: 'get',
+            }).then(function (response) {
+                vm.displayPopup(response.data.html, 'ModalPrivacyPreference')
+            }).catch(function (error) {
+                alert(error);
+            });
+        },
+        savePrivacyPreference(href) {
+            let form = document.getElementById('frmPrivacyPreference');
+            let data = new FormData(form);
+            axios({
+                url: href,
+                method: 'post',
+                data: data
+            }).catch(function (error) {
+                alert(error);
+            });
+        },
+        displayPopup(html, el) {
+            new Vue({
+                el: '#' + el,
+                data: {
+                    template: null,
+                },
+                render: function (createElement) {
+                    if (!this.template) {
+                        return createElement('b-overlay', {
+                            attrs: {
+                                show: 'true'
+                            }
+                        });
+                    } else {
+                        return this.template();
+                    }
+                },
+                methods: {
+                    showModal: function () {
+                        this.$refs[el].show()
+                    }
+                },
+                mounted: function () {
+                    var self = this;
+                    self.template = Vue.compile(html).render;
+                    this.darkMode = vm.darkMode;
+                },
+                updated: function () {
+                    this.showModal();
+                }
+            });
+        },
+        displayBarNotification(message, url, messagetype, timeout) {
+            var variant;
+
+            if (messagetype == 'error') {
+                variant = "danger";
+            } else {
+                variant = "info";
+            }
+
+            this.$bvToast.toast(message, {
+                title: messagetype,
+                variant: variant,
+                href: url,
+                autoHideDelay: timeout,
+                solid: true
+            })
+        },
+        deletecartitem: function (href) {
+            axios({
+                method: "post",
+                baseURL: href
+            }).then(function (response) {
+                const newfly = response.data.sidebarshoppingcartmodel;
+                vm.flycart = newfly;
+                vm.flycartitems = newfly.Items;
+                vm.flycartindicator = newfly.TotalProducts;
+            }).catch(function (error) {
+                alert(error);
+            });
+            return false;
+        },
+        updateCompareProductsQty: function () {
+            const cookie = AxiosCart.getCookie('Grand.CompareProduct');
+            if (cookie !== '') {
+                const qty = cookie.split('|').filter(Boolean).length;
+                this.compareProductsQty = qty;
+            } else {
+                this.compareProductsQty = 0;
+            }
+        },
+        updateSidebarShoppingCart: function (url) {
+            axios({
+                baseURL: url,
+                method: 'get',
+                data: null,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                showLoader: false
+            }).then(response => (
+                this.flycart = response.data,
+                this.flycartitems = response.data.Items,
+                this.flycartindicator = response.data.TotalProducts,
+                this.flycartfirstload = false
+            ))
+        },
+        updateWishlist: function (url) {
+            axios({
+                baseURL: url,
+                method: 'get',
+                data: null,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                showLoader: false
+            }).then(response => (
+                this.loader = false,
+                this.flywish = response.data,
+                this.wishlistitems = response.data.Items,
+                this.wishindicator = response.data.Items.length
+            ))
+        },
+        getCompareList: function (url) {
+            this.loader = true;
+            axios({
+                baseURL: url,
+                method: 'get',
+                params: {
+                    t: new Date().getTime()
+                },
+                data: null,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                showLoader: false
+            }).then(response => {
+                this.loader = false;
+                this.compareproducts = response.data
+            })
+        },
+        removeFromCompareList: function (product, index) {
+            if (product !== undefined) {
+                const compareList = AxiosCart.getCookie('Grand.CompareProduct');
+                const newCompareList = compareList.replace(product, '');
+                AxiosCart.setCookie('Grand.CompareProduct', newCompareList);
+                vm.compareproducts.Products.splice(index, 1);
+            } else {
+                AxiosCart.setCookie('Grand.CompareProduct', '');
+                vm.compareproducts.Products.splice(0);
+            }
+            this.updateCompareProductsQty();
+        },
+        showModalOutOfStock: function () {
+            this.$refs['out-of-stock'].show()
+        },
+        productImage: function (event) {
+            var Imagesrc = event.target.parentElement.getAttribute('data-href');
+            function collectionHas(a, b) {
+                for (var i = 0, len = a.length; i < len; i++) {
+                    if (a[i] == b) return true;
+                }
+                return false;
+            }
+            function findParentBySelector(elm, selector) {
+                var all = document.querySelectorAll(selector);
+                var cur = elm.parentNode;
+                while (cur && !collectionHas(all, cur)) {
+                    cur = cur.parentNode;
+                }
+                return cur;
+            }
+
+            var yourElm = event.target
+            var selector = ".product-box";
+            var parent = findParentBySelector(yourElm, selector);
+            var Image = parent.querySelectorAll(".main-product-img")[0];
+            Image.setAttribute('src', Imagesrc);
+        },
+        formSubmit() {
+            vm.$refs.form.submit();
+        },
+        formSubmitParam(e, observer) {
+            if (e && observer) {
+                observer.validate().then(success => {
+                    if (!success) {
+                        return
+                    } else {
+                        var submitter = e.target.querySelector('[type="submit"]');
+                        eval(submitter.dataset.form)
+                    }
+                });
+            }
+        },
+        isMobile: function () {
+            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+        },
+        attrchange: function (productId, loadPicture) {
+            var form = document.getElementById('product-details-form');
+            var data = new FormData(form);
+            var pId;
+
+            if (vm.PopupQuickViewVueModal.ProductBundleModels.length > 0) {
+                pId = vm.PopupQuickViewVueModal.Id;
+            } else {
+                pId = productId;
+            }
+
+            axios({
+                url: '/product/productdetails_attributechange?productId=' + pId + '&loadPicture=' + loadPicture,
+                data: data,
+                method: 'post',
+                params: { product: pId },
+            }).then(function (response) {
+                if (vm.PopupQuickViewVueModal.ProductBundleModels.length > 0) {
+                    if (response.data.price) {
+                        vm.PopupQuickViewVueModal.ProductPrice.Price = response.data.price;
+                    }
+                } else {
+                    if (response.data.price) {
+                        if (vm.PopupQuickViewVueModal.ProductType == 0) {
+                            if (vm.PopupQuickViewVueModal.ProductPrice.PriceWithDiscount != null)
+                                vm.PopupQuickViewVueModal.ProductPrice.PriceWithDiscount = response.data.price;
+                            else
+                                vm.PopupQuickViewVueModal.ProductPrice.Price = response.data.price;
+                        } else {
+                            vm.PopupQuickViewVueModal.AssociatedProducts.find(x => x.Id === pId).ProductPrice.Price = response.data.price;
+                        }
+                    }
+                    if (response.data.sku) {
+                        vm.PopupQuickViewVueModal.Sku = response.data.sku;
+                    }
+                    if (response.data.mpn) {
+                        vm.PopupQuickViewVueModal.Mpn = response.data.mpn;
+                    }
+                    if (response.data.gtin) {
+                        vm.PopupQuickViewVueModal.Gtin = response.data.gtin;
+                    }
+                    if (response.data.stockAvailability) {
+                        vm.PopupQuickViewVueModal.StockAvailability = response.data.stockAvailability;
+                    }
+                    if (response.data.enabledattributemappingids) {
+                        for (var i = 0; i < response.data.enabledattributemappingids.length; i++) {
+                            document.querySelector('#product_attribute_label_' + response.data.enabledattributemappingids[i]).style.display = "table-cell";
+                            document.querySelector('#product_attribute_input_' + response.data.enabledattributemappingids[i]).style.display = "table-cell";
+                        }
+                    }
+                    if (response.data.disabledattributemappingids) {
+                        for (var i = 0; i < response.data.disabledattributemappingids.length; i++) {
+                            document.querySelector('#product_attribute_label_' + response.data.disabledattributemappingids[i]).style.display = "none";
+                            document.querySelector('#product_attribute_input_' + response.data.disabledattributemappingids[i]).style.display = "none";
+                        }
+                    }
+                    /*if (response.data.notAvailableAttributeMappingids) {
+                        document.querySelectorAll('[data-disable]').forEach((element) => element.disabled = false);
+                        for (var i = 0; i < response.data.notAvailableAttributeMappingids.length; i++) {
+                            if (document.querySelectorAll("[data-disable='" + response.data.notAvailableAttributeMappingids[i] + "']").length > 0) {
+                                document.querySelectorAll("[data-disable='" + response.data.notAvailableAttributeMappingids[i] + "']")[0].disabled = true;
+                            }
+                        }
+                    }*/
+                    if (response.data.pictureDefaultSizeUrl !== null) {
+                        vm.PopupQuickViewVueModal.DefaultPictureModel.ImageUrl = response.data.pictureDefaultSizeUrl;
+                    }
+                }
+            });
+        },
+        uploadFile: function (e) {
+            var formData = new FormData();
+            var imagefile = e;
+            var url = imagefile.getAttribute('data-url');
+            formData.append("image", qqfile.files[0]);
+            axios.post(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(function (response) {
+                if (response.data.success) {
+                    var message = response.data.message;
+                    var downloadGuid = response.data.downloadGuid;
+                    var downloadUrl = response.data.downloadUrl;
+                    var downloadBtn = document.querySelector('.download-file');
+                    var messageContainer = document.getElementById('download-message');
+
+                    e.setAttribute('qq-button-id', downloadGuid);
+                    document.querySelector('.hidden-upload-input').value = downloadGuid;
+
+                    messageContainer.style.display = "block";
+                    messageContainer.classList.remove('alert-danger');
+                    messageContainer.classList.add('alert-info');
+                    messageContainer.innerText = message;
+
+                    downloadBtn.style.display = "block";
+                    downloadBtn.children[0].setAttribute('href', downloadUrl);
+
+                } else {
+                    var message = response.data.message;
+                    var messageContainer = document.getElementById('download-message');
+                    messageContainer.style.display = "block";
+                    messageContainer.classList.remove('alert-info');
+                    messageContainer.classList.add('alert-danger');
+                    messageContainer.innerText = message;
+                }
+            })
+        },
+        initReservationQV: function () {
+            if (vm.PopupQuickViewVueModal !== null && vm.PopupQuickViewVueModal.ProductType == 20) {
+                var productId = vm.PopupQuickViewVueModal.Id;
+                var fullDate = vm.PopupQuickViewVueModal.ReservationFullDate;
+                var year = vm.PopupQuickViewVueModal.ReservationYear;
+                var month = vm.PopupQuickViewVueModal.ReservationMonth;
+                Reservation.init(fullDate, year, month, "No available reservations", "/Product/GetDatesForMonth", productId, "/product/productdetails_attributechange?productId=" + productId);
+            }
+        },
+        getLinkedProductsQV: function (id) {
+            axios({
+                url: '/Product/RelatedProducts',
+                method: 'get',
+                params: { "productId": id },
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }).then(function (response) {
+                vm.RelatedProducts = response.data;
+            });
+        },
+        warehouse_change_handler(id, url) {
+            var data = new FormData();
+            data.append('warehouseId', document.getElementById('WarehouseId').value);
+            data.append('productId', id);
+            axios({
+                url: url,
+                data: data,
+                method: 'post'
+            }).then(function (response) {
+                if (response.data.stockAvailability) {
+                    vm.PopupQuickViewVueModal.StockAvailability = response.data.stockAvailability;
+                }
+            })
+        },
+        formatDate(date) {
+            var d = new Date(date),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+
+            if (month.length < 2)
+                month = '0' + month;
+            if (day.length < 2)
+                day = '0' + day;
+
+            return [month, day, year].join('/');
+        },
+        QuickViewShown: function () {
+            if (vm.PopupQuickViewVueModal.ProductAttributes.length > 0) {
+                vm.attrchange(vm.PopupQuickViewVueModal.Id, true)
+            } else {
+                var bundleProducts = vm.PopupQuickViewVueModal.ProductBundleModels;
+                if (bundleProducts.length > 0) {
+                    vm.attrchange(vm.PopupQuickViewVueModal.Id, true)
+                }
+            }
+            if (vm.PopupQuickViewVueModal.ProductType == 20) {
+                var StartDate;
+                var EndDate;
+                if (vm.PopupQuickViewVueModal.IntervalUnit == 10) {
+                    if (vm.PopupQuickViewVueModal.RentalStartDateUtc !== null) {
+                        StartDate = this.formatDate(vm.PopupQuickViewVueModal.RentalStartDateUtc);
+                        vm.PopupQuickViewVueModal.RentalStartDateUtc = StartDate;
+                    }
+                    if (vm.PopupQuickViewVueModal.RentalEndDateUtc !== null) {
+                        EndDate = this.formatDate(vm.PopupQuickViewVueModal.RentalEndDateUtc);
+                        vm.PopupQuickViewVueModal.RentalEndDateUtc = EndDate;
+                    }
+                } else {
+                    if (vm.PopupQuickViewVueModal.RentalStartDateUtc !== null) {
+                        vm.PopupQuickViewVueModal.RentalStartDateUtc = this.formatDate(vm.PopupQuickViewVueModal.RentalStartDateUtc);
+                    } else {
+                        vm.PopupQuickViewVueModal.RentalStartDateUtc = null;
+                    }
+                }
+            }
+        },
+
+    },
+});
