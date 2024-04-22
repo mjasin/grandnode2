@@ -9,11 +9,15 @@
     </environment>
     <link rel="preload" href="/bundles/app.runtime.bundle.js" as="script" />
     <link rel="preload" href="/bundles/chunk-vendors.runtime.bundle.js" as="script" />
+    <link rel="preload" href="/theme/script/public.common.js" as="script" />
+    <link rel="preload" href="/theme/script/public.axios.js" as="script" />
     <link rel="preload" href="/theme/script/app.js" as="script" />
     
 
     <script asp-location="Head" src="/bundles/app.runtime.bundle.js"></script>
     <script asp-location="Head" src="/bundles/chunk-vendors.runtime.bundle.js"></script>
+    <script asp-location="Head" src="/theme/script/public.common.js"></script>
+    <script asp-location="Head" src="/theme/script/public.axios.js"></script>
     <link asp-src="/bundles/libs.css" rel="stylesheet">
 
     <link rel="stylesheet" type="text/css" asp-src="/assets/custom/style.css">
@@ -49,8 +53,6 @@
         }
     </environment>
 
-    <script asp-location="Footer" asp-src="/theme/script/public.common.js" asp-order="201"></script>
-    <script asp-location="Footer" asp-src="/theme/script/public.axios.js" asp-order="202"></script>
     <script asp-location="Footer" asp-src="/theme/script/app.js" asp-order="900"></script>
     <script asp-location="Footer" asp-src="/assets/custom/script.js" asp-order="901" defer></script>
 }

@@ -30,7 +30,7 @@
                 <b-card-img-lazy class="hover-img" alt="@Model.SecondPictureModel.AlternateText" src="@Model.SecondPictureModel.ImageUrl"></b-card-img-lazy>
             }
         </a>
-        <button title="@Loc["Products.QuickView"]" href="@Url.RouteUrl("Product", new { Model.SeName })" class="btn btn-secondary quick-view-button" data-target="ModalQuickView" onclick="AxiosCart.quickview_product('@quickviewurl');return false;">
+        <button v-if="isMobile() === false" title="@Loc["Products.QuickView"]" href="@Url.RouteUrl("Product", new { Model.SeName })" class="btn btn-secondary quick-view-button" data-target="ModalQuickView" onclick="AxiosCart.quickview_product('@quickviewurl');return false;">
             <b-icon icon="search"></b-icon>
             <span>@Loc["Products.QuickView"]</span>
         </button>
@@ -117,7 +117,7 @@
             </div>
         </div>
     </div>
-    <div class="card-footer">
+    <div v-if="isMobile() === false" class="card-footer">
         @if (Model.SpecificationAttributeModels.Any())
         {
             <div class="spec-container">
