@@ -2,7 +2,7 @@
 <div class="picture-container">
     <a class="img-container" :href="Model.Url" :title="Model.DefaultPictureModel.Title">
         <b-card-img-lazy :alt="Model.DefaultPictureModel.AlternateText" class="main-product-img" :src="Model.DefaultPictureModel.ImageUrl" :title="Model.DefaultPictureModel.Title"></b-card-img-lazy>
-        <template v-if="Model.SecondPictureModel.ImageUrl !== null">
+        <template v-if="Model.SecondPictureModel.ImageUrl !== null && isMobile() === false">
             <b-card-img-lazy class="hover-img" :alt="Model.SecondPictureModel.AlternateText" :src="Model.SecondPictureModel.ImageUrl"></b-card-img-lazy>
         </template>
     </a>
