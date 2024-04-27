@@ -34,7 +34,9 @@
                 <template v-else>
                     <b-form-rating :id="'rating-inline-grid-' + Model.Id" class="p-0" variant="warning" no-border size="sm" show-value precision="2" readonly inline :value="0"></b-form-rating>
                 </template>
-                <b-link :href="Model.Url">{{Model.ReviewOverviewModel.TotalReviews}} @Loc["Reviews.Overview.Reviews"]</b-link>
+                <template v-if="isMobile() === false">
+                    <b-link :href="Model.Url">{{Model.ReviewOverviewModel.TotalReviews}} @Loc["Reviews.Overview.Reviews"]</b-link>
+                </template>
             </div>
         </template>
         <template v-if="Model.ProductType == 40">
@@ -90,7 +92,8 @@
         </div>
     </div>
 </div>
-<div v-if="isMobile() === false" class="card-footer">
+<template v-if="isMobile() === false">
+    <div class="card-footer">
     <template v-if="Model.SpecificationAttributeModels.length > 0">
         <div class="spec-container">
             <table>
@@ -237,4 +240,5 @@
         </template>
     </div>
 </div>
+</template>
 </article>

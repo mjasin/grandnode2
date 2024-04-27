@@ -57,7 +57,9 @@
                 <template>
                     <div class="rating">
                         <b-form-rating id="rating-inline-grid-@Model.Id" aria-label="Rating" class="p-0" variant="warning" no-border size="sm" show-value aria-valuenow="@(Model.ReviewOverviewModel.AvgRating.ToString("0.00", CultureInfo.InvariantCulture))" precision="2" readonly inline value="@Model.ReviewOverviewModel.AvgRating.ToString("0.00", CultureInfo.InvariantCulture)"></b-form-rating>
-                        <b-link href="@Url.RouteUrl("Product", new { Model.SeName })">@Model.ReviewOverviewModel.TotalReviews @Loc["Reviews.Overview.Reviews"]</b-link>
+                        <template v-if="isMobile() === false">
+                            <b-link href="@Url.RouteUrl("Product", new { Model.SeName })">@Model.ReviewOverviewModel.TotalReviews @Loc["Reviews.Overview.Reviews"]</b-link>
+                        </template>
                     </div>
                 </template>
             }
@@ -117,7 +119,8 @@
             </div>
         </div>
     </div>
-    <div v-if="isMobile() === false" class="card-footer">
+    <template v-if="isMobile() === false">
+        <div class="card-footer">
         @if (Model.SpecificationAttributeModels.Any())
         {
             <div class="spec-container">
@@ -177,20 +180,20 @@
                                             case AttributeControlType.RadioList:
                                             case AttributeControlType.Checkboxes:
                                             case AttributeControlType.ReadonlyCheckboxes:
-                                                <a class="btn btn-sm btn-light name" href="@Url.RouteUrl("Product", new { Model.SeName })?@item.Name=@Html.Raw(spec.Name)">
+                                                <a class="btn btn-sm btn-light name" href="@Url.RouteUrl("Product", new { Model.SeName })?@item.Name=@Html.Raw(spec.Name)" rel=”nofollow”>
                                                     @Html.Raw(spec.Name)
                                                 </a>
                                                 break;
                                             case AttributeControlType.ColorSquares:
                                                 if (spec.PictureModel.FullSizeImageUrl != null)
                                                 {
-                                                    <a class="btn btn-sm btn-light name color-container" title="@spec.Name" @@click="productImage($event)" data-href="@spec.PictureModel.FullSizeImageUrl">
+                                                    <a class="btn btn-sm btn-light name color-container" title="@spec.Name" @@click="productImage($event)" data-href="@spec.PictureModel.FullSizeImageUrl" rel=”nofollow”>
                                                         <span class="color" style="background-color:@spec.ColorSquaresRgb;">&nbsp;</span>
                                                     </a>
                                                 }
                                                 else
                                                 {
-                                                    <a class="btn btn-sm btn-light name color-container" title="@spec.Name" href="@Url.RouteUrl("Product", new { Model.SeName })?@item.Name=@Html.Raw(spec.Name)">
+                                                    <a class="btn btn-sm btn-light name color-container" title="@spec.Name" href="@Url.RouteUrl("Product", new { Model.SeName })?@item.Name=@Html.Raw(spec.Name)" rel=”nofollow”>
                                                         <span class="color" style="background-color:@spec.ColorSquaresRgb;">&nbsp;</span>
                                                     </a>
                                                 }
@@ -199,13 +202,13 @@
                                             case AttributeControlType.ImageSquares:
                                                 if (spec.PictureModel.FullSizeImageUrl != null)
                                                 {
-                                                    <a class="btn btn-sm btn-light p-1 name image-container" v-on:click='productImage' data-href="@spec.PictureModel.FullSizeImageUrl">
+                                                    <a class="btn btn-sm btn-light p-1 name image-container" v-on:click='productImage' data-href="@spec.PictureModel.FullSizeImageUrl" rel=”nofollow”>
                                                         <img src="@spec.ImageSquaresPictureModel?.ImageUrl" alt="@spec.Name"/>
                                                     </a>
                                                 }
                                                 else
                                                 {
-                                                    <a class="btn btn-sm btn-light p-1 name image-container" href="@Url.RouteUrl("Product", new { Model.SeName })?@item.Name=@Html.Raw(spec.Name)">
+                                                    <a class="btn btn-sm btn-light p-1 name image-container" href="@Url.RouteUrl("Product", new { Model.SeName })?@item.Name=@Html.Raw(spec.Name)" rel=”nofollow”>
                                                         <img src="@spec.ImageSquaresPictureModel?.ImageUrl" alt="@spec.Name"/>
                                                     </a>
                                                 }
@@ -278,4 +281,5 @@
             }
         </div>
     </div>
+    </template>
 </article>
