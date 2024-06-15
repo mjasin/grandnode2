@@ -1,8 +1,5 @@
-﻿using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Common.Directory;
-using Grand.Business.Core.Interfaces.Customers;
+﻿using Grand.Business.Core.Interfaces.Customers;
 using Grand.Data;
-using Grand.Domain.Common;
 using Grand.Domain.Customers;
 using Grand.Infrastructure;
 using Microsoft.AspNetCore.Http;
@@ -36,12 +33,10 @@ public class CustomerActivityAttribute : TypeFilterAttribute
         public CustomerActivityFilter(
             ICustomerService customerService,
             IWorkContext workContext,
-            IUserFieldService userFieldService,
             CustomerSettings customerSettings)
         {
             _customerService = customerService;
             _workContext = workContext;
-            _userFieldService = userFieldService;
             _customerSettings = customerSettings;
         }
 
@@ -92,24 +87,11 @@ public class CustomerActivityAttribute : TypeFilterAttribute
             if (string.IsNullOrEmpty(pageUrl))
                 return;
 
-            //get previous last page
-            var previousPageUrl =
-                _workContext.CurrentCustomer.GetUserFieldFromEntity<string>(SystemCustomerFieldNames.LastVisitedPage);
-
             //save new one if don't match
-            if (!pageUrl.Equals(previousPageUrl, StringComparison.OrdinalIgnoreCase))
-                await _userFieldService.SaveField(_workContext.CurrentCustomer,
-                    SystemCustomerFieldNames.LastVisitedPage, pageUrl);
-
-            if (context.HttpContext.Request?.GetTypedHeaders().Referer?.ToString() is { } referer &&
-                !referer.Contains(context.HttpContext.Request.Host.ToString()))
+            if (!pageUrl.Equals(_workContext.CurrentCustomer.LastVisitedPage, StringComparison.OrdinalIgnoreCase))
             {
-                var previousUrlReferrer =
-                    await _workContext.CurrentCustomer.GetUserField<string>(_userFieldService,
-                        SystemCustomerFieldNames.LastUrlReferrer);
-                if (previousUrlReferrer != referer)
-                    await _userFieldService.SaveField(_workContext.CurrentCustomer,
-                        SystemCustomerFieldNames.LastUrlReferrer, referer);
+                _workContext.CurrentCustomer.LastVisitedPage = pageUrl;
+                await _customerService.UpdateCustomerField(_workContext.CurrentCustomer, x => x.LastVisitedPage, pageUrl);
             }
         }
 
@@ -119,7 +101,6 @@ public class CustomerActivityAttribute : TypeFilterAttribute
 
         private readonly ICustomerService _customerService;
         private readonly IWorkContext _workContext;
-        private readonly IUserFieldService _userFieldService;
         private readonly CustomerSettings _customerSettings;
 
         #endregion

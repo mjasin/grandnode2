@@ -22,20 +22,9 @@ public class MongoRepository<T> : IRepository<T> where T : BaseEntity
     public IMongoCollection<T> Collection => _collection;
 
     /// <summary>
-    ///     Sets a collection
-    /// </summary>
-    public bool SetCollection(string collectionName)
-    {
-        _collection = _collection.Database.GetCollection<T>(collectionName);
-        return true;
-    }
-
-    /// <summary>
     ///     Mongo Database
     /// </summary>
     protected IMongoDatabase _database;
-
-    public IMongoDatabase Database => _database;
 
     #endregion
 
@@ -197,31 +186,31 @@ public class MongoRepository<T> : IRepository<T> where T : BaseEntity
     /// <summary>
     ///     Updates a single entity.
     /// </summary>
-    /// <param name="filterexpression"></param>
+    /// <param name="filterExpression"></param>
     /// <param name="updateBuilder"></param>
     /// <returns></returns>
-    public virtual async Task UpdateOneAsync(Expression<Func<T, bool>> filterexpression,
+    public virtual async Task UpdateOneAsync(Expression<Func<T, bool>> filterExpression,
         UpdateBuilder<T> updateBuilder)
     {
         updateBuilder.Set(x => x.UpdatedOnUtc, _auditInfoProvider.GetCurrentDateTime());
         updateBuilder.Set(x => x.UpdatedBy, _auditInfoProvider.GetCurrentUser());
         var update = Builders<T>.Update.Combine(updateBuilder.Fields);
-        await _collection.UpdateOneAsync(filterexpression, update);
+        await _collection.UpdateOneAsync(filterExpression, update);
     }
 
     /// <summary>
     ///     Updates a many entities
     /// </summary>
-    /// <param name="filterexpression"></param>
+    /// <param name="filterExpression"></param>
     /// <param name="updateBuilder"></param>
     /// <returns></returns>
-    public virtual async Task UpdateManyAsync(Expression<Func<T, bool>> filterexpression,
+    public virtual async Task UpdateManyAsync(Expression<Func<T, bool>> filterExpression,
         UpdateBuilder<T> updateBuilder)
     {
         updateBuilder.Set(x => x.UpdatedOnUtc, _auditInfoProvider.GetCurrentDateTime());
         updateBuilder.Set(x => x.UpdatedBy, _auditInfoProvider.GetCurrentUser());
         var update = Builders<T>.Update.Combine(updateBuilder.Fields);
-        await _collection.UpdateManyAsync(filterexpression, update);
+        await _collection.UpdateManyAsync(filterExpression, update);
     }
 
     /// <summary>
@@ -419,21 +408,19 @@ public class MongoRepository<T> : IRepository<T> where T : BaseEntity
     ///     Async Delete entities
     /// </summary>
     /// <param name="entities">Entities</param>
-    public virtual async Task<IEnumerable<T>> DeleteAsync(IEnumerable<T> entities)
+    public virtual async Task DeleteAsync(IEnumerable<T> entities)
     {
         foreach (var entity in entities) await DeleteAsync(entity);
-
-        return entities;
     }
 
     /// <summary>
     ///     Delete a many entities
     /// </summary>
-    /// <param name="filterexpression"></param>
+    /// <param name="filterExpression"></param>
     /// <returns></returns>
-    public virtual async Task DeleteManyAsync(Expression<Func<T, bool>> filterexpression)
+    public virtual async Task DeleteManyAsync(Expression<Func<T, bool>> filterExpression)
     {
-        await _collection.DeleteManyAsync(filterexpression);
+        await _collection.DeleteManyAsync(filterExpression);
     }
 
     /// <summary>

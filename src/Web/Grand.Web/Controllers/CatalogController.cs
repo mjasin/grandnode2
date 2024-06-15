@@ -36,7 +36,6 @@ public class CatalogController : BasePublicController
         IWorkContext workContext,
         IGroupService groupService,
         ITranslationService translationService,
-        IUserFieldService userFieldService,
         IAclService aclService,
         IPermissionService permissionService,
         IMediator mediator,
@@ -49,7 +48,6 @@ public class CatalogController : BasePublicController
         _workContext = workContext;
         _groupService = groupService;
         _translationService = translationService;
-        _userFieldService = userFieldService;
         _aclService = aclService;
         _permissionService = permissionService;
         _mediator = mediator;
@@ -67,7 +65,6 @@ public class CatalogController : BasePublicController
     private readonly IWorkContext _workContext;
     private readonly IGroupService _groupService;
     private readonly ITranslationService _translationService;
-    private readonly IUserFieldService _userFieldService;
     private readonly IAclService _aclService;
     private readonly IPermissionService _permissionService;
     private readonly IMediator _mediator;
@@ -77,15 +74,6 @@ public class CatalogController : BasePublicController
     #endregion
 
     #region Utilities
-
-    protected async Task SaveLastContinueShoppingPage(Customer customer)
-    {
-        await _userFieldService.SaveField(customer,
-            SystemCustomerFieldNames.LastContinueShoppingPage,
-            HttpContext.Request.Path,
-            _workContext.CurrentStore.Id);
-    }
-
     private VendorReviewOverviewModel PrepareVendorReviewOverviewModel(Domain.Vendors.Vendor vendor)
     {
         var model = new VendorReviewOverviewModel {
@@ -122,9 +110,6 @@ public class CatalogController : BasePublicController
         //Store access
         if (!_aclService.Authorize(category, _workContext.CurrentStore.Id))
             return InvokeHttp404();
-
-        //'Continue shopping' URL
-        await SaveLastContinueShoppingPage(customer);
 
         //display "edit" (manage) link
         if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel, customer) &&
@@ -186,9 +171,6 @@ public class CatalogController : BasePublicController
         if (!_aclService.Authorize(brand, _workContext.CurrentStore.Id))
             return InvokeHttp404();
 
-        //'Continue shopping' URL
-        await SaveLastContinueShoppingPage(customer);
-
         //display "edit" (manage) link
         if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel, customer) &&
             await _permissionService.Authorize(StandardPermission.ManageBrands, customer))
@@ -249,9 +231,6 @@ public class CatalogController : BasePublicController
         if (!_aclService.Authorize(collection, _workContext.CurrentStore.Id))
             return InvokeHttp404();
 
-        //'Continue shopping' URL
-        await SaveLastContinueShoppingPage(customer);
-
         //display "edit" (manage) link
         if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel, customer) &&
             await _permissionService.Authorize(StandardPermission.ManageCollections, customer))
@@ -302,9 +281,6 @@ public class CatalogController : BasePublicController
             return InvokeHttp404();
 
         var customer = _workContext.CurrentCustomer;
-
-        //'Continue shopping' URL
-        await SaveLastContinueShoppingPage(customer);
 
         //display "edit" (manage) link
         if (await _permissionService.Authorize(StandardPermission.ManageAccessAdminPanel, customer) &&
@@ -484,8 +460,6 @@ public class CatalogController : BasePublicController
     [HttpGet]
     public virtual async Task<IActionResult> Search(SearchModel model, CatalogPagingFilteringModel command)
     {
-        //'Continue shopping' URL
-        await SaveLastContinueShoppingPage(_workContext.CurrentCustomer);
         if (model != null && !string.IsNullOrEmpty(model.SearchCategoryId))
         {
             model.cid = model.SearchCategoryId;
