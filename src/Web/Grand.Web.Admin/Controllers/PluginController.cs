@@ -9,6 +9,7 @@ using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Models.Plugins;
 using Grand.Web.Common.DataSource;
 using Grand.Web.Common.Extensions;
+using Grand.Web.Common.Localization;
 using Grand.Web.Common.Security.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,7 @@ public class PluginController(
     IHostApplicationLifetime applicationLifetime,
     IWorkContext workContext,
     IServiceProvider serviceProvider,
+    IEnumTranslationService enumTranslationService,
     ExtensionsConfig extConfig)
     : BaseAdminController
 {
@@ -44,7 +46,7 @@ public class PluginController(
     {
         var pluginModel = PluginInfo.ToModel();
         //logo
-        pluginModel.LogoUrl = PluginInfo.GetLogoUrl(workContext);
+        pluginModel.LogoUrl = PluginInfo.GetLogoUrl(workContext.CurrentHost.Url);
 
         //configuration URLs
         if (PluginInfo.Installed)
@@ -109,7 +111,7 @@ public class PluginController(
     {
         var model = new PluginListModel {
             //load modes
-            AvailableLoadModes = LoadPluginsStatus.All.ToSelectList(HttpContext, false).ToList()
+            AvailableLoadModes = enumTranslationService.ToSelectList(LoadPluginsStatus.All, false).ToList()
         };
 
         return View(model);

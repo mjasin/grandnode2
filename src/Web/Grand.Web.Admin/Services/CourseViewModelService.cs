@@ -1,5 +1,4 @@
-﻿using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Catalog.Products;
+﻿using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Seo;
 using Grand.Business.Core.Interfaces.Common.Stores;
@@ -8,13 +7,13 @@ using Grand.Business.Core.Interfaces.Marketing.Courses;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Domain.Catalog;
 using Grand.Domain.Courses;
-using Grand.Domain.Seo;
 using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Catalog;
 using Grand.Web.Admin.Models.Courses;
 using Grand.Web.Common.Extensions;
+using Grand.Web.Common.Localization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Grand.Web.Admin.Services;
@@ -24,16 +23,15 @@ public class CourseViewModelService(
     ICourseLevelService courseLevelService,
     ICourseLessonService courseLessonService,
     ICourseSubjectService courseSubjectService,
-    ISlugService slugService,
     IPictureService pictureService,
-    ILanguageService languageService,
     ITranslationService translationService,
     IProductCourseService productCourseService,
     IDownloadService downloadService,
     IProductService productService,
     IStoreService storeService,
     IVendorService vendorService,
-    SeoSettings seoSettings)
+    ISeNameService seNameService,
+    IEnumTranslationService enumTranslationService)
     : ICourseViewModelService
 {
     public virtual async Task<CourseModel> PrepareCourseModel(CourseModel model = null)
@@ -55,16 +53,14 @@ public class CourseViewModelService(
     public virtual async Task<Course> InsertCourseModel(CourseModel model)
     {
         var course = model.ToEntity();
-        await courseService.Insert(course);
 
         //locales
-        model.SeName =
-            await course.ValidateSeName(model.SeName, course.Name, true, seoSettings, slugService, languageService);
-        course.SeName = model.SeName;
-        await courseService.Update(course);
-
-        await slugService.SaveSlug(course, model.SeName, "");
-
+        course.Locales = await seNameService.TranslationSeNameProperties(model.Locales, course, x => x.Name);
+        course.SeName = await seNameService.ValidateSeName(course, model.SeName, course.Name, true);
+        
+        await courseService.Insert(course);
+        await seNameService.SaveSeName(course);
+        
         //update picture seo file name
         await pictureService.UpdatePictureSeoNames(course.PictureId, course.Name);
 
@@ -81,15 +77,15 @@ public class CourseViewModelService(
         var prevProductId = course.ProductId;
 
         course = model.ToEntity(course);
-        model.SeName =
-            await course.ValidateSeName(model.SeName, course.Name, true, seoSettings, slugService, languageService);
-        course.SeName = model.SeName;
+        
         //locales
-        course.Locales =
-            await model.Locales.ToTranslationProperty(course, x => x.Name, seoSettings, slugService, languageService);
+        course.Locales = await seNameService.TranslationSeNameProperties(model.Locales, course, x => x.Name);
+        course.SeName = await seNameService.ValidateSeName(course, model.SeName, course.Name, true);
+
         await courseService.Update(course);
+        
         //search engine name
-        await slugService.SaveSlug(course, model.SeName, "");
+        await seNameService.SaveSeName(course);
 
         //delete an old picture (if deleted or updated)
         if (!string.IsNullOrEmpty(prevPictureId) && prevPictureId != course.PictureId)
@@ -213,7 +209,7 @@ public class CourseViewModelService(
             model.AvailableVendors.Add(new SelectListItem { Text = v.Name, Value = v.Id });
 
         //product types
-        model.AvailableProductTypes = ProductType.SimpleProduct.ToSelectList().ToList();
+        model.AvailableProductTypes = enumTranslationService.ToSelectList(ProductType.SimpleProduct).ToList();
         model.AvailableProductTypes.Insert(0,
             new SelectListItem { Text = translationService.GetResource("Admin.Common.All"), Value = " " });
         return model;

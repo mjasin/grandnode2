@@ -1,15 +1,12 @@
-﻿using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Cms;
+﻿using Grand.Business.Core.Interfaces.Cms;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Seo;
 using Grand.Business.Core.Interfaces.Common.Stores;
 using Grand.Domain.Pages;
-using Grand.Domain.Seo;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Pages;
-using Grand.Web.Common.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Grand.Web.Admin.Services;
@@ -17,32 +14,26 @@ namespace Grand.Web.Admin.Services;
 public class PageViewModelService : IPageViewModelService
 {
     private readonly IDateTimeService _dateTimeService;
-    private readonly ILanguageService _languageService;
     private readonly IPageLayoutService _pageLayoutService;
     private readonly IPageService _pageService;
-    private readonly SeoSettings _seoSettings;
-    private readonly ISlugService _slugService;
     private readonly IStoreService _storeService;
     private readonly ITranslationService _translationService;
-
+    private readonly ISeNameService _seNameService;
+    
     public PageViewModelService(
         IPageLayoutService pageLayoutService,
         IPageService pageService,
-        ISlugService slugService,
         ITranslationService translationService,
         IStoreService storeService,
-        ILanguageService languageService,
         IDateTimeService dateTimeService,
-        SeoSettings seoSettings)
+        ISeNameService seNameService)
     {
         _pageLayoutService = pageLayoutService;
         _pageService = pageService;
-        _slugService = slugService;
         _translationService = translationService;
         _storeService = storeService;
-        _languageService = languageService;
         _dateTimeService = dateTimeService;
-        _seoSettings = seoSettings;
+        _seNameService = seNameService;
     }
 
     public virtual async Task<PageListModel> PreparePageListModel()
@@ -73,15 +64,13 @@ public class PageViewModelService : IPageViewModelService
         if (!model.IsPasswordProtected) model.Password = null;
 
         var page = model.ToEntity(_dateTimeService);
-        await _pageService.InsertPage(page);
         //search engine name
-        model.SeName = await page.ValidateSeName(model.SeName, page.Title ?? page.SystemName, true, _seoSettings,
-            _slugService, _languageService);
-        page.Locales =
-            await model.Locales.ToTranslationProperty(page, x => x.Title, _seoSettings, _slugService, _languageService);
-        page.SeName = model.SeName;
-        await _pageService.UpdatePage(page);
-        await _slugService.SaveSlug(page, model.SeName, "");
+        page.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, page, x => x.Title);
+        page.SeName = await _seNameService.ValidateSeName(page, model.SeName, page.Title ?? page.SystemName, true);
+
+        await _pageService.InsertPage(page);
+        await _seNameService.SaveSeName(page);
+        
         return page;
     }
 
@@ -89,15 +78,13 @@ public class PageViewModelService : IPageViewModelService
     {
         if (!model.IsPasswordProtected) model.Password = null;
         page = model.ToEntity(page, _dateTimeService);
-        page.Locales =
-            await model.Locales.ToTranslationProperty(page, x => x.Title, _seoSettings, _slugService, _languageService);
-        model.SeName = await page.ValidateSeName(model.SeName, page.Title ?? page.SystemName, true, _seoSettings,
-            _slugService, _languageService);
-        page.SeName = model.SeName;
+        page.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, page, x => x.Title);
+        page.SeName = await _seNameService.ValidateSeName(page, model.SeName, page.Title ?? page.SystemName, true);
+        
         await _pageService.UpdatePage(page);
-
         //search engine name
-        await _slugService.SaveSlug(page, model.SeName, "");
+        await _seNameService.SaveSeName(page);
+        
         return page;
     }
 

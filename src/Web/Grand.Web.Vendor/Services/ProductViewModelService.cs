@@ -17,11 +17,11 @@ using Grand.Domain.Common;
 using Grand.Domain.Directory;
 using Grand.Domain.Localization;
 using Grand.Domain.Media;
-using Grand.Domain.Seo;
 using Grand.Domain.Tax;
 using Grand.Infrastructure;
 using Grand.SharedKernel.Extensions;
 using Grand.Web.Common.Extensions;
+using Grand.Web.Common.Localization;
 using Grand.Web.Vendor.Extensions;
 using Grand.Web.Vendor.Interfaces;
 using Grand.Web.Vendor.Models.Catalog;
@@ -54,8 +54,6 @@ public class ProductViewModelService : IProductViewModelService
     private readonly IProductCollectionService _productCollectionService;
     private readonly IProductLayoutService _productLayoutService;
     private readonly IProductService _productService;
-    private readonly SeoSettings _seoSettings;
-    private readonly ISlugService _slugService;
     private readonly ISpecificationAttributeService _specificationAttributeService;
     private readonly IStockQuantityService _stockQuantityService;
     private readonly IStoreService _storeService;
@@ -64,6 +62,8 @@ public class ProductViewModelService : IProductViewModelService
     private readonly ITranslationService _translationService;
     private readonly IWarehouseService _warehouseService;
     private readonly IWorkContext _workContext;
+    private readonly ISeNameService _seNameService;
+    private readonly IEnumTranslationService _enumTranslationService;
 
     public ProductViewModelService(
         IProductService productService,
@@ -86,7 +86,6 @@ public class ProductViewModelService : IProductViewModelService
         ITaxCategoryService taxCategoryService,
         ICustomerService customerService,
         IStoreService storeService,
-        ISlugService slugService,
         IOutOfStockSubscriptionService outOfStockSubscriptionService,
         ILanguageService languageService,
         IProductAttributeFormatter productAttributeFormatter,
@@ -95,7 +94,9 @@ public class ProductViewModelService : IProductViewModelService
         IPriceFormatter priceFormatter,
         CurrencySettings currencySettings,
         MeasureSettings measureSettings,
-        TaxSettings taxSettings, SeoSettings seoSettings)
+        TaxSettings taxSettings,
+        ISeNameService seNameService,
+        IEnumTranslationService enumTranslationService)
     {
         _productService = productService;
         _inventoryManageService = inventoryManageService;
@@ -117,7 +118,6 @@ public class ProductViewModelService : IProductViewModelService
         _taxCategoryService = taxCategoryService;
         _customerService = customerService;
         _storeService = storeService;
-        _slugService = slugService;
         _outOfStockSubscriptionService = outOfStockSubscriptionService;
         _stockQuantityService = stockQuantityService;
         _languageService = languageService;
@@ -127,7 +127,8 @@ public class ProductViewModelService : IProductViewModelService
         _currencySettings = currencySettings;
         _measureSettings = measureSettings;
         _taxSettings = taxSettings;
-        _seoSettings = seoSettings;
+        _seNameService = seNameService;
+        _enumTranslationService = enumTranslationService;
     }
 
     public virtual async Task PrepareAddProductAttributeCombinationModel(ProductAttributeCombinationModel model,
@@ -189,7 +190,8 @@ public class ProductViewModelService : IProductViewModelService
                 ProductId = product.Id,
                 PictureId = picture.PictureId,
                 PictureUrl = await _pictureService.GetPictureUrl(picture.PictureId),
-                DisplayOrder = picture.DisplayOrder
+                DisplayOrder = picture.DisplayOrder,
+                IsDefault = picture.IsDefault
             });
 
         model.PrimaryStoreCurrencyCode =
@@ -213,7 +215,8 @@ public class ProductViewModelService : IProductViewModelService
                 ProductId = product.Id,
                 PictureId = x.PictureId,
                 PictureUrl = await _pictureService.GetPictureUrl(x.PictureId),
-                DisplayOrder = x.DisplayOrder
+                DisplayOrder = x.DisplayOrder,
+                IsDefault = x.IsDefault
             });
 
         var associatedProduct = await _productService.GetProductById(model.AssociatedProductId);
@@ -552,8 +555,7 @@ public class ProductViewModelService : IProductViewModelService
             model.AvailableWarehouses.Add(new SelectListItem { Text = wh.Name, Value = wh.Id });
 
         //product types
-        model.AvailableProductTypes = ProductType.SimpleProduct
-            .ToSelectList(_translationService, _workContext, false).ToList();
+        model.AvailableProductTypes = _enumTranslationService.ToSelectList(ProductType.SimpleProduct, false).ToList();
         model.AvailableProductTypes.Insert(0,
             new SelectListItem { Text = _translationService.GetResource("Vendor.Common.All"), Value = "0" });
 
@@ -636,7 +638,7 @@ public class ProductViewModelService : IProductViewModelService
             productModel.PictureThumbnailUrl =
                 await _pictureService.GetPictureUrl(defaultProductPicture.PictureId, 100);
             //product type
-            productModel.ProductTypeName = x.ProductTypeId.GetTranslationEnum(_translationService, _workContext);
+            productModel.ProductTypeName = _enumTranslationService.GetTranslationEnum(x.ProductTypeId);
             //friendly stock quantity
             //if a simple product AND "manage inventory" is "Track inventory", then display
             if (x.ProductTypeId == ProductType.SimpleProduct &&
@@ -687,21 +689,18 @@ public class ProductViewModelService : IProductViewModelService
     {
         //product
         var product = model.ToEntity(_dateTimeService);
-        product.VendorId = _workContext.CurrentVendor!.Id;
+        product.VendorId = _workContext.CurrentVendor?.Id;
+
+        product.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, product, x => x.Name);
+        product.SeName = await _seNameService.ValidateSeName(product, model.SeName, product.Name, true);
+
         await _productService.InsertProduct(product);
 
-        model.SeName = await product.ValidateSeName(model.SeName, product.Name, true, _seoSettings, _slugService,
-            _languageService);
-        product.SeName = model.SeName;
-        product.Locales = await model.Locales.ToTranslationProperty(product, x => x.Name,
-            _seoSettings, _slugService, _languageService);
-
         //search engine name
-        await _slugService.SaveSlug(product, model.SeName, "");
+        await _seNameService.SaveSeName(product);
+
         //warehouses
         await SaveProductWarehouseInventory(product, model.ProductWarehouseInventoryModels);
-
-        await _productService.UpdateProduct(product);
 
         return product;
     }
@@ -717,20 +716,20 @@ public class ProductViewModelService : IProductViewModelService
         //product
         product = model.ToEntity(product, _dateTimeService);
         product.AutoAddRequiredProducts = model.AutoAddRequiredProducts;
-        model.SeName = await product.ValidateSeName(model.SeName, product.Name, true, _seoSettings, _slugService,
-            _languageService);
-        product.SeName = model.SeName;
-        product.Locales = await model.Locales.ToTranslationProperty(product, x => x.Name, _seoSettings,
-            _slugService, _languageService);
 
-        //search engine name
-        await _slugService.SaveSlug(product, model.SeName, "");
-        //warehouses
-        await SaveProductWarehouseInventory(product, model.ProductWarehouseInventoryModels);
-        //picture seo names
-        await UpdatePictureSeoNames(product);
+        product.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, product, x => x.Name);
+        product.SeName = await _seNameService.ValidateSeName(product, model.SeName, product.Name, true);
 
         await _productService.UpdateProduct(product);
+
+        //search engine name
+        await _seNameService.SaveSeName(product);
+
+        //warehouses
+        await SaveProductWarehouseInventory(product, model.ProductWarehouseInventoryModels);
+
+        //picture seo names
+        await UpdatePictureSeoNames(product);
 
         //out of stock notifications
         await OutOfStockNotifications(product, prevStockQuantity, prevMultiWarehouseStock);
@@ -1134,8 +1133,7 @@ public class ProductViewModelService : IProductViewModelService
     {
         var model = new BulkEditListModel {
             //product types
-            AvailableProductTypes = ProductType.SimpleProduct
-                .ToSelectList(_translationService, _workContext, false).ToList()
+            AvailableProductTypes = _enumTranslationService.ToSelectList(ProductType.SimpleProduct, false).ToList()
         };
 
         model.AvailableProductTypes.Insert(0,
@@ -1170,9 +1168,7 @@ public class ProductViewModelService : IProductViewModelService
                 OldPrice = x.OldPrice,
                 Price = x.Price,
                 ManageInventoryMethodId = (int)x.ManageInventoryMethodId,
-                ManageInventoryMethod =
-                    x.ManageInventoryMethodId.GetTranslationEnum(_translationService,
-                        _workContext.WorkingLanguage.Id),
+                ManageInventoryMethod = _enumTranslationService.GetTranslationEnum(x.ManageInventoryMethodId),
                 StockQuantity = x.StockQuantity,
                 Published = x.Published
             };
@@ -1320,8 +1316,7 @@ public class ProductViewModelService : IProductViewModelService
                 TextPrompt = x.TextPrompt,
                 IsRequired = x.IsRequired,
                 ShowOnCatalogPage = x.ShowOnCatalogPage,
-                AttributeControlType =
-                    x.AttributeControlTypeId.GetTranslationEnum(_translationService, _workContext),
+                AttributeControlType = _enumTranslationService.GetTranslationEnum(x.AttributeControlTypeId),
                 AttributeControlTypeId = x.AttributeControlTypeId,
                 DisplayOrder = x.DisplayOrder,
                 Combination = x.Combination
@@ -1638,7 +1633,8 @@ public class ProductViewModelService : IProductViewModelService
                 ProductId = product.Id,
                 PictureId = x.PictureId,
                 PictureUrl = await _pictureService.GetPictureUrl(x.PictureId),
-                DisplayOrder = x.DisplayOrder
+                DisplayOrder = x.DisplayOrder,
+                IsDefault = x.IsDefault
             });
 
         return model;
@@ -1664,8 +1660,7 @@ public class ProductViewModelService : IProductViewModelService
                 Id = x.Id,
                 ProductAttributeMappingId = productAttributeMapping.Id, //TODO - check x.ProductAttributeMappingId,
                 AttributeValueTypeId = x.AttributeValueTypeId,
-                AttributeValueTypeName =
-                    x.AttributeValueTypeId.GetTranslationEnum(_translationService, _workContext),
+                AttributeValueTypeName = _enumTranslationService.GetTranslationEnum(x.AttributeValueTypeId),
                 AssociatedProductId = x.AssociatedProductId,
                 AssociatedProductName = associatedProduct != null ? associatedProduct.Name : "",
                 Name = productAttributeMapping.AttributeControlTypeId != AttributeControlType.ColorSquares
@@ -1703,7 +1698,7 @@ public class ProductViewModelService : IProductViewModelService
         var model = new ProductModel.ProductAttributeValueModel {
             ProductAttributeMappingId = pa.Id, //TODO - check pav.ProductAttributeMappingId,
             AttributeValueTypeId = pav.AttributeValueTypeId,
-            AttributeValueTypeName = pav.AttributeValueTypeId.GetTranslationEnum(_translationService, _workContext),
+            AttributeValueTypeName = _enumTranslationService.GetTranslationEnum(pav.AttributeValueTypeId),
             AssociatedProductId = pav.AssociatedProductId,
             AssociatedProductName = associatedProduct != null ? associatedProduct.Name : "",
             Name = pav.Name,
@@ -2178,6 +2173,7 @@ public class ProductViewModelService : IProductViewModelService
                 AltAttribute = picture?.AltAttribute,
                 TitleAttribute = picture?.TitleAttribute,
                 DisplayOrder = x.DisplayOrder,
+                IsDefault = x.IsDefault,
                 Style = picture?.Style,
                 ExtraField = picture?.ExtraField
             };
@@ -2199,6 +2195,7 @@ public class ProductViewModelService : IProductViewModelService
             AltAttribute = picture?.AltAttribute,
             TitleAttribute = picture?.TitleAttribute,
             DisplayOrder = productPicture.DisplayOrder,
+            IsDefault = productPicture.IsDefault,
             Style = picture?.Style,
             ExtraField = picture?.ExtraField
         };
@@ -2216,7 +2213,8 @@ public class ProductViewModelService : IProductViewModelService
 
         await _productService.InsertProductPicture(new ProductPicture {
             PictureId = picture.Id,
-            DisplayOrder = displayOrder
+            DisplayOrder = displayOrder,
+            IsDefault = product.ProductPictures.Any()
         }, product.Id);
 
         await _pictureService.SetSeoFilename(picture, _pictureService.GetPictureSeName(product.Name));
@@ -2235,6 +2233,7 @@ public class ProductViewModelService : IProductViewModelService
             throw new ArgumentException("No picture found with the specified id");
 
         productPicture.DisplayOrder = model.DisplayOrder;
+        productPicture.IsDefault = model.IsDefault;
         await _productService.UpdateProductPicture(productPicture, product.Id);
 
         //Update picture fields
@@ -2273,7 +2272,7 @@ public class ProductViewModelService : IProductViewModelService
                 AttributeTypeId = (int)x.AttributeTypeId,
                 AttributeId = x.SpecificationAttributeId,
                 ProductId = product.Id,
-                AttributeTypeName = x.AttributeTypeId.GetTranslationEnum(_translationService, _workContext),
+                AttributeTypeName = _enumTranslationService.GetTranslationEnum(x.AttributeTypeId),
                 AllowFiltering = x.AllowFiltering,
                 ShowOnProductPage = x.ShowOnProductPage,
                 DisplayOrder = x.DisplayOrder,
@@ -2372,8 +2371,7 @@ public class ProductViewModelService : IProductViewModelService
     {
         var model = new T {
             //product types
-            AvailableProductTypes = ProductType.SimpleProduct
-                .ToSelectList(_translationService, _workContext, false).ToList()
+            AvailableProductTypes = _enumTranslationService.ToSelectList(ProductType.SimpleProduct, false).ToList()
         };
 
         model.AvailableProductTypes.Insert(0,

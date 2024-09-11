@@ -28,6 +28,7 @@ using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Catalog;
 using Grand.Web.Common.Extensions;
+using Grand.Web.Common.Localization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Net;
 using ProductExtensions = Grand.Domain.Catalog.ProductExtensions;
@@ -59,7 +60,6 @@ public class ProductViewModelService(
     IDiscountService discountService,
     ICustomerService customerService,
     IStoreService storeService,
-    ISlugService slugService,
     IOutOfStockSubscriptionService outOfStockSubscriptionService,
     IDownloadService downloadService,
     ILanguageService languageService,
@@ -70,7 +70,9 @@ public class ProductViewModelService(
     TaxSettings taxSettings,
     SeoSettings seoSettings,
     IAuctionService auctionService,
-    IPriceFormatter priceFormatter)
+    IPriceFormatter priceFormatter,
+    ISeNameService seNameService,
+    IEnumTranslationService enumTranslationService)
     : IProductViewModelService
 {
     public virtual async Task PrepareAddProductAttributeCombinationModel(ProductAttributeCombinationModel model,
@@ -131,7 +133,8 @@ public class ProductViewModelService(
                 ProductId = product.Id,
                 PictureId = picture.PictureId,
                 PictureUrl = await pictureService.GetPictureUrl(picture.PictureId),
-                DisplayOrder = picture.DisplayOrder
+                DisplayOrder = picture.DisplayOrder,
+                IsDefault = picture.IsDefault
             });
         model.PrimaryStoreCurrencyCode =
             (await currencyService.GetCurrencyById(currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
@@ -169,7 +172,8 @@ public class ProductViewModelService(
                 ProductId = product.Id,
                 PictureId = x.PictureId,
                 PictureUrl = await pictureService.GetPictureUrl(x.PictureId),
-                DisplayOrder = x.DisplayOrder
+                DisplayOrder = x.DisplayOrder,
+                IsDefault = x.IsDefault
             });
 
         var associatedProduct = await productService.GetProductById(model.AssociatedProductId);
@@ -537,8 +541,7 @@ public class ProductViewModelService(
             model.AvailableWarehouses.Add(new SelectListItem { Text = wh.Name, Value = wh.Id });
 
         //product types
-        model.AvailableProductTypes =
-            ProductType.SimpleProduct.ToSelectList(translationService, workContext, false).ToList();
+        model.AvailableProductTypes = enumTranslationService.ToSelectList(ProductType.SimpleProduct, false).ToList();
         model.AvailableProductTypes.Insert(0,
             new SelectListItem { Text = translationService.GetResource("Admin.Common.All"), Value = "0" });
 
@@ -633,7 +636,7 @@ public class ProductViewModelService(
             var defaultProductPicture = x.ProductPictures.FirstOrDefault() ?? new ProductPicture();
             productModel.PictureThumbnailUrl = await pictureService.GetPictureUrl(defaultProductPicture.PictureId, 100);
             //product type
-            productModel.ProductTypeName = x.ProductTypeId.GetTranslationEnum(translationService, workContext);
+            productModel.ProductTypeName = enumTranslationService.GetTranslationEnum(x.ProductTypeId);
             //friendly stock quantity
             //if a simple product AND "manage inventory" is "Track inventory", then display
             if (x.ProductTypeId == ProductType.SimpleProduct &&
@@ -696,20 +699,7 @@ public class ProductViewModelService(
 
         //product
         var product = model.ToEntity(dateTimeService);
-        await productService.InsertProduct(product);
-
-        model.SeName =
-            await product.ValidateSeName(model.SeName, product.Name, true, seoSettings, slugService, languageService);
-        product.SeName = model.SeName;
-        product.Locales =
-            await model.Locales.ToTranslationProperty(product, x => x.Name, seoSettings, slugService, languageService);
-
-        //search engine name
-        await slugService.SaveSlug(product, model.SeName, "");
-        //tags
-        await SaveProductTags(product, ParseProductTags(model.ProductTags));
-        //warehouses
-        await SaveProductWarehouseInventory(product, model.ProductWarehouseInventoryModels);
+        
         //discounts
         var allDiscounts =
             await discountService.GetDiscountsQuery(DiscountType.AssignedToSkus,
@@ -718,11 +708,26 @@ public class ProductViewModelService(
             if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
             {
                 product.AppliedDiscounts.Add(discount.Id);
-                await productService.InsertDiscount(discount.Id, product.Id);
             }
+        
+        product.Locales = await seNameService.TranslationSeNameProperties(model.Locales, product, x => x.Name);
+        product.SeName = await seNameService.ValidateSeName(product, model.SeName, product.Name, true);
+        
+        await productService.InsertProduct(product);
 
+        //search engine name
+        await seNameService.SaveSeName(product);
+        
+        //tags
+        await SaveProductTags(product, ParseProductTags(model.ProductTags));
+        
+        //warehouses
+        await SaveProductWarehouseInventory(product, model.ProductWarehouseInventoryModels);
+        
+        
+        
         await productService.UpdateProduct(product);
-
+        
         return product;
     }
 
@@ -743,20 +748,8 @@ public class ProductViewModelService(
         //product
         product = model.ToEntity(product, dateTimeService);
         product.AutoAddRequiredProducts = model.AutoAddRequiredProducts;
-        model.SeName =
-            await product.ValidateSeName(model.SeName, product.Name, true, seoSettings, slugService, languageService);
-        product.SeName = model.SeName;
-        product.Locales =
-            await model.Locales.ToTranslationProperty(product, x => x.Name, seoSettings, slugService, languageService);
-
-        //search engine name
-        await slugService.SaveSlug(product, model.SeName, "");
-        //tags
-        await SaveProductTags(product, ParseProductTags(model.ProductTags));
-        //warehouses
-        await SaveProductWarehouseInventory(product, model.ProductWarehouseInventoryModels);
-        //picture seo names
-        await UpdatePictureSeoNames(product);
+        product.Locales = await seNameService.TranslationSeNameProperties(model.Locales, product, x => x.Name);
+        product.SeName = await seNameService.ValidateSeName(product, model.SeName, product.Name, true);
         //discounts
         var allDiscounts =
             await discountService.GetDiscountsQuery(DiscountType.AssignedToSkus,
@@ -768,7 +761,6 @@ public class ProductViewModelService(
                 if (product.AppliedDiscounts.Count(d => d == discount.Id) == 0)
                 {
                     product.AppliedDiscounts.Add(discount.Id);
-                    await productService.InsertDiscount(discount.Id, product.Id);
                 }
             }
             else
@@ -777,11 +769,19 @@ public class ProductViewModelService(
                 if (product.AppliedDiscounts.Count(d => d == discount.Id) > 0)
                 {
                     product.AppliedDiscounts.Remove(discount.Id);
-                    await productService.DeleteDiscount(discount.Id, product.Id);
                 }
             }
-
+               
         await productService.UpdateProduct(product);
+
+        //search engine name
+        await seNameService.SaveSeName(product);
+        //tags
+        await SaveProductTags(product, ParseProductTags(model.ProductTags));
+        //warehouses
+        await SaveProductWarehouseInventory(product, model.ProductWarehouseInventoryModels);
+        //picture seo names
+        await UpdatePictureSeoNames(product);
 
         //out of stock notifications
         await OutOfStockNotifications(product, model, prevStockQuantity, prevMultiWarehouseStock);
@@ -1231,11 +1231,10 @@ public class ProductViewModelService(
     {
         var model = new BulkEditListModel();
 
-        var storeId = string.Empty;
+        string storeId;
 
         //product types
-        model.AvailableProductTypes =
-            ProductType.SimpleProduct.ToSelectList(translationService, workContext, false).ToList();
+        model.AvailableProductTypes = enumTranslationService.ToSelectList(ProductType.SimpleProduct, false).ToList();
         model.AvailableProductTypes.Insert(0,
             new SelectListItem { Text = translationService.GetResource("Admin.Common.All"), Value = "0" });
 
@@ -1289,8 +1288,7 @@ public class ProductViewModelService(
                 OldPrice = x.OldPrice,
                 Price = x.Price,
                 ManageInventoryMethodId = (int)x.ManageInventoryMethodId,
-                ManageInventoryMethod =
-                    x.ManageInventoryMethodId.GetTranslationEnum(translationService, workContext.WorkingLanguage.Id),
+                ManageInventoryMethod = enumTranslationService.GetTranslationEnum(x.ManageInventoryMethodId),
                 StockQuantity = x.StockQuantity,
                 Published = x.Published
             };
@@ -1471,7 +1469,7 @@ public class ProductViewModelService(
                 TextPrompt = x.TextPrompt,
                 IsRequired = x.IsRequired,
                 ShowOnCatalogPage = x.ShowOnCatalogPage,
-                AttributeControlType = x.AttributeControlTypeId.GetTranslationEnum(translationService, workContext),
+                AttributeControlType = enumTranslationService.GetTranslationEnum(x.AttributeControlTypeId),
                 AttributeControlTypeId = x.AttributeControlTypeId,
                 DisplayOrder = x.DisplayOrder,
                 Combination = x.Combination
@@ -1797,7 +1795,8 @@ public class ProductViewModelService(
                 ProductId = product.Id,
                 PictureId = x.PictureId,
                 PictureUrl = await pictureService.GetPictureUrl(x.PictureId),
-                DisplayOrder = x.DisplayOrder
+                DisplayOrder = x.DisplayOrder,
+                IsDefault = x.IsDefault
             });
         return model;
     }
@@ -1823,7 +1822,7 @@ public class ProductViewModelService(
                 Id = x.Id,
                 ProductAttributeMappingId = productAttributeMapping.Id, //TODO - check x.ProductAttributeMappingId,
                 AttributeValueTypeId = x.AttributeValueTypeId,
-                AttributeValueTypeName = x.AttributeValueTypeId.GetTranslationEnum(translationService, workContext),
+                AttributeValueTypeName = enumTranslationService.GetTranslationEnum(x.AttributeValueTypeId),
                 AssociatedProductId = x.AssociatedProductId,
                 AssociatedProductName = associatedProduct != null ? associatedProduct.Name : "",
                 Name = productAttributeMapping.AttributeControlTypeId != AttributeControlType.ColorSquares
@@ -1861,7 +1860,7 @@ public class ProductViewModelService(
         var model = new ProductModel.ProductAttributeValueModel {
             ProductAttributeMappingId = pa.Id, //TODO - check pav.ProductAttributeMappingId,
             AttributeValueTypeId = pav.AttributeValueTypeId,
-            AttributeValueTypeName = pav.AttributeValueTypeId.GetTranslationEnum(translationService, workContext),
+            AttributeValueTypeName = enumTranslationService.GetTranslationEnum(pav.AttributeValueTypeId),
             AssociatedProductId = pav.AssociatedProductId,
             AssociatedProductName = associatedProduct != null ? associatedProduct.Name : "",
             Name = pav.Name,
@@ -2354,6 +2353,7 @@ public class ProductViewModelService(
                 AltAttribute = picture?.AltAttribute,
                 TitleAttribute = picture?.TitleAttribute,
                 DisplayOrder = x.DisplayOrder,
+                IsDefault = x.IsDefault,
                 Style = picture?.Style,
                 ExtraField = picture?.ExtraField
             };
@@ -2375,6 +2375,7 @@ public class ProductViewModelService(
             AltAttribute = picture?.AltAttribute,
             TitleAttribute = picture?.TitleAttribute,
             DisplayOrder = productPicture.DisplayOrder,
+            IsDefault = productPicture.IsDefault,
             Style = picture?.Style,
             ExtraField = picture?.ExtraField
         };
@@ -2389,12 +2390,12 @@ public class ProductViewModelService(
 
         if (product.ProductPictures.Any(x => x.PictureId == picture.Id))
             return;
-
-        await productService.InsertProductPicture(new ProductPicture {
+        
+        var productPicture = new ProductPicture {
             PictureId = picture.Id,
             DisplayOrder = displayOrder
-        }, product.Id);
-
+        };
+        await productService.InsertProductPicture(productPicture, product.Id);
         await pictureService.SetSeoFilename(picture, pictureService.GetPictureSeName(product.Name));
     }
 
@@ -2411,6 +2412,7 @@ public class ProductViewModelService(
             throw new ArgumentException("No picture found with the specified id");
 
         productPicture.DisplayOrder = model.DisplayOrder;
+        productPicture.IsDefault = model.IsDefault;
         await productService.UpdateProductPicture(productPicture, product.Id);
 
         //Update picture fields
@@ -2449,7 +2451,7 @@ public class ProductViewModelService(
                 AttributeTypeId = (int)x.AttributeTypeId,
                 AttributeId = x.SpecificationAttributeId,
                 ProductId = product.Id,
-                AttributeTypeName = x.AttributeTypeId.GetTranslationEnum(translationService, workContext),
+                AttributeTypeName = enumTranslationService.GetTranslationEnum(x.AttributeTypeId),
                 AllowFiltering = x.AllowFiltering,
                 ShowOnProductPage = x.ShowOnProductPage,
                 DisplayOrder = x.DisplayOrder,
@@ -2626,8 +2628,7 @@ public class ProductViewModelService(
             model.AvailableVendors.Add(new SelectListItem { Text = v.Name, Value = v.Id });
 
         //product types
-        model.AvailableProductTypes =
-            ProductType.SimpleProduct.ToSelectList(translationService, workContext, false).ToList();
+        model.AvailableProductTypes = enumTranslationService.ToSelectList(ProductType.SimpleProduct, false).ToList();
         model.AvailableProductTypes.Insert(0,
             new SelectListItem { Text = translationService.GetResource("Admin.Common.All"), Value = "0" });
 

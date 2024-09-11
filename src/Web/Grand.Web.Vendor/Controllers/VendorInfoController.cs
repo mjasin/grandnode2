@@ -4,10 +4,8 @@ using Grand.Business.Core.Interfaces.Common.Localization;
 using Grand.Business.Core.Interfaces.Common.Seo;
 using Grand.Business.Core.Interfaces.Customers;
 using Grand.Domain.Directory;
-using Grand.Domain.Seo;
 using Grand.Domain.Vendors;
 using Grand.Infrastructure;
-using Grand.Web.Common.Extensions;
 using Grand.Web.Vendor.Extensions;
 using Grand.Web.Vendor.Models.Common;
 using Grand.Web.Vendor.Models.Vendor;
@@ -26,18 +24,16 @@ public class VendorInfoController : BaseVendorController
         ILanguageService languageService,
         IWorkContext workContext,
         ICountryService countryService,
-        ISlugService slugService,
-        SeoSettings seoSettings,
-        VendorSettings vendorSettings)
+        VendorSettings vendorSettings, 
+        ISeNameService seNameService)
     {
         _translationService = translationService;
         _vendorService = vendorService;
         _languageService = languageService;
         _workContext = workContext;
         _countryService = countryService;
-        _slugService = slugService;
-        _seoSettings = seoSettings;
         _vendorSettings = vendorSettings;
+        _seNameService = seNameService;
     }
 
     #endregion
@@ -49,9 +45,7 @@ public class VendorInfoController : BaseVendorController
     private readonly IVendorService _vendorService;
     private readonly ILanguageService _languageService;
     private readonly ICountryService _countryService;
-    private readonly ISlugService _slugService;
-
-    private readonly SeoSettings _seoSettings;
+    private readonly ISeNameService _seNameService;
     private readonly VendorSettings _vendorSettings;
 
     #endregion
@@ -105,18 +99,16 @@ public class VendorInfoController : BaseVendorController
     private async Task UpdateVendorModel(Domain.Vendors.Vendor vendor, VendorModel model)
     {
         vendor = model.ToEntity(vendor);
-        vendor.Locales =
-            await model.Locales.ToTranslationProperty(vendor, x => x.Name, _seoSettings, _slugService,
-                _languageService);
-        model.SeName = await vendor.ValidateSeName(model.SeName, vendor.Name, true, _seoSettings, _slugService,
-            _languageService);
+        vendor.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, vendor, x => x.Name);
+        vendor.SeName = await _seNameService.ValidateSeName(vendor, model.SeName, vendor.Name, true);
+        
         vendor.Address = model.Address.ToEntity();
         vendor.SeName = model.SeName;
 
         await _vendorService.UpdateVendor(vendor);
 
         //search engine name                
-        await _slugService.SaveSlug(vendor, model.SeName, "");
+        await _seNameService.SaveSeName(vendor);
     }
 
     #endregion

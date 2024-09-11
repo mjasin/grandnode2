@@ -10,9 +10,11 @@ using Grand.Domain.Payments;
 using Grand.Domain.Seo;
 using Grand.Domain.Shipping;
 using Grand.Infrastructure;
+using Grand.SharedKernel.Extensions;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Affiliates;
+using Grand.Web.Common.Localization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Grand.Web.Admin.Services;
@@ -30,13 +32,13 @@ public class AffiliateViewModelService : IAffiliateViewModelService
     private readonly SeoSettings _seoSettings;
     private readonly ITranslationService _translationService;
     private readonly IWorkContext _workContext;
-
+    private readonly IEnumTranslationService _enumTranslationService;
     public AffiliateViewModelService(IWorkContext workContext, ICountryService countryService,
         IPriceFormatter priceFormatter, IAffiliateService affiliateService,
         ICustomerService customerService, IOrderService orderService, ITranslationService translationService,
         IDateTimeService dateTimeService,
         IOrderStatusService orderStatusService,
-        SeoSettings seoSettings, ICurrencyService currencyService)
+        SeoSettings seoSettings, ICurrencyService currencyService, IEnumTranslationService enumTranslationService)
     {
         _workContext = workContext;
         _countryService = countryService;
@@ -49,6 +51,7 @@ public class AffiliateViewModelService : IAffiliateViewModelService
         _orderStatusService = orderStatusService;
         _seoSettings = seoSettings;
         _currencyService = currencyService;
+        _enumTranslationService = enumTranslationService;
     }
 
     public virtual async Task PrepareAffiliateModel(AffiliateModel model, Affiliate affiliate, bool excludeProperties,
@@ -145,8 +148,7 @@ public class AffiliateViewModelService : IAffiliateViewModelService
             Name = model.Name
         };
         //validate friendly URL name
-        var friendlyUrlName =
-            await affiliate.ValidateFriendlyUrlName(_affiliateService, _seoSettings, model.FriendlyUrlName, model.Name);
+        var friendlyUrlName = await ValidateFriendlyUrlName(affiliate, model.FriendlyUrlName, model.Name);
         affiliate.FriendlyUrlName = friendlyUrlName.ToLowerInvariant();
         affiliate.Address = model.Address.ToEntity();
         //some validation
@@ -160,8 +162,7 @@ public class AffiliateViewModelService : IAffiliateViewModelService
         affiliate.AdminComment = model.AdminComment;
         affiliate.Name = model.Name;
         //validate friendly URL name
-        var friendlyUrlName =
-            await affiliate.ValidateFriendlyUrlName(_affiliateService, _seoSettings, model.FriendlyUrlName, model.Name);
+        var friendlyUrlName = await ValidateFriendlyUrlName(affiliate, model.FriendlyUrlName, model.Name);
         affiliate.FriendlyUrlName = friendlyUrlName.ToLowerInvariant();
         affiliate.Address = model.Address.ToEntity(affiliate.Address);
         await _affiliateService.UpdateAffiliate(affiliate);
@@ -203,8 +204,8 @@ public class AffiliateViewModelService : IAffiliateViewModelService
                 OrderNumber = order.OrderNumber,
                 OrderCode = order.Code,
                 OrderStatus = statuses.FirstOrDefault(y => y.StatusId == order.OrderStatusId)?.Name,
-                PaymentStatus = order.PaymentStatusId.GetTranslationEnum(_translationService, _workContext),
-                ShippingStatus = order.ShippingStatusId.GetTranslationEnum(_translationService, _workContext),
+                PaymentStatus = _enumTranslationService.GetTranslationEnum(order.PaymentStatusId),
+                ShippingStatus = _enumTranslationService.GetTranslationEnum(order.ShippingStatusId),
                 OrderTotal = _priceFormatter.FormatPrice(order.OrderTotal,
                     await _currencyService.GetCurrencyByCode(order.CustomerCurrencyCode)),
                 CreatedOn = _dateTimeService.ConvertToUserTime(order.CreatedOnUtc, DateTimeKind.Utc)
@@ -232,5 +233,49 @@ public class AffiliateViewModelService : IAffiliateViewModelService
             };
             return customerModel;
         }), customers.TotalCount);
+    }
+    
+    /// <summary>
+    ///     Validate friendly URL name
+    /// </summary>
+    /// <param name="affiliate">Affiliate</param>
+    /// <param name="seoSettings"></param>
+    /// <param name="friendlyUrlName">Friendly URL name</param>
+    /// <param name="affiliateService"></param>
+    /// <param name="name"></param>
+    /// <returns>Valid friendly name</returns>
+    private async Task<string> ValidateFriendlyUrlName(Affiliate affiliate, string friendlyUrlName, string name)
+    {
+        ArgumentNullException.ThrowIfNull(affiliate);
+
+        if (string.IsNullOrEmpty(friendlyUrlName))
+            friendlyUrlName = name;
+
+        //ensure we have only valid chars
+        friendlyUrlName = SeoExtensions.GetSeName(friendlyUrlName, _seoSettings.ConvertNonWesternChars,
+            _seoSettings.AllowUnicodeCharsInUrls, _seoSettings.SeoCharConversion);
+
+        //max length
+        friendlyUrlName = CommonHelper.EnsureMaximumLength(friendlyUrlName, 200);
+
+        if (string.IsNullOrEmpty(friendlyUrlName))
+            return friendlyUrlName;
+        //check whether such friendly URL name already exists (and that is not the current affiliate)
+        var i = 2;
+        var tempName = friendlyUrlName;
+        while (true)
+        {
+            var affiliateByFriendlyUrlName = await _affiliateService.GetAffiliateByFriendlyUrlName(tempName);
+            var reserved = affiliateByFriendlyUrlName != null && affiliateByFriendlyUrlName.Id != affiliate.Id;
+            if (!reserved)
+                break;
+
+            tempName = $"{friendlyUrlName}-{i}";
+            i++;
+        }
+
+        friendlyUrlName = tempName;
+
+        return friendlyUrlName;
     }
 }

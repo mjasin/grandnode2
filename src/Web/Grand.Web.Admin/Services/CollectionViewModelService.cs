@@ -1,5 +1,4 @@
-﻿using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Catalog.Collections;
+﻿using Grand.Business.Core.Interfaces.Catalog.Collections;
 using Grand.Business.Core.Interfaces.Catalog.Discounts;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Common.Localization;
@@ -9,19 +8,37 @@ using Grand.Business.Core.Interfaces.Customers;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Domain.Catalog;
 using Grand.Domain.Discounts;
-using Grand.Domain.Seo;
 using Grand.Infrastructure;
 using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Catalog;
 using Grand.Web.Common.Extensions;
+using Grand.Web.Common.Localization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Grand.Web.Admin.Services;
 
 public class CollectionViewModelService : ICollectionViewModelService
 {
+
+    #region Fields
+
+    private readonly ICollectionService _collectionService;
+    private readonly IProductCollectionService _productCollectionService;
+    private readonly ICollectionLayoutService _collectionLayoutService;
+    private readonly IProductService _productService;
+    private readonly IStoreService _storeService;
+    private readonly IPictureService _pictureService;
+    private readonly ITranslationService _translationService;
+    private readonly IDiscountService _discountService;
+    private readonly IVendorService _vendorService;
+    private readonly IWorkContext _workContext;
+    private readonly ISeNameService _seNameService;
+    private readonly IEnumTranslationService _enumTranslationService;
+    
+    #endregion
+
     #region Constructors
 
     public CollectionViewModelService(
@@ -30,28 +47,26 @@ public class CollectionViewModelService : ICollectionViewModelService
         ICollectionLayoutService collectionLayoutService,
         IProductService productService,
         IStoreService storeService,
-        ISlugService slugService,
         IPictureService pictureService,
         ITranslationService translationService,
         IDiscountService discountService,
         IVendorService vendorService,
-        ILanguageService languageService,
         IWorkContext workContext,
-        SeoSettings seoSettings)
+        ISeNameService seNameService, 
+        IEnumTranslationService enumTranslationService)
     {
         _collectionLayoutService = collectionLayoutService;
         _collectionService = collectionService;
         _productCollectionService = productCollectionService;
         _productService = productService;
         _storeService = storeService;
-        _slugService = slugService;
         _pictureService = pictureService;
         _translationService = translationService;
         _discountService = discountService;
         _vendorService = vendorService;
-        _languageService = languageService;
         _workContext = workContext;
-        _seoSettings = seoSettings;
+        _seNameService = seNameService;
+        _enumTranslationService = enumTranslationService;
     }
 
     #endregion
@@ -60,7 +75,7 @@ public class CollectionViewModelService : ICollectionViewModelService
     {
         ArgumentNullException.ThrowIfNull(model);
 
-        model.AvailableSortOptions = ProductSortingEnum.Position.ToSelectList().ToList();
+        model.AvailableSortOptions = _enumTranslationService.ToSelectList(ProductSortingEnum.Position).ToList();
         model.AvailableSortOptions.Insert(0, new SelectListItem { Text = "None", Value = "-1" });
     }
 
@@ -97,18 +112,13 @@ public class CollectionViewModelService : ICollectionViewModelService
         foreach (var discount in allDiscounts)
             if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
                 collection.AppliedDiscounts.Add(discount.Id);
+        
+        //search engine name
+        collection.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, collection, x => x.Name);
+        collection.SeName = await _seNameService.ValidateSeName(collection, model.SeName, collection.Name, true);
 
         await _collectionService.InsertCollection(collection);
-        //search engine name
-        collection.Locales =
-            await model.Locales.ToTranslationProperty(collection, x => x.Name, _seoSettings, _slugService,
-                _languageService);
-        model.SeName = await collection.ValidateSeName(model.SeName, collection.Name, true, _seoSettings, _slugService,
-            _languageService);
-        collection.SeName = model.SeName;
-        await _collectionService.UpdateCollection(collection);
-
-        await _slugService.SaveSlug(collection, model.SeName, "");
+        await _seNameService.SaveSeName(collection);
 
         //update picture seo file name
         await _pictureService.UpdatePictureSeoNames(collection.PictureId, collection.Name);
@@ -120,9 +130,10 @@ public class CollectionViewModelService : ICollectionViewModelService
     {
         var prevPictureId = collection.PictureId;
         collection = model.ToEntity(collection);
-        collection.Locales =
-            await model.Locales.ToTranslationProperty(collection, x => x.Name, _seoSettings, _slugService,
-                _languageService);
+        
+        collection.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, collection, x => x.Name);
+        collection.SeName = await _seNameService.ValidateSeName(collection, model.SeName, collection.Name, true);
+        
         //discounts
         var allDiscounts = await _discountService.GetDiscountsQuery(DiscountType.AssignedToCollections);
         foreach (var discount in allDiscounts)
@@ -139,13 +150,9 @@ public class CollectionViewModelService : ICollectionViewModelService
                     collection.AppliedDiscounts.Remove(discount.Id);
             }
 
-        model.SeName = await collection.ValidateSeName(model.SeName, collection.Name, true, _seoSettings, _slugService,
-            _languageService);
-        collection.SeName = model.SeName;
-
         await _collectionService.UpdateCollection(collection);
         //search engine name
-        await _slugService.SaveSlug(collection, model.SeName, "");
+        await _seNameService.SaveSeName(collection);
 
         //delete an old picture (if deleted or updated)
         if (!string.IsNullOrEmpty(prevPictureId) && prevPictureId != collection.PictureId)
@@ -191,8 +198,7 @@ public class CollectionViewModelService : ICollectionViewModelService
             model.AvailableVendors.Add(new SelectListItem { Text = v.Name, Value = v.Id });
 
         //product types
-        model.AvailableProductTypes =
-            ProductType.SimpleProduct.ToSelectList(_translationService, _workContext, false).ToList();
+        model.AvailableProductTypes = _enumTranslationService.ToSelectList(ProductType.SimpleProduct, false).ToList();
         model.AvailableProductTypes.Insert(0,
             new SelectListItem { Text = _translationService.GetResource("Admin.Common.All"), Value = "0" });
         return model;
@@ -272,22 +278,4 @@ public class CollectionViewModelService : ICollectionViewModelService
                         }, product.Id);
         }
     }
-
-    #region Fields
-
-    private readonly ICollectionService _collectionService;
-    private readonly IProductCollectionService _productCollectionService;
-    private readonly ICollectionLayoutService _collectionLayoutService;
-    private readonly IProductService _productService;
-    private readonly IStoreService _storeService;
-    private readonly ISlugService _slugService;
-    private readonly IPictureService _pictureService;
-    private readonly ITranslationService _translationService;
-    private readonly IDiscountService _discountService;
-    private readonly IVendorService _vendorService;
-    private readonly ILanguageService _languageService;
-    private readonly IWorkContext _workContext;
-    private readonly SeoSettings _seoSettings;
-
-    #endregion
 }

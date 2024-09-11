@@ -1,5 +1,4 @@
-﻿using Grand.Business.Core.Extensions;
-using Grand.Business.Core.Interfaces.Catalog.Categories;
+﻿using Grand.Business.Core.Interfaces.Catalog.Categories;
 using Grand.Business.Core.Interfaces.Catalog.Discounts;
 using Grand.Business.Core.Interfaces.Catalog.Products;
 using Grand.Business.Core.Interfaces.Common.Localization;
@@ -9,12 +8,12 @@ using Grand.Business.Core.Interfaces.Customers;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Domain.Catalog;
 using Grand.Domain.Discounts;
-using Grand.Domain.Seo;
 using Grand.Web.Admin.Extensions;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Catalog;
 using Grand.Web.Common.Extensions;
+using Grand.Web.Common.Localization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Grand.Web.Admin.Services;
@@ -25,16 +24,15 @@ public class CategoryViewModelService : ICategoryViewModelService
     private readonly ICategoryLayoutService _categoryLayoutService;
     private readonly ICategoryService _categoryService;
     private readonly IDiscountService _discountService;
-    private readonly ILanguageService _languageService;
     private readonly IPictureService _pictureService;
     private readonly IProductCategoryService _productCategoryService;
     private readonly IProductService _productService;
-    private readonly SeoSettings _seoSettings;
-    private readonly ISlugService _slugService;
     private readonly IStoreService _storeService;
     private readonly ITranslationService _translationService;
     private readonly IVendorService _vendorService;
-
+    private readonly ISeNameService _seNameService;
+    private readonly IEnumTranslationService _enumTranslationService;
+   
     public CategoryViewModelService(
         ICategoryService categoryService,
         IProductCategoryService productCategoryService,
@@ -43,12 +41,11 @@ public class CategoryViewModelService : ICategoryViewModelService
         ITranslationService translationService,
         IStoreService storeService,
         IPictureService pictureService,
-        ISlugService slugService,
         IProductService productService,
         IVendorService vendorService,
-        ILanguageService languageService,
         CatalogSettings catalogSettings,
-        SeoSettings seoSettings)
+        ISeNameService seNameService, 
+        IEnumTranslationService enumTranslationService)
     {
         _categoryService = categoryService;
         _productCategoryService = productCategoryService;
@@ -56,13 +53,12 @@ public class CategoryViewModelService : ICategoryViewModelService
         _discountService = discountService;
         _translationService = translationService;
         _storeService = storeService;
-        _slugService = slugService;
         _productService = productService;
         _pictureService = pictureService;
         _vendorService = vendorService;
-        _languageService = languageService;
         _catalogSettings = catalogSettings;
-        _seoSettings = seoSettings;
+        _seNameService = seNameService;
+        _enumTranslationService = enumTranslationService;
     }
 
     public virtual async Task<CategoryListModel> PrepareCategoryListModel(string storeId)
@@ -135,18 +131,13 @@ public class CategoryViewModelService : ICategoryViewModelService
         foreach (var discount in allDiscounts)
             if (model.SelectedDiscountIds != null && model.SelectedDiscountIds.Contains(discount.Id))
                 category.AppliedDiscounts.Add(discount.Id);
-        await _categoryService.InsertCategory(category);
 
         //locales
-        category.Locales =
-            await model.Locales.ToTranslationProperty(category, x => x.Name, _seoSettings, _slugService,
-                _languageService);
-        model.SeName = await category.ValidateSeName(model.SeName, category.Name, true, _seoSettings, _slugService,
-            _languageService);
-        category.SeName = model.SeName;
-        await _categoryService.UpdateCategory(category);
+        category.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, category, x => x.Name);
+        category.SeName = await _seNameService.ValidateSeName(category, model.SeName, category.Name, true);
 
-        await _slugService.SaveSlug(category, model.SeName, "");
+        await _categoryService.InsertCategory(category);
+        await _seNameService.SaveSeName(category);
 
         //update picture seo file name
         await _pictureService.UpdatePictureSeoNames(category.PictureId, category.Name);
@@ -158,13 +149,10 @@ public class CategoryViewModelService : ICategoryViewModelService
     {
         var prevPictureId = category.PictureId;
         category = model.ToEntity(category);
-        model.SeName = await category.ValidateSeName(model.SeName, category.Name, true, _seoSettings, _slugService,
-            _languageService);
-        category.SeName = model.SeName;
-        //locales
-        category.Locales =
-            await model.Locales.ToTranslationProperty(category, x => x.Name, _seoSettings, _slugService,
-                _languageService);
+
+        category.Locales = await _seNameService.TranslationSeNameProperties(model.Locales, category, x => x.Name);
+        category.SeName = await _seNameService.ValidateSeName(category, model.SeName, category.Name, true);
+
         //discounts
         var allDiscounts = await _discountService.GetDiscountsQuery(DiscountType.AssignedToCategories);
         foreach (var discount in allDiscounts)
@@ -184,7 +172,7 @@ public class CategoryViewModelService : ICategoryViewModelService
         await _categoryService.UpdateCategory(category);
 
         //search engine name
-        await _slugService.SaveSlug(category, model.SeName, "");
+        await _seNameService.SaveSeName(category);
 
         //delete an old picture (if deleted or updated)
         if (!string.IsNullOrEmpty(prevPictureId) && prevPictureId != category.PictureId)
@@ -270,7 +258,7 @@ public class CategoryViewModelService : ICategoryViewModelService
             model.AvailableVendors.Add(new SelectListItem { Text = v.Name, Value = v.Id });
 
         //product types
-        model.AvailableProductTypes = ProductType.SimpleProduct.ToSelectList().ToList();
+        model.AvailableProductTypes = _enumTranslationService.ToSelectList(ProductType.SimpleProduct).ToList();
         model.AvailableProductTypes.Insert(0,
             new SelectListItem { Text = _translationService.GetResource("Admin.Common.All"), Value = "0" });
         return model;
@@ -330,7 +318,7 @@ public class CategoryViewModelService : ICategoryViewModelService
     {
         ArgumentNullException.ThrowIfNull(model);
 
-        model.AvailableSortOptions = ProductSortingEnum.Position.ToSelectList().ToList();
+        model.AvailableSortOptions = _enumTranslationService.ToSelectList(ProductSortingEnum.Position).ToList();
         model.AvailableSortOptions.Insert(0, new SelectListItem { Text = "None", Value = "-1" });
     }
 }
