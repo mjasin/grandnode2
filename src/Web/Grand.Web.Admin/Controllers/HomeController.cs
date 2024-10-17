@@ -150,7 +150,7 @@ public class HomeController : BaseAdminController
                 SystemCustomerFieldNames.AdminAreaStoreScopeConfiguration, "");
 
         //home page
-        if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
+        if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.Action("Index", "Home", new { area = Constants.AreaAdmin });
 
         return Redirect(returnUrl);
@@ -197,17 +197,16 @@ public class HomeController : BaseAdminController
         return Json(result);
     }
 
-    public async Task<IActionResult> AccessDenied(string pageUrl)
+    public async Task<IActionResult> AccessDenied()
     {
         var currentCustomer = _workContext.CurrentCustomer;
         if (currentCustomer == null || await _groupService.IsGuest(currentCustomer))
         {
-            _logger.LogInformation("Access denied to anonymous request on {PageUrl}", pageUrl);
+            _logger.LogInformation("Access denied to anonymous request");
             return View();
         }
 
-        _logger.LogInformation("Access denied to user #{CurrentCustomerEmail} \'{CurrentCustomerEmail}\' on {PageUrl}",
-            currentCustomer.Email, currentCustomer.Email, pageUrl);
+        _logger.LogInformation("Access denied to user #{CurrentCustomerEmail} \'{CurrentCustomerEmail}\'", currentCustomer.Email, currentCustomer.Email);
 
         return View();
     }

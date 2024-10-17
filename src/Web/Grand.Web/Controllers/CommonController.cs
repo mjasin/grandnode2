@@ -70,7 +70,7 @@ public class CommonController : BasePublicController
         _ = new PathString(url).StartsWithSegments(pathBase, out var result);
         url = WebUtility.UrlDecode(result);
 
-        var firstSegment = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ??
+        var firstSegment = url.Split(['/'], StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ??
                            string.Empty;
         if (string.IsNullOrEmpty(firstSegment))
             return false;
@@ -143,15 +143,11 @@ public class CommonController : BasePublicController
     public virtual async Task<IActionResult> SetLanguage(
         [FromServices] AppConfig config,
         [FromServices] ICustomerService customerService,
-        string langCode, string returnUrl = default)
+        string langCode, string returnUrl = "")
     {
         var language = await _languageService.GetLanguageByCode(langCode);
         if (!language?.Published ?? false)
             language = _workContext.WorkingLanguage;
-
-        //home page
-        if (string.IsNullOrEmpty(returnUrl))
-            returnUrl = Url.RouteUrl("HomePage");
 
         //prevent open redirection attack
         if (!Url.IsLocalUrl(returnUrl))
@@ -227,10 +223,6 @@ public class CommonController : BasePublicController
         //notification
         await _mediator.Publish(new ChangeCurrencyEvent(_workContext.CurrentCustomer, currency));
 
-        //home page
-        if (string.IsNullOrEmpty(returnUrl))
-            returnUrl = Url.RouteUrl("HomePage");
-
         //prevent open redirection attack
         if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl("HomePage");
@@ -266,10 +258,6 @@ public class CommonController : BasePublicController
                 }
             }
 
-        //home page
-        if (string.IsNullOrEmpty(returnUrl))
-            returnUrl = Url.RouteUrl("HomePage");
-
         //prevent open redirection attack
         if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl("HomePage");
@@ -284,17 +272,13 @@ public class CommonController : BasePublicController
     public virtual async Task<IActionResult> SetTaxType(
         [FromServices] TaxSettings taxSettings,
         [FromServices] ICustomerService customerService,
-        int customerTaxType, string returnUrl = default)
+        int customerTaxType, string returnUrl = "")
     {
-        var taxDisplayType = (TaxDisplayType)Enum.ToObject(typeof(TaxDisplayType), customerTaxType);
-
-        //home page
-        if (string.IsNullOrEmpty(returnUrl))
-            returnUrl = Url.RouteUrl("HomePage");
-
         //prevent open redirection attack
         if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl("HomePage");
+
+        var taxDisplayType = (TaxDisplayType)Enum.ToObject(typeof(TaxDisplayType), customerTaxType);
 
         //whether customers are allowed to select tax display type
         if (!taxSettings.AllowCustomersToSelectTaxDisplayType)
@@ -316,6 +300,10 @@ public class CommonController : BasePublicController
         [FromServices] StoreInformationSettings storeInformationSettings,
         [FromServices] IThemeContextFactory themeContextFactory, string themeName, string returnUrl = "")
     {
+        //prevent open redirection attack
+        if (!Url.IsLocalUrl(returnUrl))
+            returnUrl = Url.RouteUrl("HomePage");
+
         if (!storeInformationSettings.AllowCustomerToSelectTheme) return Redirect(returnUrl);
 
         var themeContext = themeContextFactory.GetThemeContext("");
@@ -323,14 +311,6 @@ public class CommonController : BasePublicController
 
         //notification
         await _mediator.Publish(new ChangeThemeEvent(_workContext.CurrentCustomer, themeName));
-
-        //home page
-        if (string.IsNullOrEmpty(returnUrl))
-            returnUrl = Url.RouteUrl("HomePage");
-
-        //prevent open redirection attack
-        if (!Url.IsLocalUrl(returnUrl))
-            returnUrl = Url.RouteUrl("HomePage");
 
         return Redirect(returnUrl);
     }
@@ -366,9 +346,8 @@ public class CommonController : BasePublicController
         //save consent cookies
         await customerService.UpdateUserField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies, "",
             _workContext.CurrentStore.Id);
-        var dictionary = new Dictionary<string, bool>();
         var consentCookies = cookiePreference.GetConsentCookies();
-        foreach (var item in consentCookies.Where(x => x.AllowToDisable)) dictionary.Add(item.SystemName, accept);
+        var dictionary = consentCookies.Where(x => x.AllowToDisable).ToDictionary(item => item.SystemName, item => accept);
 
         if (dictionary.Any())
             await customerService.UpdateUserField(_workContext.CurrentCustomer, SystemCustomerFieldNames.ConsentCookies,
