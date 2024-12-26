@@ -37,6 +37,7 @@ Advanced personalization, scalability, speed, and high efficiency - these are fe
 [![Build Status](https://dev.azure.com/grandnode/grandnode2/_apis/build/status/grandnode.grandnode2?branchName=main)](https://dev.azure.com/grandnode/grandnode2/_build/latest?definitionId=8&branchName=main)
 [![Docker Image CI](https://github.com/grandnode/grandnode2/actions/workflows/docker-image.yml/badge.svg)](https://github.com/grandnode/grandnode2/actions/workflows/docker-image.yml)
 ![License](https://img.shields.io/github/license/grandnode/grandnode2)
+[![CodeQL Advanced](https://github.com/grandnode/grandnode2/actions/workflows/codeql.yml/badge.svg)](https://github.com/grandnode/grandnode2/actions/workflows/codeql.yml)
 <a href="https://docs.grandnode.com/"><img src="https://img.shields.io/badge/Docs-docs.grandnode.com-brightgreen"></a>
 </div>
 
@@ -71,7 +72,7 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites (develop version)
 
-GrandNode requires .NET Core 8.0, MongoDB 4.0+, and OS-specific dependency tools. 
+GrandNode requires .NET Core 9.0, MongoDB 4.0+, and OS-specific dependency tools. 
 
 ### Installation
 
@@ -81,14 +82,14 @@ latest stable version, download it from the Releases page or switch to a release
 * Docker 
 ```
 docker run -d -p 127.0.0.1:27017:27017 --name mongodb mongo 
-docker run -d -p 80:8080 --name grandnode2 --link mongodb:mongo grandnode/grandnode2
+docker run -d -p 80:8080 --name grandnode2 --link mongodb:mongo -v grandnode_images:/app/wwwroot/assets/images -v grandnode_appdata:/app/App_Data grandnode/grandnode2
 ``` 
 If you want to download the latest stable version of GrandNode please use the following command, where x.xx is a number of GrandNode release: 
 ```
 docker pull grandnode/grandnode2:x.xx 
 ```
 
-* Open locally with VS2022+
+* Open locally with VS2022+ (v17.12.0) or above
 
 Run the project in the Visual Studio 2022+, extract the source code package downloaded from Releases tab to a folder. Enter the extracted folder and double-click the GrandNode.sln solution file. Select the Plugins project, rebuild it, then select the GrandNode.Web project.
 
