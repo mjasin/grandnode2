@@ -11,15 +11,15 @@ using MediatR;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace Grand.Module.Api.Controllers;
 
 [ApiExplorerSettings(GroupName = "v2")]
 [ApiController]
 [Route("[controller]/[action]")]
-[SwaggerTag("Create token")]
+[Tags("Create token")]
 public class TokenWebController : ControllerBase
 {
     private readonly IAntiforgery _antiforgery;
@@ -27,19 +27,19 @@ public class TokenWebController : ControllerBase
     private readonly ICustomerService _customerService;
     private readonly IMediator _mediator;
     private readonly IRefreshTokenService _refreshTokenService;
-    private readonly IStoreHelper _storeHelper;
+    private readonly IWorkContextAccessor _workContextAccessor;
 
     public TokenWebController(
         ICustomerService customerService,
         IMediator mediator,
-        IStoreHelper storeHelper,
+        IWorkContextAccessor workContextAccessor,
         IRefreshTokenService refreshTokenService,
         IAntiforgery antiforgery,
         FrontendAPIConfig apiConfig)
     {
         _customerService = customerService;
         _mediator = mediator;
-        _storeHelper = storeHelper;
+        _workContextAccessor = workContextAccessor;
         _refreshTokenService = refreshTokenService;
         _antiforgery = antiforgery;
         _apiConfig = apiConfig;
@@ -56,7 +56,7 @@ public class TokenWebController : ControllerBase
         var customer = new Customer {
             CustomerGuid = Guid.NewGuid(),
             Active = true,
-            StoreId = _storeHelper.StoreHost.Id,
+            StoreId = _workContextAccessor.WorkContext.CurrentStore.Id,
             LastActivityDateUtc = DateTime.UtcNow
         };
 

@@ -1,7 +1,7 @@
-﻿@inject IWorkContext workContext
+﻿@inject IWorkContextAccessor workContextAccessor
 
 @{
-    var supportRtl = workContext.WorkingLanguage.Rtl;
+    var supportRtl = workContextAccessor.WorkContext.WorkingLanguage.Rtl;
 
     <link rel="preload" href="/bundles/libs.css" as="style" />
     <environment include="Production">

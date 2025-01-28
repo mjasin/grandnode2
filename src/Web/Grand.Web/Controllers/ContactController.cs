@@ -6,6 +6,7 @@ using Grand.Domain.Catalog;
 using Grand.Domain.Media;
 using Grand.Domain.Stores;
 using Grand.Infrastructure;
+using Grand.SharedKernel.Attributes;
 using Grand.Web.Commands.Models.Contact;
 using Grand.Web.Common.Controllers;
 using Grand.Web.Common.Extensions;
@@ -18,17 +19,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Grand.Web.Controllers;
 
+[ApiGroup(SharedKernel.Extensions.ApiConstants.ApiGroupNameV2)]
 public class ContactController : BasePublicController
 {
     #region Constructors
 
     public ContactController(
         ITranslationService translationService,
-        IWorkContext workContext,
+        IWorkContextAccessor workContextAccessor,
         IMediator mediator)
     {
         _translationService = translationService;
-        _workContext = workContext;
+        _workContextAccessor = workContextAccessor;
         _mediator = mediator;
     }
 
@@ -50,9 +52,9 @@ public class ContactController : BasePublicController
         }
 
         var model = await _mediator.Send(new ContactUsCommand {
-            Customer = _workContext.CurrentCustomer,
-            Language = _workContext.WorkingLanguage,
-            Store = _workContext.CurrentStore
+            Customer = _workContextAccessor.WorkContext.CurrentCustomer,
+            Language = _workContextAccessor.WorkContext.WorkingLanguage,
+            Store = _workContextAccessor.WorkContext.CurrentStore
         });
         return View(model);
     }
@@ -82,15 +84,15 @@ public class ContactController : BasePublicController
             });
 
             //notification
-            await _mediator.Publish(new ContactUsEvent(_workContext.CurrentCustomer, result));
+            await _mediator.Publish(new ContactUsEvent(_workContextAccessor.WorkContext.CurrentCustomer, result));
 
             return View(result);
         }
 
         var modelReturn = await _mediator.Send(new ContactUsCommand {
-            Customer = _workContext.CurrentCustomer,
-            Language = _workContext.WorkingLanguage,
-            Store = _workContext.CurrentStore,
+            Customer = _workContextAccessor.WorkContext.CurrentCustomer,
+            Language = _workContextAccessor.WorkContext.WorkingLanguage,
+            Store = _workContextAccessor.WorkContext.CurrentStore,
             Model = model
         });
 
@@ -103,8 +105,8 @@ public class ContactController : BasePublicController
     {
         var result = await _mediator.Send(new ContactAttributeChangeCommand {
             Attributes = model.Attributes,
-            Customer = _workContext.CurrentCustomer,
-            Store = _workContext.CurrentStore
+            Customer = _workContextAccessor.WorkContext.CurrentCustomer,
+            Store = _workContextAccessor.WorkContext.CurrentStore
         });
         return Json(new {
             enabledattributeids = result.enabledAttributeIds.ToArray(),
@@ -176,7 +178,7 @@ public class ContactController : BasePublicController
 
         var download = new Download {
             DownloadGuid = Guid.NewGuid(),
-            CustomerId = _workContext.CurrentCustomer.Id,
+            CustomerId = _workContextAccessor.WorkContext.CurrentCustomer.Id,
             UseDownloadUrl = false,
             DownloadUrl = "",
             DownloadBinary = fileBinary,
@@ -202,7 +204,7 @@ public class ContactController : BasePublicController
     #region Fields
 
     private readonly ITranslationService _translationService;
-    private readonly IWorkContext _workContext;
+    private readonly IWorkContextAccessor _workContextAccessor;
     private readonly IMediator _mediator;
 
     #endregion

@@ -4,9 +4,10 @@ using Grand.Business.Core.Interfaces.Common.Security;
 using Grand.Business.Core.Interfaces.Customers;
 using Grand.Business.Core.Interfaces.Messages;
 using Grand.Business.Core.Utilities.Checkout;
-using Grand.Domain.Permissions;
 using Grand.Domain.Orders;
+using Grand.Domain.Permissions;
 using Grand.Infrastructure;
+using Grand.SharedKernel.Attributes;
 using Grand.SharedKernel.Extensions;
 using Grand.Web.Common.Controllers;
 using Grand.Web.Common.Filters;
@@ -19,12 +20,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Grand.Web.Controllers;
 
+[ApiGroup(SharedKernel.Extensions.ApiConstants.ApiGroupNameV2)]
 public class WishlistController : BasePublicController
 {
     #region Constructors
 
     public WishlistController(
-        IWorkContext workContext,
+        IWorkContextAccessor workContextAccessor,
         IShoppingCartService shoppingCartService,
         ITranslationService translationService,
         ICustomerService customerService,
@@ -32,7 +34,7 @@ public class WishlistController : BasePublicController
         IMediator mediator,
         ShoppingCartSettings shoppingCartSettings)
     {
-        _workContext = workContext;
+        _workContextAccessor = workContextAccessor;
         _shoppingCartService = shoppingCartService;
         _translationService = translationService;
         _customerService = customerService;
@@ -45,7 +47,7 @@ public class WishlistController : BasePublicController
 
     #region Fields
 
-    private readonly IWorkContext _workContext;
+    private readonly IWorkContextAccessor _workContextAccessor;
     private readonly IShoppingCartService _shoppingCartService;
     private readonly ITranslationService _translationService;
     private readonly ICustomerService _customerService;
@@ -64,18 +66,18 @@ public class WishlistController : BasePublicController
         if (!await _permissionService.Authorize(StandardPermission.EnableWishlist))
             return Content("");
 
-        var cart = _workContext.CurrentCustomer.ShoppingCartItems.Where(sci =>
+        var cart = _workContextAccessor.WorkContext.CurrentCustomer.ShoppingCartItems.Where(sci =>
             sci.ShoppingCartTypeId == ShoppingCartType.Wishlist);
 
-        if (!string.IsNullOrEmpty(_workContext.CurrentStore.Id))
-            cart = cart.LimitPerStore(_shoppingCartSettings.SharedCartBetweenStores, _workContext.CurrentStore.Id);
+        if (!string.IsNullOrEmpty(_workContextAccessor.WorkContext.CurrentStore.Id))
+            cart = cart.LimitPerStore(_shoppingCartSettings.SharedCartBetweenStores, _workContextAccessor.WorkContext.CurrentStore.Id);
 
         var model = await _mediator.Send(new GetMiniWishlist {
             Cart = cart.ToList(),
-            Customer = _workContext.CurrentCustomer,
-            Language = _workContext.WorkingLanguage,
-            Currency = _workContext.WorkingCurrency,
-            Store = _workContext.CurrentStore
+            Customer = _workContextAccessor.WorkContext.CurrentCustomer,
+            Language = _workContextAccessor.WorkContext.WorkingLanguage,
+            Currency = _workContextAccessor.WorkContext.WorkingCurrency,
+            Store = _workContextAccessor.WorkContext.CurrentStore
         });
 
         return Json(model);
@@ -90,23 +92,23 @@ public class WishlistController : BasePublicController
 
         var customer = customerGuid.HasValue
             ? await _customerService.GetCustomerByGuid(customerGuid.Value)
-            : _workContext.CurrentCustomer;
+            : _workContextAccessor.WorkContext.CurrentCustomer;
         if (customer == null)
             return RedirectToRoute("HomePage");
 
         var cart = customer.ShoppingCartItems.Where(sci => sci.ShoppingCartTypeId == ShoppingCartType.Wishlist);
 
-        if (!string.IsNullOrEmpty(_workContext.CurrentStore.Id))
-            cart = cart.LimitPerStore(_shoppingCartSettings.SharedCartBetweenStores, _workContext.CurrentStore.Id);
+        if (!string.IsNullOrEmpty(_workContextAccessor.WorkContext.CurrentStore.Id))
+            cart = cart.LimitPerStore(_shoppingCartSettings.SharedCartBetweenStores, _workContextAccessor.WorkContext.CurrentStore.Id);
 
         var model = await _mediator.Send(new GetWishlist {
             Cart = cart.ToList(),
             Customer = customer,
-            Language = _workContext.WorkingLanguage,
-            Currency = _workContext.WorkingCurrency,
-            Store = _workContext.CurrentStore,
+            Language = _workContextAccessor.WorkContext.WorkingLanguage,
+            Currency = _workContextAccessor.WorkContext.WorkingCurrency,
+            Store = _workContextAccessor.WorkContext.CurrentStore,
             IsEditable = !customerGuid.HasValue,
-            TaxDisplayType = _workContext.TaxDisplayType
+            TaxDisplayType = _workContextAccessor.WorkContext.TaxDisplayType
         });
 
         return View(model);
@@ -121,12 +123,12 @@ public class WishlistController : BasePublicController
         if (ModelState.IsValid)
         {
             var cart =
-                (await _shoppingCartService.GetShoppingCart(_workContext.CurrentStore.Id, ShoppingCartType.Wishlist))
+                (await _shoppingCartService.GetShoppingCart(_workContextAccessor.WorkContext.CurrentStore.Id, ShoppingCartType.Wishlist))
                 .FirstOrDefault(x => x.Id == model.ShoppingCartId);
             if (cart != null)
             {
                 var currSciWarnings = await _shoppingCartService.UpdateShoppingCartItem(
-                    _workContext.CurrentCustomer,
+                    _workContextAccessor.WorkContext.CurrentCustomer,
                     cart.Id, cart.WarehouseId, cart.Attributes, cart.EnteredPrice,
                     cart.RentalStartDateUtc, cart.RentalEndDateUtc,
                     model.Quantity);
@@ -138,11 +140,12 @@ public class WishlistController : BasePublicController
             warnings = ModelState.Values.SelectMany(x => x.Errors.Select(x => x.ErrorMessage)).ToList();
         }
 
-        return Json(new {
+        return Json(new
+        {
             success = !warnings.Any(),
             warnings = string.Join(", ", warnings),
             totalproducts =
-                (await _shoppingCartService.GetShoppingCart(_workContext.CurrentStore.Id, ShoppingCartType.Wishlist))
+                (await _shoppingCartService.GetShoppingCart(_workContextAccessor.WorkContext.CurrentStore.Id, ShoppingCartType.Wishlist))
                 .Sum(x => x.Quantity)
         });
     }
@@ -159,7 +162,7 @@ public class WishlistController : BasePublicController
 
         var pageCustomer = model.CustomerGuid.HasValue
             ? await _customerService.GetCustomerByGuid(model.CustomerGuid.Value)
-            : _workContext.CurrentCustomer;
+            : _workContextAccessor.WorkContext.CurrentCustomer;
         if (pageCustomer == null)
             return Json(new { success = false, message = "Customer not found" });
 
@@ -170,9 +173,9 @@ public class WishlistController : BasePublicController
         if (itemCart == null)
             return Json(new { success = false, message = "Shopping cart ident not found" });
 
-        var warnings = (await _shoppingCartService.AddToCart(_workContext.CurrentCustomer,
+        var warnings = (await _shoppingCartService.AddToCart(_workContextAccessor.WorkContext.CurrentCustomer,
             itemCart.ProductId, ShoppingCartType.ShoppingCart,
-            _workContext.CurrentStore.Id, itemCart.WarehouseId,
+            _workContextAccessor.WorkContext.CurrentStore.Id, itemCart.WarehouseId,
             itemCart.Attributes, itemCart.EnteredPrice,
             itemCart.RentalStartDateUtc, itemCart.RentalEndDateUtc, itemCart.Quantity,
             validator: new ShoppingCartValidatorOptions { GetRequiredProductWarnings = false })).warnings;
@@ -181,7 +184,7 @@ public class WishlistController : BasePublicController
             return Json(new { success = false, message = string.Join(',', warnings) });
 
         if (_shoppingCartSettings.MoveItemsFromWishlistToCart)
-            await _shoppingCartService.DeleteShoppingCartItem(_workContext.CurrentCustomer, itemCart);
+            await _shoppingCartService.DeleteShoppingCartItem(_workContextAccessor.WorkContext.CurrentCustomer, itemCart);
 
         return Json(new { success = true, message = "" });
     }
@@ -196,13 +199,13 @@ public class WishlistController : BasePublicController
         if (!await _permissionService.Authorize(StandardPermission.EnableWishlist))
             return Json(new { success = false, message = "No permission" });
 
-        var itemCart = _workContext.CurrentCustomer.ShoppingCartItems
+        var itemCart = _workContextAccessor.WorkContext.CurrentCustomer.ShoppingCartItems
             .FirstOrDefault(sci => sci.ShoppingCartTypeId == ShoppingCartType.Wishlist && sci.Id == shoppingCartId);
 
         if (itemCart == null)
             return Json(new { success = false, message = "Shopping cart ident not found" });
 
-        await _shoppingCartService.DeleteShoppingCartItem(_workContext.CurrentCustomer, itemCart);
+        await _shoppingCartService.DeleteShoppingCartItem(_workContextAccessor.WorkContext.CurrentCustomer, itemCart);
 
         return Json(new { success = true, message = "" });
     }
@@ -218,16 +221,16 @@ public class WishlistController : BasePublicController
             !_shoppingCartSettings.EmailWishlistEnabled)
             return Content("");
 
-        var cart = await _shoppingCartService.GetShoppingCart(_workContext.CurrentStore.Id, ShoppingCartType.Wishlist);
+        var cart = await _shoppingCartService.GetShoppingCart(_workContextAccessor.WorkContext.CurrentStore.Id, ShoppingCartType.Wishlist);
         if (!cart.Any())
             return Content("");
 
         if (ModelState.IsValid)
         {
             //email
-            await messageProviderService.SendWishlistEmailAFriendMessage(_workContext.CurrentCustomer,
-                _workContext.CurrentStore,
-                _workContext.WorkingLanguage.Id, model.YourEmailAddress,
+            await messageProviderService.SendWishlistEmailAFriendMessage(_workContextAccessor.WorkContext.CurrentCustomer,
+                _workContextAccessor.WorkContext.CurrentStore,
+                _workContextAccessor.WorkContext.WorkingLanguage.Id, model.YourEmailAddress,
                 model.FriendEmail, FormatText.ConvertText(model.PersonalMessage));
 
             model.SuccessfullySent = true;
