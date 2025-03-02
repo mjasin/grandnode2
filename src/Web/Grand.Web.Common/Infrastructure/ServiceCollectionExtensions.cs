@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.WebEncoders;
 using StackExchange.Redis;
 using System.Text.Encodings.Web;
@@ -122,7 +121,7 @@ public static class ServiceCollectionExtensions
         else
         {
             var securityConfig = new SecurityConfig();
-            configuration.GetSection("Security").Bind(securityConfig);            
+            configuration.GetSection("Security").Bind(securityConfig);
             var keyPersistenceLocation = string.IsNullOrEmpty(securityConfig.KeyPersistenceLocation)
                 ? "/App_Data/DataProtectionKeys" : securityConfig.KeyPersistenceLocation;
             var dataProtectionKeysFolder = new DirectoryInfo(keyPersistenceLocation);
@@ -255,9 +254,9 @@ public static class ServiceCollectionExtensions
                 var type = item.GetType();
                 var storeId = "";
                 var settingService = x.GetRequiredService<ISettingService>();
-                var store = x.GetRequiredService<IWorkContextAccessor>().WorkContext?.CurrentStore;
-                if (store != null)
-                    storeId = store.Id;
+                var contextAccessor = x.GetRequiredService<IContextAccessor>();
+                if (contextAccessor.StoreContext != null)
+                    storeId = contextAccessor.StoreContext.CurrentStore.Id;
 
                 return settingService.LoadSetting(type, storeId);
             });
@@ -267,31 +266,6 @@ public static class ServiceCollectionExtensions
     {
         var hcBuilder = services.AddHealthChecks();
         hcBuilder.AddCheck("self", () => HealthCheckResult.Healthy());
-    }
-
-    public static void AddGrandApplicationInsights(this IServiceCollection services, IConfiguration configuration)
-    {
-        var applicationInsights = new ApplicationInsightsConfig();
-        configuration.GetSection("ApplicationInsights").Bind(applicationInsights);
-        if (!string.IsNullOrEmpty(applicationInsights.ConnectionString))
-        {
-            services.AddApplicationInsightsTelemetry();
-            services.AddServiceProfiler();
-            services.AddLogging(builder =>
-            {
-                builder.AddApplicationInsights(
-                    config =>
-                    {
-                        config.ConnectionString = applicationInsights.ConnectionString;
-                    },
-                    options =>
-                    {
-                        options.IncludeScopes = false;
-                        options.TrackExceptionsAsExceptionTelemetry = false;
-                    }
-                );
-            });
-        }
     }
 
     /// <summary>

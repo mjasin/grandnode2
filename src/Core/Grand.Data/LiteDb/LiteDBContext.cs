@@ -1,12 +1,13 @@
 ﻿using Grand.Domain;
 using Grand.Domain.Common;
 using LiteDB;
+using System.Xml.Linq;
 
 namespace Grand.Data.LiteDb;
 
 public class LiteDBContext : IDatabaseContext
 {
-    protected LiteDatabase _database;
+    private readonly LiteDatabase _database;
 
     public LiteDBContext(LiteDatabase database)
     {
@@ -26,8 +27,7 @@ public class LiteDBContext : IDatabaseContext
 
     public Task DeleteTable(string name)
     {
-        if (string.IsNullOrEmpty(name))
-            throw new ArgumentNullException(nameof(name));
+        ArgumentNullException.ThrowIfNullOrEmpty(name);
 
         _database.DropCollection(name);
 
@@ -37,8 +37,7 @@ public class LiteDBContext : IDatabaseContext
     public Task CreateIndex<T>(IRepository<T> repository, OrderBuilder<T> orderBuilder, string indexName,
         bool unique = false) where T : BaseEntity
     {
-        if (string.IsNullOrEmpty(indexName))
-            throw new ArgumentNullException(nameof(indexName));
+        ArgumentNullException.ThrowIfNullOrEmpty(indexName);
         try
         {
             foreach (var (selector, value, fieldName) in orderBuilder?.Fields)

@@ -1,6 +1,7 @@
 using Grand.Business.Core.Interfaces.Common.Configuration;
 using Grand.Data;
 using Grand.Domain.Configuration;
+using Grand.Domain.Payments;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
 using System.Text.Json;
@@ -37,9 +38,7 @@ public class SettingService : ISettingService
     /// <returns>Setting</returns>
     private IList<Setting> GetSettingsByName(string name)
     {
-        if (string.IsNullOrEmpty(name))
-            throw new ArgumentNullException(nameof(name));
-
+        ArgumentNullException.ThrowIfNullOrEmpty(name);
         return _settingRepository.Table.Where(x => x.Name == name.ToLowerInvariant()).ToList();
     }
 
@@ -59,15 +58,14 @@ public class SettingService : ISettingService
     /// </summary>
     /// <param name="setting">Setting</param>
     /// <param name="clearCache">A value indicating whether to clear cache after setting update</param>
-    public virtual async Task InsertSetting(Setting setting, bool clearCache = true)
+    public virtual async Task InsertSetting(Setting setting)
     {
         ArgumentNullException.ThrowIfNull(setting);
 
         await _settingRepository.InsertAsync(setting);
 
         //cache
-        if (clearCache)
-            await _cacheBase.Clear();
+        await _cacheBase.Clear();
     }
 
     /// <summary>
@@ -75,15 +73,14 @@ public class SettingService : ISettingService
     /// </summary>
     /// <param name="setting">Setting</param>
     /// <param name="clearCache">A value indicating whether to clear cache after setting update</param>
-    public virtual async Task UpdateSetting(Setting setting, bool clearCache = true)
+    public virtual async Task UpdateSetting(Setting setting)
     {
         ArgumentNullException.ThrowIfNull(setting);
 
         await _settingRepository.UpdateAsync(setting);
 
         //cache
-        if (clearCache)
-            await _cacheBase.Clear();
+        await _cacheBase.Clear();
     }
 
     /// <summary>
@@ -119,21 +116,21 @@ public class SettingService : ISettingService
     /// <param name="defaultValue">Default value</param>
     /// <param name="storeId">Store identifier</param>
     /// <returns>Setting value</returns>
-    public virtual T GetSettingByKey<T>(string key, T defaultValue = default, string storeId = "")
+    public virtual async Task<T> GetSettingByKey<T>(string key, T defaultValue = default, string storeId = "")
     {
         if (string.IsNullOrEmpty(key))
             return defaultValue;
 
         var keyCache = string.Format(CacheKey.SETTINGS_BY_KEY, key, storeId);
-        return _cacheBase.Get(keyCache, () =>
+        return await _cacheBase.GetAsync<T>(keyCache, () =>
         {
             var settings = GetSettingsByName(key);
             key = key.Trim().ToLowerInvariant();
-            if (!settings.Any()) return defaultValue;
+            if (!settings.Any()) return Task.FromResult(defaultValue);
 
             var setting = settings.FirstOrDefault(x => x.StoreId == storeId) ??
                           settings.FirstOrDefault(x => string.IsNullOrEmpty(x.StoreId));
-            return setting != null ? JsonSerializer.Deserialize<T>(setting.Metadata) : defaultValue;
+            return setting != null ? Task.FromResult(JsonSerializer.Deserialize<T>(setting.Metadata)) : Task.FromResult(defaultValue);
         });
     }
 
@@ -145,7 +142,7 @@ public class SettingService : ISettingService
     /// <param name="value">Value</param>
     /// <param name="storeId">Store identifier</param>
     /// <param name="clearCache">A value indicating whether to clear cache after setting update</param>
-    public virtual async Task SetSetting<T>(string key, T value, string storeId = "", bool clearCache = true)
+    public virtual async Task SetSetting<T>(string key, T value, string storeId = "")
     {
         ArgumentNullException.ThrowIfNull(key);
 
@@ -157,7 +154,7 @@ public class SettingService : ISettingService
         {
             //update
             setting.Metadata = JsonSerializer.Serialize(value);
-            await UpdateSetting(setting, clearCache);
+            await UpdateSetting(setting);
         }
         else
         {
@@ -168,7 +165,7 @@ public class SettingService : ISettingService
                 Metadata = metadata,
                 StoreId = storeId
             };
-            await InsertSetting(setting, clearCache);
+            await InsertSetting(setting);
         }
     }
 
@@ -186,9 +183,9 @@ public class SettingService : ISettingService
     /// </summary>
     /// <typeparam name="T">Type</typeparam>
     /// <param name="storeId">Store identifier for which settings should be loaded</param>
-    public virtual T LoadSetting<T>(string storeId = "") where T : ISettings, new()
+    public virtual Task<T> LoadSetting<T>(string storeId = "") where T : ISettings, new()
     {
-        return (T)LoadSetting(typeof(T), storeId);
+        return Task.FromResult((T)LoadSetting(typeof(T), storeId));
     }
 
     /// <summary>
@@ -208,7 +205,9 @@ public class SettingService : ISettingService
             if (setting == null && !string.IsNullOrEmpty(storeId))
                 setting = settings.FirstOrDefault(x => string.IsNullOrEmpty(x.StoreId));
 
-            if (setting != null) return JsonSerializer.Deserialize(setting.Metadata, type) as ISettings;
+            if (setting != null)
+                return JsonSerializer.Deserialize(setting.Metadata, type) as ISettings;
+
             return Activator.CreateInstance(type) as ISettings;
         });
     }
@@ -239,9 +238,6 @@ public class SettingService : ISettingService
             };
             await InsertSetting(setting);
         }
-
-        //and now clear cache
-        await ClearCache();
     }
 
     /// <summary>

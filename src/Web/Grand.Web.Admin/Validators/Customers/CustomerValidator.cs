@@ -17,7 +17,7 @@ public class CustomerValidator : BaseGrandValidator<CustomerModel>
         IEnumerable<IValidatorConsumer<CustomerModel>> validators,
         ITranslationService translationService,
         ICountryService countryService,
-        IWorkContextAccessor workContextAccessor,
+        IContextAccessor contextAccessor,
         ICustomerService customerService,
         IGroupService groupService,
         CustomerSettings customerSettings)
@@ -79,15 +79,13 @@ public class CustomerValidator : BaseGrandValidator<CustomerModel>
 
         RuleFor(x => x).Custom((x, context) =>
         {
-            if (!string.IsNullOrEmpty(x.Password))
-                if (!string.IsNullOrEmpty(customerSettings.PasswordRegularExpression))
-                {
-                    var passwordRegex = new Regex(customerSettings.PasswordRegularExpression);
-                    if (!passwordRegex.Match(x.Password).Success)
-                        context.AddFailure(translationService.GetResource("Account.Fields.Password.Validation"));
-                }
-
-            if (string.IsNullOrWhiteSpace(x.Username) & customerSettings.UsernamesEnabled)
+            if (!string.IsNullOrEmpty(x.Password) && !string.IsNullOrEmpty(customerSettings.PasswordRegularExpression))
+            {
+                var passwordRegex = new Regex(customerSettings.PasswordRegularExpression, RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+                if (!passwordRegex.Match(x.Password).Success)
+                    context.AddFailure(translationService.GetResource("Account.Fields.Password.Validation"));
+            }
+            if (string.IsNullOrWhiteSpace(x.Username) && customerSettings.UsernamesEnabled)
                 context.AddFailure("The username cannot be empty");
         });
 
@@ -118,11 +116,11 @@ public class CustomerValidator : BaseGrandValidator<CustomerModel>
                     return "Add the customer to 'Guests' or 'Registered' customer group";
             }
 
-            if (await groupService.IsSalesManager(workContextAccessor.WorkContext.CurrentCustomer) &&
+            if (await groupService.IsSalesManager(contextAccessor.WorkContext.CurrentCustomer) &&
                 (isInGuestsGroup || customerGroups.Count != 1))
                 return "Sales manager can assign role 'Registered' only";
 
-            if (!await groupService.IsAdmin(workContextAccessor.WorkContext.CurrentCustomer) && isAdminGroup)
+            if (!await groupService.IsAdmin(contextAccessor.WorkContext.CurrentCustomer) && isAdminGroup)
                 return "Only administrators can assign role 'Administrators'";
 
             switch (isAdminGroup)
@@ -185,7 +183,7 @@ public class CustomerValidator : BaseGrandValidator<CustomerModel>
                             context.AddFailure("Owner email is not exists");
                     }
 
-                    if (!string.IsNullOrWhiteSpace(x.Username) & customerSettings.UsernamesEnabled)
+                    if (!string.IsNullOrWhiteSpace(x.Username) && customerSettings.UsernamesEnabled)
                     {
                         var customerByUsername = await customerService.GetCustomerByUsername(x.Username);
                         if (customerByUsername != null)
@@ -230,8 +228,8 @@ public class CustomerValidator : BaseGrandValidator<CustomerModel>
                     }
 
                     var customer = await customerService.GetCustomerById(x.Id);
-                    if (await groupService.IsSalesManager(workContextAccessor.WorkContext.CurrentCustomer) &&
-                        customer?.Id == workContextAccessor.WorkContext.CurrentCustomer.Id)
+                    if (await groupService.IsSalesManager(contextAccessor.WorkContext.CurrentCustomer) &&
+                        customer?.Id == contextAccessor.WorkContext.CurrentCustomer.Id)
                         context.AddFailure("You can't edit own data from admin panel");
 
                     if (customer != null && customer.Email != x.Email.ToLower())
@@ -250,7 +248,7 @@ public class CustomerValidator : BaseGrandValidator<CustomerModel>
                                 translationService.GetResource("Account.EmailUsernameErrors.EmailAlreadyExists"));
                     }
 
-                    if (customer != null && !string.IsNullOrWhiteSpace(x.Username) & customerSettings.UsernamesEnabled)
+                    if (customer != null && !string.IsNullOrWhiteSpace(x.Username) && customerSettings.UsernamesEnabled)
                     {
                         if (x.Username.Length > 100)
                             context.AddFailure("Username is too long");

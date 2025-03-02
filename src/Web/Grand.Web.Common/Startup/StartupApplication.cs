@@ -4,10 +4,10 @@ using Grand.Data;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Message;
-using Grand.Infrastructure.Caching.RabbitMq;
 using Grand.Infrastructure.Caching.Redis;
 using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Validators;
+using Grand.Web.Common.Helpers;
 using Grand.Web.Common.Localization;
 using Grand.Web.Common.Menu;
 using Grand.Web.Common.Middleware;
@@ -69,19 +69,15 @@ public class StartupApplication : IStartupApplication
             serviceCollection.AddSingleton<ICacheBase, RedisMessageCacheManager>();
             return;
         }
-
-        var rabbit = new RabbitConfig();
-        configuration.GetSection("Rabbit").Bind(rabbit);
-        if (rabbit.RabbitCachePubSubEnabled && rabbit.RabbitEnabled)
-            serviceCollection.AddSingleton<ICacheBase, RabbitMqMessageCacheManager>();
     }
 
     private void RegisterContextService(IServiceCollection serviceCollection)
     {
         //work context
-        serviceCollection.AddSingleton<IWorkContextAccessor, WorkContextAccessor>();
+        serviceCollection.AddSingleton<IContextAccessor, ContextAccessor>();
         serviceCollection.AddScoped<IWorkContextSetter, WorkContextSetter>();
-
+        serviceCollection.AddScoped<IStoreContextSetter, StoreContextSetter>();
+        serviceCollection.AddScoped<IAdminStoreService, AdminStoreService>();
         //View factory
         serviceCollection.AddScoped<IViewFactory, ViewFactory>();
 

@@ -123,7 +123,7 @@ public class BrainTreePaymentProvider : IPaymentProvider
             Environment = useSandBox ? Environment.SANDBOX : Environment.PRODUCTION,
             MerchantId = merchantId,
             PublicKey = publicKey,
-            PrivateKey = privateKey
+            PrivateKey = privateKey,
         };
 
         //new transaction request
@@ -156,6 +156,7 @@ public class BrainTreePaymentProvider : IPaymentProvider
             PostalCode = customer.BillingAddress.ZipPostalCode
         };
         transactionRequest.BillingAddress = addressRequest;
+        transactionRequest.CurrencyIsoCode = paymentTransaction.CurrencyCode;
 
         //transaction options request
         var transactionOptionsRequest = new TransactionOptionsRequest {
@@ -241,7 +242,7 @@ public class BrainTreePaymentProvider : IPaymentProvider
 
         if (!(result > 0)) return await Task.FromResult(result);
         var currencyService = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<ICurrencyService>();
-        var workContext = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IWorkContextAccessor>().WorkContext;
+        var workContext = _httpContextAccessor.HttpContext!.RequestServices.GetRequiredService<IContextAccessor>().WorkContext;
         result = await currencyService.ConvertFromPrimaryStoreCurrency(result, workContext.WorkingCurrency);
 
         //return result;

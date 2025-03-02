@@ -2,6 +2,7 @@ using Grand.Business.Core.Extensions;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Data;
 using Grand.Domain.Directory;
+using Grand.Domain.Payments;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Caching.Constants;
 using Grand.Infrastructure.Configuration;
@@ -142,7 +143,9 @@ public class CountryService : ICountryService
             select c;
         var countries = await Task.FromResult(query.ToList());
         //sort by passed identifiers
-        return countryIds.Select(id => countries.Find(x => x.Id == id)).Where(country => country != null).ToList();
+        return countryIds.Select(id => countries.FirstOrDefault(country => country.Id == id))
+            .Where(country => country != null)
+            .ToList();
     }
 
     /// <summary>
@@ -253,8 +256,7 @@ public class CountryService : ICountryService
         ArgumentNullException.ThrowIfNull(stateProvince);
 
         var country = await GetCountryById(countryId);
-        if (country == null)
-            throw new ArgumentNullException(nameof(country));
+        ArgumentNullException.ThrowIfNull(country);
 
         country.StateProvinces.Add(stateProvince);
 
@@ -271,8 +273,7 @@ public class CountryService : ICountryService
         ArgumentNullException.ThrowIfNull(stateProvince);
 
         var country = await GetCountryById(countryId);
-        if (country == null)
-            throw new ArgumentNullException(nameof(country));
+        ArgumentNullException.ThrowIfNull(country);
 
         if (country.StateProvinces.FirstOrDefault(x => x.Id == stateProvince.Id) != null)
         {
@@ -300,8 +301,7 @@ public class CountryService : ICountryService
         ArgumentNullException.ThrowIfNull(stateProvince);
 
         var country = await GetCountryById(countryId);
-        if (country == null)
-            throw new ArgumentNullException(nameof(country));
+        ArgumentNullException.ThrowIfNull(country);
 
         var state = country.StateProvinces.FirstOrDefault(x => x.Id == stateProvince.Id);
         country.StateProvinces.Remove(state);

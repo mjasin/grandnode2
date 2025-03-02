@@ -5,14 +5,17 @@ using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//add configuration
+builder.Configuration.AddAppSettingsJsonFile(args, builder.Environment);
+
+builder.AddServiceDefaults();
+
 builder.Host.UseDefaultServiceProvider((_, options) =>
 {
     options.ValidateScopes = false;
     options.ValidateOnBuild = false;
 });
 
-//add configuration
-builder.Configuration.AddAppSettingsJsonFile(args, builder.Environment);
 
 //add services
 StartupBase.ConfigureServices(builder.Services, builder.Configuration);
@@ -26,4 +29,4 @@ var app = builder.Build();
 StartupBase.ConfigureRequestPipeline(app, builder.Environment);
 
 //run app
-app.Run();
+await app.RunAsync();

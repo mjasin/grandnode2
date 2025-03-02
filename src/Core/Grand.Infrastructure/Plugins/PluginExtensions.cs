@@ -6,7 +6,7 @@ namespace Grand.Infrastructure.Plugins;
 public sealed class PluginPaths
 {
     private static PluginPaths _instance;
-    private static readonly object _lock = new();
+    private static readonly Lock _lock = new();
     public static PluginPaths Instance => _instance ?? throw new InvalidOperationException("PluginPaths has not been initialized. Call Initialize first.");
     private readonly string _pluginPath;
 
@@ -60,8 +60,7 @@ public static class PluginExtensions
     /// <param name="systemName">Plugin system name</param>
     public static async Task MarkPluginAsInstalled(string systemName)
     {
-        if (string.IsNullOrEmpty(systemName))
-            throw new ArgumentNullException(nameof(systemName));
+        ArgumentNullException.ThrowIfNullOrEmpty(systemName);
 
         var filePath = PluginPaths.Instance.InstalledPluginsFile;
         if (!File.Exists(filePath))
@@ -87,13 +86,13 @@ public static class PluginExtensions
     /// <param name="systemName">Plugin system name</param>
     public static async Task MarkPluginAsUninstalled(string systemName)
     {
-        if (string.IsNullOrEmpty(systemName))
-            throw new ArgumentNullException(nameof(systemName));
+        ArgumentNullException.ThrowIfNullOrEmpty(systemName);
 
         var filePath = PluginPaths.Instance.InstalledPluginsFile;
         if (!File.Exists(filePath))
             await using (File.Create(filePath))
             {
+                //we use 'using' to close the file after it's created
             }
 
         var installedPluginSystemNames = ParseInstalledPluginsFile(filePath);

@@ -2,6 +2,7 @@ using Grand.Business.Core.Interfaces.Cms;
 using Grand.Data;
 using Grand.Domain;
 using Grand.Domain.Blogs;
+using Grand.Domain.Payments;
 using Grand.Infrastructure.Configuration;
 using Grand.Infrastructure.Extensions;
 using MediatR;
@@ -154,7 +155,7 @@ public class BlogService : IBlogService
             foreach (var tag in tags)
             {
                 var foundBlogPostTag =
-                    blogPostTags.Find(bpt => bpt.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
+                    blogPostTags.FirstOrDefault(bpt => bpt.Name.Equals(tag, StringComparison.OrdinalIgnoreCase));
                 if (foundBlogPostTag == null)
                 {
                     foundBlogPostTag = new BlogPostTag {
@@ -266,8 +267,10 @@ public class BlogService : IBlogService
             select bc;
         var comments = query.ToList();
         //sort by passed identifiers
-        var sortedComments = commentIds.Select(id => comments.Find(x => x.Id == id)).Where(comment => comment != null)
+        var sortedComments = commentIds.Select(id => comments.FirstOrDefault(comment => comment.Id == id))
+            .Where(comment => comment != null)
             .ToList();
+        
         return await Task.FromResult(sortedComments);
     }
 
@@ -322,8 +325,7 @@ public class BlogService : IBlogService
     /// <returns></returns>
     public virtual async Task<BlogCategory> GetBlogCategoryBySeName(string blogCategorySeName)
     {
-        if (string.IsNullOrEmpty(blogCategorySeName))
-            throw new ArgumentNullException(nameof(blogCategorySeName));
+        ArgumentNullException.ThrowIfNullOrEmpty(blogCategorySeName);
 
         return await _blogCategoryRepository.GetOneAsync(x => x.SeName == blogCategorySeName.ToLowerInvariant());
     }

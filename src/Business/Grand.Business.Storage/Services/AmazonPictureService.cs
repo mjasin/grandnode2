@@ -5,6 +5,7 @@ using Amazon.S3.Model;
 using Amazon.S3.Util;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Data;
+using Grand.Domain.Customers;
 using Grand.Domain.Media;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Configuration;
@@ -40,12 +41,9 @@ public class AmazonPictureService : PictureService
         _config = config;
 
         //Arguments guard
-        if (string.IsNullOrEmpty(_config.AmazonAwsAccessKeyId))
-            throw new ArgumentNullException("AmazonAwsAccessKeyId");
-        if (string.IsNullOrEmpty(_config.AmazonAwsSecretAccessKey))
-            throw new ArgumentNullException("AmazonAwsSecretAccessKey");
-        if (string.IsNullOrEmpty(_config.AmazonBucketName))
-            throw new ArgumentNullException("AmazonBucketName");
+        ArgumentNullException.ThrowIfNullOrEmpty(_config.AmazonAwsAccessKeyId);
+        ArgumentNullException.ThrowIfNullOrEmpty(_config.AmazonAwsSecretAccessKey);
+        ArgumentNullException.ThrowIfNullOrEmpty(_config.AmazonBucketName);
 
         //Region guard
         var regionEndpoint = RegionEndpoint.GetBySystemName(_config.AmazonRegion);
@@ -155,19 +153,18 @@ public class AmazonPictureService : PictureService
     /// </summary>
     /// <param name="thumbFileName">Thumb file name</param>
     /// <returns>Result</returns>
-    private Task<bool> GeneratedThumbExists(string thumbFileName)
+    private async Task<bool> GeneratedThumbExists(string thumbFileName)
     {
         try
         {
-            var getObjectResponse = _s3Client.GetObjectAsync(_bucketName, thumbFileName).GetAwaiter().GetResult();
+            var getObjectResponse = await _s3Client.GetObjectAsync(_bucketName, thumbFileName);
             EnsureValidResponse(getObjectResponse, HttpStatusCode.OK);
 
-            return Task.FromResult(
-                getObjectResponse.BucketName == _bucketName || getObjectResponse.Key == thumbFileName);
+            return getObjectResponse.BucketName == _bucketName || getObjectResponse.Key == thumbFileName;
         }
         catch
         {
-            return Task.FromResult(false);
+            return false;
         }
     }
 

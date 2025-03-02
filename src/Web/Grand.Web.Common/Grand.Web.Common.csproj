@@ -5,8 +5,8 @@
 		<PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Keys" />
 		<PackageReference Include="Azure.Identity" />
 		<PackageReference Include="Flurl.Http" />
-		<PackageReference Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" />
 		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" />
 		<PackageReference Include="NetEscapades.AspNetCore.SecurityHeaders" />
 		<PackageReference Include="Wangkanai.Detection" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />

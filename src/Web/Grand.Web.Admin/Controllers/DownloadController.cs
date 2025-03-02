@@ -6,6 +6,7 @@ using Grand.Web.Admin.Extensions;
 using Grand.Web.Common.Extensions;
 using Grand.Web.Common.Security.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace Grand.Web.Admin.Controllers;
 
@@ -13,12 +14,12 @@ namespace Grand.Web.Admin.Controllers;
 public class DownloadController : BaseAdminController
 {
     private readonly IDownloadService _downloadService;
-    private readonly IWorkContextAccessor _workContextAccessor;
+    private readonly IContextAccessor _contextAccessor;
 
-    public DownloadController(IDownloadService downloadService, IWorkContextAccessor workContextAccessor)
+    public DownloadController(IDownloadService downloadService, IContextAccessor contextAccessor)
     {
         _downloadService = downloadService;
-        _workContextAccessor = workContextAccessor;
+        _contextAccessor = contextAccessor;
     }
 
     public async Task<IActionResult> DownloadFile(Guid downloadGuid)
@@ -64,47 +65,30 @@ public class DownloadController : BaseAdminController
         return Json(new { downloadId = download.Id, success = true });
     }
 
-    [DisableRequestSizeLimit]
     [HttpPost]
     //do not validate request token (XSRF)
     [IgnoreAntiforgeryToken]
-    public virtual async Task<IActionResult> AsyncUpload(DownloadType downloadType = DownloadType.None,
+    public virtual async Task<IActionResult> AsyncUpload(IFormFile file, DownloadType downloadType = DownloadType.None,
         string referenceId = "")
     {
-        var form = await HttpContext.Request.ReadFormAsync();
-        var httpPostedFile = form.Files.FirstOrDefault();
-        if (httpPostedFile == null)
+        if (file == null)
             return Json(new {
                 success = false,
                 message = "No file uploaded",
                 downloadGuid = Guid.Empty
             });
 
-        var fileBinary = httpPostedFile.GetDownloadBits();
-
-        var qqFileNameParameter = "qqfilename";
-        var fileName = httpPostedFile.FileName;
-        if (string.IsNullOrEmpty(fileName) && form.ContainsKey(qqFileNameParameter))
-            fileName = form[qqFileNameParameter].ToString();
-
-        fileName = Path.GetFileName(fileName);
-
-        var contentType = httpPostedFile.ContentType;
-
-        var fileExtension = Path.GetExtension(fileName);
-        if (!string.IsNullOrEmpty(fileExtension))
-            fileExtension = fileExtension.ToLowerInvariant();
-
+        var fileBinary = file.GetDownloadBits();
 
         var download = new Download {
             DownloadGuid = Guid.NewGuid(),
-            CustomerId = _workContextAccessor.WorkContext.CurrentCustomer.Id,
+            CustomerId = _contextAccessor.WorkContext.CurrentCustomer.Id,
             UseDownloadUrl = false,
             DownloadUrl = "",
             DownloadBinary = fileBinary,
-            ContentType = contentType,
-            Filename = Path.GetFileNameWithoutExtension(fileName),
-            Extension = fileExtension,
+            ContentType = file.ContentType,
+            Filename = Path.GetFileNameWithoutExtension(file.FileName),
+            Extension = Path.GetExtension(file.FileName),
             DownloadType = downloadType,
             ReferenceId = referenceId
         };

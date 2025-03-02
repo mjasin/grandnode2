@@ -31,16 +31,16 @@ public class AffiliateViewModelService : IAffiliateViewModelService
     private readonly IPriceFormatter _priceFormatter;
     private readonly SeoSettings _seoSettings;
     private readonly ITranslationService _translationService;
-    private readonly IWorkContextAccessor _workContextAccessor;
+    private readonly IContextAccessor _contextAccessor;
     private readonly IEnumTranslationService _enumTranslationService;
-    public AffiliateViewModelService(IWorkContextAccessor workContextAccessor, ICountryService countryService,
+    public AffiliateViewModelService(IContextAccessor contextAccessor, ICountryService countryService,
         IPriceFormatter priceFormatter, IAffiliateService affiliateService,
         ICustomerService customerService, IOrderService orderService, ITranslationService translationService,
         IDateTimeService dateTimeService,
         IOrderStatusService orderStatusService,
         SeoSettings seoSettings, ICurrencyService currencyService, IEnumTranslationService enumTranslationService)
     {
-        _workContextAccessor = workContextAccessor;
+        _contextAccessor = contextAccessor;
         _countryService = countryService;
         _priceFormatter = priceFormatter;
         _affiliateService = affiliateService;
@@ -64,9 +64,9 @@ public class AffiliateViewModelService : IAffiliateViewModelService
             model.Id = affiliate.Id;
             model.Name = affiliate.Name;
 
-            var host = _workContextAccessor.WorkContext.CurrentHost == null
-                ? _workContextAccessor.WorkContext.CurrentStore.Url.TrimEnd('/')
-                : _workContextAccessor.WorkContext.CurrentHost.Url.TrimEnd('/');
+            var host = _contextAccessor.StoreContext.CurrentHost == null
+                ? _contextAccessor.StoreContext.CurrentStore.Url.TrimEnd('/')
+                : _contextAccessor.StoreContext.CurrentHost.Url.TrimEnd('/');
             model.Url = affiliate.GenerateUrl(host);
             if (!excludeProperties)
             {
@@ -112,7 +112,8 @@ public class AffiliateViewModelService : IAffiliateViewModelService
             var states = !string.IsNullOrEmpty(model.Address.CountryId)
                 ? (await _countryService.GetCountryById(model.Address.CountryId))?.StateProvinces
                 : new List<StateProvince>();
-            if (states.Count > 0)
+
+            if (states?.Count > 0)
                 foreach (var s in states)
                     model.Address.AvailableStates.Add(new SelectListItem {
                         Text = s.Name, Value = s.Id,

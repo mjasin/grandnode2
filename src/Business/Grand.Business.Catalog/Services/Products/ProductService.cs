@@ -28,14 +28,14 @@ public class ProductService : IProductService
     /// </summary>
     public ProductService(ICacheBase cacheBase,
         IRepository<Product> productRepository,
-        IWorkContextAccessor workContextAccessor,
+        IContextAccessor contextAccessor,
         IMediator mediator,
         IAclService aclService
     )
     {
         _cacheBase = cacheBase;
         _productRepository = productRepository;
-        _workContextAccessor = workContextAccessor;
+        _contextAccessor = contextAccessor;
         _mediator = mediator;
         _aclService = aclService;
     }
@@ -46,7 +46,7 @@ public class ProductService : IProductService
 
     private readonly IRepository<Product> _productRepository;
     private readonly ICacheBase _cacheBase;
-    private readonly IWorkContextAccessor _workContextAccessor;
+    private readonly IContextAccessor _contextAccessor;
     private readonly IAclService _aclService;
     private readonly IMediator _mediator;
 
@@ -130,8 +130,8 @@ public class ProductService : IProductService
         foreach (var id in productIds)
         {
             var product = await GetProductById(id);
-            if (product != null && (showHidden || (_aclService.Authorize(product, _workContextAccessor.WorkContext.CurrentCustomer) &&
-                                                   _aclService.Authorize(product, _workContextAccessor.WorkContext.CurrentStore.Id) &&
+            if (product != null && (showHidden || (_aclService.Authorize(product, _contextAccessor.WorkContext.CurrentCustomer) &&
+                                                   _aclService.Authorize(product, _contextAccessor.StoreContext.CurrentStore.Id) &&
                                                    product.IsAvailable())))
                 products.Add(product);
         }
@@ -524,7 +524,7 @@ public class ProductService : IProductService
             bool? overridePublished = null)
     {
         var model = await _mediator.Send(new GetSearchProductsQuery {
-            Customer = _workContextAccessor.WorkContext.CurrentCustomer,
+            Customer = _contextAccessor.WorkContext.CurrentCustomer,
             LoadFilterableSpecificationAttributeOptionIds = loadFilterableSpecificationAttributeOptionIds,
             PageIndex = pageIndex,
             PageSize = pageSize,
@@ -608,7 +608,7 @@ public class ProductService : IProductService
 
         //ACL mapping
         if (!showHidden)
-            products = products.Where(x => _aclService.Authorize(x, _workContextAccessor.WorkContext.CurrentCustomer)).ToList();
+            products = products.Where(x => _aclService.Authorize(x, _contextAccessor.WorkContext.CurrentCustomer)).ToList();
         //Store acl
         if (!showHidden && !string.IsNullOrEmpty(storeId))
             products = products.Where(x => _aclService.Authorize(x, storeId)).ToList();
@@ -890,13 +890,13 @@ public class ProductService : IProductService
             foreach (var crossSell in crossSells)
             {
                 //validate that this product is not added to result yet
-                if (result.Find(p => p.Id == crossSell) != null ||
+                if (result.FirstOrDefault(p => p.Id == crossSell) != null ||
                     cartProductIds.Contains(crossSell)) continue;
                 var productToAdd = await GetProductById(crossSell);
                 //validate product
                 if (productToAdd is not { Published: true }
-                    || !_aclService.Authorize(productToAdd, _workContextAccessor.WorkContext.CurrentCustomer) ||
-                    !_aclService.Authorize(productToAdd, _workContextAccessor.WorkContext.CurrentStore.Id)
+                    || !_aclService.Authorize(productToAdd, _contextAccessor.WorkContext.CurrentCustomer) ||
+                    !_aclService.Authorize(productToAdd, _contextAccessor.StoreContext.CurrentStore.Id)
                     || !productToAdd.IsAvailable())
                     continue;
 
@@ -1181,8 +1181,8 @@ public class ProductService : IProductService
 
     public virtual async Task DeleteDiscount(string discountId, string productId)
     {
-        if (string.IsNullOrEmpty(discountId))
-            throw new ArgumentNullException(nameof(discountId));
+        ArgumentNullException.ThrowIfNullOrEmpty(discountId);
+        ArgumentNullException.ThrowIfNullOrEmpty(productId);
 
         await _productRepository.Pull(productId, x => x.AppliedDiscounts, discountId);
 

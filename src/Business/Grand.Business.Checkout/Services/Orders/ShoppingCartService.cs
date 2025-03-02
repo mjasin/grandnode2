@@ -8,6 +8,7 @@ using Grand.Domain.Catalog;
 using Grand.Domain.Common;
 using Grand.Domain.Customers;
 using Grand.Domain.Orders;
+using Grand.Domain.Payments;
 using Grand.Infrastructure;
 using Grand.Infrastructure.Extensions;
 using MediatR;
@@ -22,14 +23,14 @@ public class ShoppingCartService : IShoppingCartService
     #region Ctor
 
     public ShoppingCartService(
-        IWorkContextAccessor workContextAccessor,
+        IContextAccessor contextAccessor,
         IProductService productService,
         ICustomerService customerService,
         IMediator mediator,
         IShoppingCartValidator shoppingCartValidator,
         ShoppingCartSettings shoppingCartSettings)
     {
-        _workContextAccessor = workContextAccessor;
+        _contextAccessor = contextAccessor;
         _productService = productService;
         _customerService = customerService;
         _mediator = mediator;
@@ -41,7 +42,7 @@ public class ShoppingCartService : IShoppingCartService
 
     #region Fields
 
-    private readonly IWorkContextAccessor _workContextAccessor;
+    private readonly IContextAccessor _contextAccessor;
     private readonly IProductService _productService;
     private readonly ICustomerService _customerService;
     private readonly IMediator _mediator;
@@ -62,7 +63,7 @@ public class ShoppingCartService : IShoppingCartService
         params ShoppingCartType[] shoppingCartType)
     {
         var model = new List<ShoppingCartItem>();
-        var cart = _workContextAccessor.WorkContext.CurrentCustomer.ShoppingCartItems.ToList();
+        var cart = _contextAccessor.WorkContext.CurrentCustomer.ShoppingCartItems.ToList();
 
         if (!string.IsNullOrEmpty(storeId))
             cart = cart.LimitPerStore(_shoppingCartSettings.SharedCartBetweenStores, storeId).ToList();
@@ -198,8 +199,7 @@ public class ShoppingCartService : IShoppingCartService
         validator ??= new ShoppingCartValidatorOptions();
 
         var product = await _productService.GetProductById(productId);
-        if (product == null)
-            throw new ArgumentNullException(nameof(product));
+        ArgumentNullException.ThrowIfNull(product);
 
         var cart = customer.ShoppingCartItems
             .Where(sci => sci.ShoppingCartTypeId == shoppingCartType)
@@ -431,9 +431,9 @@ public class ShoppingCartService : IShoppingCartService
         }
 
         //move selected checkout attributes
-        var checkoutAttributes = fromCustomer.GetUserFieldFromEntity<List<CustomAttribute>>(SystemCustomerFieldNames.CheckoutAttributes, _workContextAccessor.WorkContext.CurrentStore.Id);
+        var checkoutAttributes = fromCustomer.GetUserFieldFromEntity<List<CustomAttribute>>(SystemCustomerFieldNames.CheckoutAttributes, _contextAccessor.StoreContext.CurrentStore.Id);
         await _customerService.UpdateUserField(toCustomer, SystemCustomerFieldNames.CheckoutAttributes, checkoutAttributes,
-            _workContextAccessor.WorkContext.CurrentStore.Id);
+            _contextAccessor.StoreContext.CurrentStore.Id);
     }
 
     #endregion

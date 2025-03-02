@@ -202,8 +202,10 @@ public class CustomerService : ICustomerService
             select c;
         var customers = query.ToList();
         //sort by passed identifiers
-        var sortedCustomers = customerIds.Select(id => customers.Find(x => x.Id == id))
-            .Where(customer => customer != null).ToList();
+        var sortedCustomers = customerIds.Select(id => customers.FirstOrDefault(customer => customer.Id == id))
+            .Where(customer => customer != null)
+            .ToList();
+        
         return await Task.FromResult(sortedCustomers);
     }
 
@@ -222,11 +224,9 @@ public class CustomerService : ICustomerService
     /// </summary>
     /// <param name="email">Email</param>
     /// <returns>Customer</returns>
-    public virtual async Task<Customer> GetCustomerByEmail(string email)
+    public virtual Task<Customer> GetCustomerByEmail(string email)
     {
-        return string.IsNullOrWhiteSpace(email)
-            ? null
-            : await _customerRepository.GetOneAsync(x => x.Email == email.ToLowerInvariant());
+        return string.IsNullOrWhiteSpace(email) ? Task.FromResult<Customer>(null) : _customerRepository.GetOneAsync(x => x.Email == email.ToLowerInvariant());
     }
 
     /// <summary>
@@ -237,7 +237,7 @@ public class CustomerService : ICustomerService
     public virtual Task<Customer> GetCustomerBySystemName(string systemName)
     {
         if (string.IsNullOrWhiteSpace(systemName))
-            return null;
+            return Task.FromResult<Customer>(null);
 
         var key = string.Format(CacheKey.CUSTOMER_BY_SYSTEMNAME_BY_KEY, systemName);
 
@@ -249,12 +249,12 @@ public class CustomerService : ICustomerService
     /// </summary>
     /// <param name="username">Username</param>
     /// <returns>Customer</returns>
-    public virtual async Task<Customer> GetCustomerByUsername(string username)
+    public virtual Task<Customer> GetCustomerByUsername(string username)
     {
         if (string.IsNullOrWhiteSpace(username))
-            return null;
+            return Task.FromResult<Customer>(null);
 
-        return await _customerRepository.GetOneAsync(x => x.Username == username.ToLowerInvariant());
+        return _customerRepository.GetOneAsync(x => x.Username == username.ToLowerInvariant());
     }
 
     /// <summary>
@@ -323,8 +323,7 @@ public class CustomerService : ICustomerService
     public virtual async Task UpdateCustomerField<T>(string customerId,
         Expression<Func<Customer, T>> expression, T value)
     {
-        if (string.IsNullOrEmpty(customerId))
-            throw new ArgumentNullException(nameof(customerId));
+        ArgumentNullException.ThrowIfNullOrEmpty(customerId);
 
         await _customerRepository.UpdateField(customerId, expression, value);
     }
@@ -611,9 +610,7 @@ public class CustomerService : ICustomerService
     public virtual async Task DeleteCustomerGroupInCustomer(CustomerGroup customerGroup, string customerId)
     {
         ArgumentNullException.ThrowIfNull(customerGroup);
-
-        if (string.IsNullOrEmpty(customerId))
-            throw new ArgumentNullException(nameof(customerId));
+        ArgumentNullException.ThrowIfNullOrEmpty(customerId);
 
         await _customerRepository.Pull(customerId, x => x.Groups, customerGroup.Id);
     }
@@ -621,9 +618,7 @@ public class CustomerService : ICustomerService
     public virtual async Task InsertCustomerGroupInCustomer(CustomerGroup customerGroup, string customerId)
     {
         ArgumentNullException.ThrowIfNull(customerGroup);
-
-        if (string.IsNullOrEmpty(customerId))
-            throw new ArgumentNullException(nameof(customerId));
+        ArgumentNullException.ThrowIfNullOrEmpty(customerId);
 
         await _customerRepository.AddToSet(customerId, x => x.Groups, customerGroup.Id);
     }
@@ -635,9 +630,7 @@ public class CustomerService : ICustomerService
     public virtual async Task DeleteAddress(Address address, string customerId)
     {
         ArgumentNullException.ThrowIfNull(address);
-
-        if (string.IsNullOrEmpty(customerId))
-            throw new ArgumentNullException(nameof(customerId));
+        ArgumentNullException.ThrowIfNullOrEmpty(customerId);
 
         await _customerRepository.PullFilter(customerId, x => x.Addresses, x => x.Id, address.Id);
 
@@ -648,9 +641,7 @@ public class CustomerService : ICustomerService
     public virtual async Task InsertAddress(Address address, string customerId)
     {
         ArgumentNullException.ThrowIfNull(address);
-
-        if (string.IsNullOrEmpty(customerId))
-            throw new ArgumentNullException(nameof(customerId));
+        ArgumentNullException.ThrowIfNullOrEmpty(customerId);
 
         if (address.StateProvinceId == "0")
             address.StateProvinceId = "";
@@ -664,9 +655,7 @@ public class CustomerService : ICustomerService
     public virtual async Task UpdateAddress(Address address, string customerId)
     {
         ArgumentNullException.ThrowIfNull(address);
-
-        if (string.IsNullOrEmpty(customerId))
-            throw new ArgumentNullException(nameof(customerId));
+        ArgumentNullException.ThrowIfNullOrEmpty(customerId);
 
         await _customerRepository.UpdateToSet(customerId, x => x.Addresses, z => z.Id, address.Id, address);
 
@@ -678,9 +667,7 @@ public class CustomerService : ICustomerService
     public virtual async Task UpdateBillingAddress(Address address, string customerId)
     {
         ArgumentNullException.ThrowIfNull(address);
-
-        if (string.IsNullOrEmpty(customerId))
-            throw new ArgumentNullException(nameof(customerId));
+        ArgumentNullException.ThrowIfNullOrEmpty(customerId);
 
         await _customerRepository.UpdateField(customerId, x => x.BillingAddress, address);
     }
@@ -688,9 +675,7 @@ public class CustomerService : ICustomerService
     public virtual async Task UpdateShippingAddress(Address address, string customerId)
     {
         ArgumentNullException.ThrowIfNull(address);
-
-        if (string.IsNullOrEmpty(customerId))
-            throw new ArgumentNullException(nameof(customerId));
+        ArgumentNullException.ThrowIfNullOrEmpty(customerId);
 
         await _customerRepository.UpdateField(customerId, x => x.ShippingAddress, address);
     }
