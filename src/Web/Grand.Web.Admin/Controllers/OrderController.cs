@@ -266,7 +266,7 @@ public class OrderController(
 
             //add a note
             await orderService.InsertOrderNote(new OrderNote {
-                Note = $"Order status has been edited. New status: {status?.Name}",
+                Note = $"Order status has been edited. New status: {status.Name}",
                 DisplayToCustomer = false,
                 OrderId = order.Id
             });
@@ -945,7 +945,6 @@ public class OrderController(
 
         //If we got this far, something failed, redisplay form
         model = await orderViewModelService.PrepareOrderAddressModel(order, address);
-        model.BillingAddress = model.BillingAddress;
         return View(model);
     }
 

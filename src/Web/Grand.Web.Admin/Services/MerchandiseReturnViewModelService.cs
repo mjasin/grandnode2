@@ -11,7 +11,6 @@ using Grand.Domain.Common;
 using Grand.Domain.Directory;
 using Grand.Domain.Localization;
 using Grand.Domain.Orders;
-using Grand.Infrastructure;
 using Grand.Web.Admin.Extensions.Mapping;
 using Grand.Web.Admin.Interfaces;
 using Grand.Web.Admin.Models.Common;
@@ -214,6 +213,7 @@ public class MerchandiseReturnViewModelService(
         foreach (var item in merchandiseReturn.MerchandiseReturnItems)
         {
             var orderItem = order.OrderItems.FirstOrDefault(x => x.Id == item.OrderItemId);
+            ArgumentNullException.ThrowIfNull(orderItem);
             items.Add(new MerchandiseReturnModel.MerchandiseReturnItemModel {
                 ProductId = orderItem.ProductId,
                 ProductName = (await productService.GetProductByIdIncludeArch(orderItem.ProductId)).Name,

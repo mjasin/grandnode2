@@ -59,22 +59,14 @@ public static class ApplicationBuilderExtensions
                     return;
                 }
 
-                try
+                if (DataSettingsManager.DatabaseIsInstalled())
                 {
-                    //check whether database is installed
-                    if (DataSettingsManager.DatabaseIsInstalled())
-                    {
-                        var logger = context.RequestServices.GetRequiredService<ILoggerFactory>()
-                            .CreateLogger("UseExceptionHandler");
-                        //log error
-                        logger.LogError(exception, exception.Message);
-                    }
+                    var logger = context.RequestServices.GetRequiredService<ILoggerFactory>()
+                        .CreateLogger("UseExceptionHandler");
+                    // Log the error
+                    logger.LogError(exception, exception.Message);
                 }
-                finally
-                {
-                    //rethrow the exception to show the error page
-                    throw exception;
-                }
+
             });
         });
     }

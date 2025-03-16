@@ -60,9 +60,8 @@ public class OrderReportService : IOrderReportService
     /// <param name="startTimeUtc">Start date</param>
     /// <param name="endTimeUtc">End date</param>
     /// <returns>Result</returns>
-    public virtual async Task<IList<OrderByCountryReportLine>> GetCountryReport(string storeId, string vendorId,
-        int? os,
-        PaymentStatus? ps, ShippingStatus? ss, DateTime? startTimeUtc, DateTime? endTimeUtc)
+    public virtual async Task<IList<OrderByCountryReportLine>> GetCountryReport(string storeId = "", string vendorId = "",
+        int? os = null, PaymentStatus? ps = null, ShippingStatus? ss = null, DateTime? startTimeUtc = null, DateTime? endTimeUtc = null)
     {
         var query = from p in _orderRepository.Table
             select p;
@@ -489,7 +488,8 @@ public class OrderReportService : IOrderReportService
             group o by 1
             into g
             select new ReportPeriodOrder { Amount = g.Sum(x => x.OrderTotal / x.CurrencyRate), Count = g.Count() };
-        var report = query.ToList()?.FirstOrDefault() ?? new ReportPeriodOrder();
+
+        var report = query.FirstOrDefault() ?? new ReportPeriodOrder();
         report.Date = date;
         return await Task.FromResult(report);
     }

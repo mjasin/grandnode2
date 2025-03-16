@@ -1,5 +1,4 @@
-﻿using Grand.Business.Common.Services.Stores;
-using Grand.Business.Core.Interfaces.Authentication;
+﻿using Grand.Business.Core.Interfaces.Authentication;
 using Grand.Business.Core.Interfaces.Cms;
 using Grand.Business.Core.Interfaces.Common.Directory;
 using Grand.Business.Core.Interfaces.Common.Localization;
@@ -24,7 +23,6 @@ using Grand.Web.Features.Models.Common;
 using Grand.Web.Models.Common;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -56,7 +54,7 @@ public class CommonController : BasePublicController
 
     #region Utilities
 
-    private string RemoveLanguageSeoCode(string url, PathString pathBase)
+    private static string RemoveLanguageSeoCode(string url, PathString pathBase)
     {
         if (string.IsNullOrEmpty(url))
             return url;

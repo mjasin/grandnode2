@@ -5,7 +5,6 @@ using Amazon.S3.Model;
 using Amazon.S3.Util;
 using Grand.Business.Core.Interfaces.Storage;
 using Grand.Data;
-using Grand.Domain.Customers;
 using Grand.Domain.Media;
 using Grand.Infrastructure.Caching;
 using Grand.Infrastructure.Configuration;
@@ -109,7 +108,7 @@ public class AmazonPictureService : PictureService
     /// </summary>
     /// <param name="actualResponse">Actual Response</param>
     /// <param name="expectedHttpStatusCode">Expected Status Code</param>
-    private void EnsureValidResponse(AmazonWebServiceResponse actualResponse, HttpStatusCode expectedHttpStatusCode)
+    private static void EnsureValidResponse(AmazonWebServiceResponse actualResponse, HttpStatusCode expectedHttpStatusCode)
     {
         if (actualResponse.HttpStatusCode != expectedHttpStatusCode)
             throw new Exception("Http Status Codes Aren't Consistent");

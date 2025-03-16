@@ -1,7 +1,6 @@
 ﻿using Grand.Domain;
 using Grand.Domain.Common;
 using LiteDB;
-using System.Xml.Linq;
 
 namespace Grand.Data.LiteDb;
 
@@ -40,7 +39,7 @@ public class LiteDBContext : IDatabaseContext
         ArgumentNullException.ThrowIfNullOrEmpty(indexName);
         try
         {
-            foreach (var (selector, value, fieldName) in orderBuilder?.Fields)
+            foreach (var (selector, value, fieldName) in orderBuilder.Fields)
             {
                 var col = _database.GetCollection<T>();
                 if (selector != null)

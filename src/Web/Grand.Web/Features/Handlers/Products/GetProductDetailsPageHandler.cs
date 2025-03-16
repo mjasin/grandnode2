@@ -31,7 +31,6 @@ using Grand.Web.Features.Models.Products;
 using Grand.Web.Models.Catalog;
 using Grand.Web.Models.Media;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
 using ProductExtensions = Grand.Domain.Catalog.ProductExtensions;
@@ -410,7 +409,7 @@ public class GetProductDetailsPageHandler : IRequestHandler<GetProductDetailsPag
                     WarehouseId = warehouse.Id,
                     Name = warehouse.Name,
                     Code = warehouse.Code,
-                    Selected = updateCartItem != null && updateCartItem?.WarehouseId == warehouse.Id
+                    Selected = updateCartItem != null && updateCartItem.WarehouseId == warehouse.Id
                 });
             }
 

@@ -1,7 +1,6 @@
 using Grand.Domain;
 using Grand.SharedKernel.Attributes;
 using LiteDB;
-using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -227,8 +226,8 @@ public class LiteDBRepository<T> : IRepository<T> where T : BaseEntity
             propertyInfo?.SetValue(entity, item.Value);
         }
 
-        entity.UpdatedOnUtc = _auditInfoProvider.GetCurrentDateTime();
-        entity.UpdatedBy = _auditInfoProvider.GetCurrentUser();
+        entity!.UpdatedOnUtc = _auditInfoProvider.GetCurrentDateTime();
+        entity!.UpdatedBy = _auditInfoProvider.GetCurrentUser();
 
         Collection.Update(entity);
         return Task.CompletedTask;
@@ -362,7 +361,7 @@ public class LiteDBRepository<T> : IRepository<T> where T : BaseEntity
                 var bsonValue = BsonMapper.Global.Serialize(value);
                 var oldbsonValue = BsonMapper.Global.Serialize(elemFieldMatch);
                 var list = entity[fieldName].AsArray.ToList();
-                if (list != null && list.Any())
+                if (list.Any())
                 {
                     list.Add(bsonValue);
                     list.Remove(oldbsonValue);
@@ -416,7 +415,7 @@ public class LiteDBRepository<T> : IRepository<T> where T : BaseEntity
                 var bsonValue = BsonMapper.Global.Serialize(elemMatch);
                 var list = entity[fieldName].AsArray.ToList();
                 var documents = list.Where(x => x[elementfieldName] == new BsonValue(elemMatch)).ToList();
-                if (documents != null && documents.Any())
+                if (documents.Any())
                 {
                     foreach (var document in documents) list.Remove(document);
                     entity[fieldName] = new BsonArray(list);
@@ -492,7 +491,7 @@ public class LiteDBRepository<T> : IRepository<T> where T : BaseEntity
             if (entity != null && entity[fieldName].IsArray)
             {
                 var list = entity[fieldName].AsArray.ToList();
-                if (list != null && list.Any())
+                if (list.Any())
                 {
                     list.Remove(new BsonValue(element));
                     entity[fieldName] = new BsonArray(list);
@@ -575,13 +574,13 @@ public class LiteDBRepository<T> : IRepository<T> where T : BaseEntity
 
     #region Helpers
 
-    private string GetName(LambdaExpression lambdaexpression)
+    private static string GetName(LambdaExpression lambdaexpression)
     {
         var expression = (MemberExpression)lambdaexpression.Body;
         return expression.Member.Name;
     }
 
-    private string GetName<TSource, TField>(Expression<Func<TSource, TField>> Field)
+    private static string GetName<TSource, TField>(Expression<Func<TSource, TField>> Field)
     {
         if (Equals(Field, null)) throw new NullReferenceException("Field is required");
 

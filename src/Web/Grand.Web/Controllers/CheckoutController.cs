@@ -26,7 +26,6 @@ using Grand.Web.Models.Checkout;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Logging;
 
 namespace Grand.Web.Controllers;
 
@@ -842,7 +841,7 @@ public class CheckoutController : BasePublicController
         return warnings;
     }
 
-    private IList<string> SerializeModelState(ModelStateDictionary modelState)
+    private static IList<string> SerializeModelState(ModelStateDictionary modelState)
     {
         var errors = new List<string>();
         var valuerrors = modelState.Where(entry => entry.Value.Errors.Any());
